@@ -1,0 +1,12 @@
+{
+  "$schema": "https://dev.office.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "image-map-webpart-client-side-solution",
+    "id": "55a00c44-88d0-47ae-9b2b-f7afe70a0e8c",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true
+  },
+  "paths": {
+    "zippedPackage": "solution/image-map-webpart.sppkg"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "version": "1.4.1",
+    "libraryName": "image-map-webpart",
+    "libraryId": "cf5c1760-81b5-4666-8474-1d9733b2f1b2",
+    "environment": "spo"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "3f6c8d2e-9b41-4c7a-8e15-2a7d5b9c0f13",
+  "alias": "ImageMapWebPart",
+  "componentType": "WebPart",
+  "version": "*",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+
+  "preconfiguredEntries": [{
+    "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+    "group": { "default": "Other" },
+    "title": { "default": "Bildbereiche verlinken", "en-US": "Image map" },
+    "description": { "default": "Bild mit klickbaren, verlinkten Bereichen", "en-US": "Image with clickable linked areas" },
+    "officeFabricIconFontName": "Photo2",
+    "properties": {
+      "imageUrl": "",
+      "imageAlt": "",
+      "areas": [],
+      "stretch": true,
+      "hintAreas": false,
+      "showLinkList": false,
+      "uploadFolder": "SiteAssets",
+      "defaultHover": {
+        "borderColor": "#0078d4",
+        "borderWidth": 3,
+        "borderStyle": "solid",
+        "fillColor": "rgba(0, 120, 212, 0.2)",
+        "borderRadius": 0
+      }
+    }
+  }]
+}

@@ -1,0 +1,18 @@
+# Abhängigkeiten
+node_modules
+
+# Build-Ausgaben
+dist
+lib
+sharepoint/solution
+temp
+*.sppkg
+
+# Sonstiges
+logs
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+coverage
+.vscode/*.log

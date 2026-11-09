@@ -1,0 +1,93 @@
+import { AreaBorderStyle, DEFAULT_HOVER, IHoverStyle, IImageArea } from '../models/IImageMap';
+import { ISecurityPolicy } from '../config/securityConfig';
+import { normalizeRect } from './geometry';
+
+const COLOR_PATTERN = /^(#[0-9a-f]{3,8}|rgba?\(\s*[\d.\s,%]+\)|hsla?\(\s*[\d.\s,%deg]+\)|[a-z]{3,30})$/i;
+const BORDER_STYLES: AreaBorderStyle[] = ['solid', 'dashed', 'dotted', 'double'];
+const ID_PATTERN = /^[a-z0-9_\-]{1,64}$/i;
+
+/** Lässt nur gültige CSS-Farbwerte zu (verhindert CSS-Injection über Farbwerte). */
+export function safeColor(value: string | undefined, fallback: string): string {
+  const v = typeof value === 'string' ? value.trim() : '';
+  return COLOR_PATTERN.test(v) ? v : fallback;
+}
+
+export function safeNumber(value: any, min: number, max: number, fallback: number): number {
+  const n = typeof value === 'number' ? value : parseFloat(value);
+  if (typeof n !== 'number' || isNaN(n) || !isFinite(n)) {
+    return fallback;
+  }
+  return Math.min(max, Math.max(min, n));
+}
+
+export function safeBorderStyle(value: string | undefined): AreaBorderStyle {
+  return BORDER_STYLES.indexOf(value as AreaBorderStyle) >= 0 ? value as AreaBorderStyle : 'solid';
+}
+
+function safeString(value: any, maxLength: number): string {
+  return typeof value === 'string' ? value.substr(0, maxLength) : '';
+}
+
+/** Deckkraft einer CSS-Farbe (0–1), für den Sichtbarkeits-Hinweis. */
+export function colorAlpha(color: string): number {
+  const c = (color || '').trim().toLowerCase();
+  if (c === 'transparent') { return 0; }
+  const rgba = /^rgba\(([^)]+)\)$/.exec(c) || /^hsla\(([^)]+)\)$/.exec(c);
+  if (rgba) {
+    const parts = rgba[1].split(',');
+    const a = parseFloat(parts[3]);
+    return isNaN(a) ? 1 : (parts[3].indexOf('%') >= 0 ? a / 100 : a);
+  }
+  if (/^#[0-9a-f]{8}$/.test(c)) { return parseInt(c.substr(7, 2), 16) / 255; }
+  if (/^#[0-9a-f]{4}$/.test(c)) { return parseInt(c.charAt(4) + c.charAt(4), 16) / 255; }
+  return 1;
+}
+
+export function sanitizeHover(raw: any): IHoverStyle {
+  const h = raw && typeof raw === 'object' ? raw : {};
+  return {
+    borderColor: safeColor(h.borderColor, DEFAULT_HOVER.borderColor),
+    borderWidth: safeNumber(h.borderWidth, 0, 20, DEFAULT_HOVER.borderWidth),
+    borderStyle: safeBorderStyle(h.borderStyle),
+    fillColor: safeColor(h.fillColor, DEFAULT_HOVER.fillColor),
+    borderRadius: safeNumber(h.borderRadius, 0, 200, 0)
+  };
+}
+
+/**
+ * Webpart-Properties sind nicht vertrauenswürdig (sie lassen sich z. B. per REST oder durch
+ * Bearbeiten des Seiten-JSON manipulieren). Deshalb wird alles beim Laden typisiert, begrenzt und bereinigt.
+ */
+export function sanitizeAreas(raw: any, policy: ISecurityPolicy): IImageArea[] {
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+  const seen: { [id: string]: boolean } = {};
+  return raw
+    .filter((a: any) => !!a && typeof a === 'object')
+    .slice(0, policy.maxAreas)
+    .map((a: any, index: number) => {
+      let id = typeof a.id === 'string' && ID_PATTERN.test(a.id) ? a.id : `area-${index}`;
+      if (seen[id]) { id = `area-${index}-dup`; }
+      seen[id] = true;
+      const rect = normalizeRect({
+        x: safeNumber(a.x, 0, 100, 0),
+        y: safeNumber(a.y, 0, 100, 0),
+        width: safeNumber(a.width, 0, 100, 10),
+        height: safeNumber(a.height, 0, 100, 10)
+      });
+      return {
+        id,
+        shape: a.shape === 'ellipse' || a.shape === 'circle' ? a.shape : 'rect',
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
+        url: safeString(a.url, policy.maxUrlLength),
+        openInNewTab: a.openInNewTab === true,
+        title: safeString(a.title, policy.maxTitleLength),
+        tooltip: safeString(a.tooltip, policy.maxTooltipLength),
+        hover: sanitizeHover(a.hover)
+      } as IImageArea;
+    });
+}

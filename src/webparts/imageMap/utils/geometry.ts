@@ -1,0 +1,170 @@
+import { IImageArea, IHoverStyle, newId } from '../models/IImageMap';
+
+export interface IPoint { x: number; y: number; }
+export interface IRect { x: number; y: number; width: number; height: number; }
+
+export type ResizeHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w';
+export const RESIZE_HANDLES: ResizeHandle[] = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+
+/** Mindestgröße eines Bereichs in % */
+export const MIN_AREA_SIZE = 1;
+/** Mindestgröße beim Aufziehen, damit ein einfacher Klick keinen Bereich erzeugt */
+export const MIN_DRAW_SIZE = 2;
+
+export function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+export function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+/** Wandelt Bildschirmkoordinaten in Prozent-Koordinaten relativ zum Element um. */
+export function toPercentPoint(clientX: number, clientY: number, element: HTMLElement): IPoint {
+  const box = element.getBoundingClientRect();
+  if (!box.width || !box.height) {
+    return { x: 0, y: 0 };
+  }
+  return {
+    x: clamp(((clientX - box.left) / box.width) * 100, 0, 100),
+    y: clamp(((clientY - box.top) / box.height) * 100, 0, 100)
+  };
+}
+
+export function rectFromPoints(a: IPoint, b: IPoint): IRect {
+  return {
+    x: Math.min(a.x, b.x),
+    y: Math.min(a.y, b.y),
+    width: Math.abs(a.x - b.x),
+    height: Math.abs(a.y - b.y)
+  };
+}
+
+export function toRect(area: IRect): IRect {
+  return { x: area.x, y: area.y, width: area.width, height: area.height };
+}
+
+/** Begrenzt ein Rechteck auf die Bildfläche und rundet auf 2 Nachkommastellen. */
+export function normalizeRect(r: IRect): IRect {
+  const width = clamp(r.width, MIN_AREA_SIZE, 100);
+  const height = clamp(r.height, MIN_AREA_SIZE, 100);
+  return {
+    x: round2(clamp(r.x, 0, 100 - width)),
+    y: round2(clamp(r.y, 0, 100 - height)),
+    width: round2(width),
+    height: round2(height)
+  };
+}
+
+export function moveRect(r: IRect, dx: number, dy: number): IRect {
+  return {
+    x: clamp(r.x + dx, 0, 100 - r.width),
+    y: clamp(r.y + dy, 0, 100 - r.height),
+    width: r.width,
+    height: r.height
+  };
+}
+
+export function resizeRect(r: IRect, handle: ResizeHandle, p: IPoint): IRect {
+  let left = r.x;
+  let top = r.y;
+  let right = r.x + r.width;
+  let bottom = r.y + r.height;
+  if (handle.indexOf('w') >= 0) { left = Math.min(p.x, right - MIN_AREA_SIZE); }
+  if (handle.indexOf('e') >= 0) { right = Math.max(p.x, left + MIN_AREA_SIZE); }
+  if (handle.indexOf('n') >= 0) { top = Math.min(p.y, bottom - MIN_AREA_SIZE); }
+  if (handle.indexOf('s') >= 0) { bottom = Math.max(p.y, top + MIN_AREA_SIZE); }
+  return { x: left, y: top, width: right - left, height: bottom - top };
+}
+
+// ---------------- Kreise ----------------
+// Prozentwerte beziehen sich horizontal auf die Bildbreite und vertikal auf die Bildhöhe.
+// Damit ein Kreis rund bleibt, gilt: Höhe% = Breite% × ratio  (ratio = Bildbreite / Bildhöhe).
+
+/** Kreis aus linker/oberer Kante und Durchmesser (in % der Bildbreite), auf das Bild begrenzt. */
+export function circleFromWidth(x: number, y: number, diameter: number, ratio: number): IRect {
+  const r = ratio > 0 && isFinite(ratio) ? ratio : 1;
+  let width = clamp(diameter, MIN_AREA_SIZE, 100);
+  let height = width * r;
+  if (height > 100) {
+    height = 100;
+    width = height / r;
+  }
+  return {
+    x: round2(clamp(x, 0, 100 - width)),
+    y: round2(clamp(y, 0, 100 - height)),
+    width: round2(width),
+    height: round2(height)
+  };
+}
+
+/** Kreis beim Aufziehen: Durchmesser = größere der beiden Zugrichtungen (in Pixeln gemessen). */
+export function circleFromDrag(start: IPoint, p: IPoint, ratio: number): IRect {
+  const dx = p.x - start.x;
+  const dy = (p.y - start.y) / ratio; // in "Breiten-Prozent" umgerechnet
+  const d = Math.max(Math.abs(dx), Math.abs(dy));
+  const width = d;
+  const height = d * ratio;
+  return {
+    x: dx < 0 ? start.x - width : start.x,
+    y: dy < 0 ? start.y - height : start.y,
+    width,
+    height
+  };
+}
+
+/** Kreis an einem Griff skalieren; die gegenüberliegende Seite bleibt fest. */
+export function resizeCircle(r: IRect, handle: ResizeHandle, p: IPoint, ratio: number): IRect {
+  const hasW = handle.indexOf('w') >= 0;
+  const hasE = handle.indexOf('e') >= 0;
+  const hasN = handle.indexOf('n') >= 0;
+  const hasS = handle.indexOf('s') >= 0;
+  const anchorX = hasW ? r.x + r.width : r.x;
+  const anchorY = hasN ? r.y + r.height : r.y;
+  let d = 0;
+  if (hasW || hasE) { d = Math.max(d, Math.abs(p.x - anchorX)); }
+  if (hasN || hasS) { d = Math.max(d, Math.abs(p.y - anchorY) / ratio); }
+  d = Math.max(d, MIN_AREA_SIZE);
+  const height = d * ratio;
+  return {
+    x: hasW ? anchorX - d : r.x,
+    y: hasN ? anchorY - height : r.y,
+    width: d,
+    height
+  };
+}
+
+/** Normalisiert je nach Form (Kreise bleiben rund). */
+export function normalizeShapeRect(r: IRect, shape: string, ratio: number): IRect {
+  return shape === 'circle' ? circleFromWidth(r.x, r.y, r.width, ratio) : normalizeRect(r);
+}
+
+export function createArea(rect: IRect, hover: IHoverStyle, shape: 'rect' | 'circle' | 'ellipse' = 'rect', ratio: number = 1): IImageArea {
+  const r = normalizeShapeRect(rect, shape, ratio);
+  return {
+    id: newId(),
+    shape,
+    x: r.x,
+    y: r.y,
+    width: r.width,
+    height: r.height,
+    url: '',
+    openInNewTab: false,
+    title: '',
+    tooltip: '',
+    hover: { ...hover }
+  };
+}
+
+/** Sucht ab `start` aufwärts bis `stop` nach einem Attribut (IE11 kennt Element.closest nicht). */
+export function findAttribute(start: HTMLElement | null, attribute: string, stop: HTMLElement): string | undefined {
+  let el: HTMLElement | null = start;
+  while (el && el !== stop) {
+    const value = el.getAttribute(attribute);
+    if (value) {
+      return value;
+    }
+    el = el.parentElement;
+  }
+  return undefined;
+}
