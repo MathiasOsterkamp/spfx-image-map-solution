@@ -1,4 +1,5 @@
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
+import { strings } from '../loc/strings';
 
 export interface IImageFile {
   name: string;
@@ -6,7 +7,7 @@ export interface IImageFile {
   modified: string;
 }
 
-/** Fehler mit HTTP-Status. Die Meldung ist benutzerfreundlich und enthält keine Serverdetails. */
+/** Error with HTTP status. The message is user-friendly and contains no server details. */
 export interface IServiceError extends Error {
   status?: number;
 }
@@ -14,9 +15,9 @@ export interface IServiceError extends Error {
 const IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|svg|bmp)$/i;
 
 /**
- * Lädt Bilder aus einem Bibliotheksordner der AKTUELLEN Website und lädt neue Bilder hoch.
- * Nutzt ausschließlich die SharePoint-REST-API über SPHttpClient (Request-Digest wird automatisch gesetzt).
- * Berechtigungen prüft SharePoint serverseitig. Der Webpart kann sie nicht umgehen.
+ * Loads images from a library folder of the CURRENT site and uploads new images.
+ * Uses only the SharePoint REST API via SPHttpClient (request digest is set automatically).
+ * Permissions are checked by SharePoint on the server. The web part cannot bypass them.
  */
 export class ImageService {
   constructor(
@@ -25,7 +26,7 @@ export class ImageService {
     private readonly webServerRelativeUrl: string
   ) { }
 
-  /** "SiteAssets/Bilder" → "/sites/xyz/SiteAssets/Bilder". Nur Pfade innerhalb der aktuellen Website. */
+  /** "SiteAssets/Bilder" → "/sites/xyz/SiteAssets/Bilder". Only paths within the current site. */
   public resolveFolder(folder: string): string {
     const clean = (folder || 'SiteAssets').trim().replace(/^\/+|\/+$/g, '');
     const base = this.webServerRelativeUrl === '/' ? '' : this.webServerRelativeUrl.replace(/\/+$/, '');
@@ -61,8 +62,8 @@ export class ImageService {
   }
 
   /**
-   * Lädt eine (vorher mit validateImageFile geprüfte) Datei hoch. Überschreibt nie:
-   * Ist der Name vergeben, wird ein Zeitstempel angehängt.
+   * Uploads a file (previously checked with validateImageFile). Never overwrites:
+   * If the name is taken, a timestamp is appended.
    */
   public upload(folder: string, file: File, fileName: string): Promise<IImageFile> {
     const path = this.resolveFolder(folder);
@@ -103,16 +104,16 @@ function mapFile(item: any): IImageFile {
 
 function friendlyMessage(status: number): string {
   switch (status) {
-    case 400: return 'Die Anfrage war ungültig.';
+    case 400: return strings.httpBadRequest;
     case 401:
-    case 403: return 'Sie haben keine Berechtigung für diesen Ordner.';
-    case 404: return 'Der Ordner wurde nicht gefunden. Bitte die Einstellung „Bibliotheksordner“ prüfen.';
-    case 409: return 'Eine Datei mit diesem Namen existiert bereits.';
-    case 413: return 'Die Datei ist zu groß für den Server.';
-    case 423: return 'Die Datei oder der Ordner ist gesperrt.';
+    case 403: return strings.httpForbidden;
+    case 404: return strings.httpNotFound;
+    case 409: return strings.httpConflict;
+    case 413: return strings.httpTooLarge;
+    case 423: return strings.httpLocked;
     case 429:
-    case 503: return 'Der Server ist ausgelastet. Bitte später erneut versuchen.';
-    default: return `Serverfehler (Status ${status}). Bitte später erneut versuchen.`;
+    case 503: return strings.httpBusy;
+    default: return strings.httpError(status);
   }
 }
 
@@ -121,9 +122,9 @@ function readJson(response: SPHttpClientResponse): Promise<any> {
     return response.json();
   }
   return response.text().then((text: string) => {
-    // Technische Details nur in der Konsole, nicht in der Oberfläche
+    // Technical details only in the console, not in the UI
     // tslint:disable-next-line:no-console
-    console.error('[ImageMap] SharePoint-Fehler', response.status, text);
+    console.error('[ImageMap] SharePoint error', response.status, text);
     const error: IServiceError = new Error(friendlyMessage(response.status));
     error.status = response.status;
     throw error;
@@ -134,7 +135,7 @@ function readAsArrayBuffer(file: File): Promise<ArrayBuffer> {
   return new Promise<ArrayBuffer>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as ArrayBuffer);
-    reader.onerror = () => reject(new Error('Die Datei konnte nicht gelesen werden.'));
+    reader.onerror = () => reject(new Error(strings.fileReadFailed));
     reader.readAsArrayBuffer(file);
   });
 }

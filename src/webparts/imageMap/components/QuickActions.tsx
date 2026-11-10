@@ -4,6 +4,7 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import { handleRovingKeyDown, initRovingTabIndex } from '../utils/rovingFocus';
 import { getTheme, mergeStyleSets } from '@fluentui/react/lib/Styling';
 import { IImageArea } from '../models/IImageMap';
+import { strings } from '../loc/strings';
 
 const theme = getTheme();
 const css = mergeStyleSets({
@@ -34,14 +35,14 @@ export interface IQuickActionsProps {
   onEdit: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
-  /** Esc: zurück zum Bereich */
+  /** Esc: back to the area */
   onEscape: () => void;
 }
 
 /**
- * Schnellaktionen am ausgewählten Bereich (ARIA-Toolbar-Muster).
- * Steht im DOM direkt hinter dem Bereich: EIN Tab-Stopp, Pfeiltasten wechseln zwischen
- * den Schaltflächen, Esc springt zurück zum Bereich.
+ * Quick actions on the selected area (ARIA toolbar pattern).
+ * Placed in the DOM directly after the area: ONE tab stop, arrow keys switch between
+ * the buttons, Esc jumps back to the area.
  */
 export const QuickActions: React.FunctionComponent<IQuickActionsProps> = (props: IQuickActionsProps) => {
   const a = props.area;
@@ -58,20 +59,20 @@ export const QuickActions: React.FunctionComponent<IQuickActionsProps> = (props:
       className={css.bar}
       style={style}
       role="toolbar"
-      aria-label={`Aktionen für Bereich ${props.index + 1}`}
+      aria-label={strings.actionsFor(props.index + 1)}
       data-ui="quick-actions"
       onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Escape' || e.key === 'Esc') { e.preventDefault(); e.stopPropagation(); props.onEscape(); return; }
         handleRovingKeyDown(e, 'horizontal');
       }}
     >
-      <span className={css.target} title={a.url || 'Kein Link'} aria-label={a.url ? `Ziel: ${a.url}` : 'Kein Link hinterlegt'} role="note">
+      <span className={css.target} title={a.url || strings.noLink} aria-label={a.url ? strings.targetAria(a.url) : strings.noLinkSet} role="note">
         <Icon iconName="Link" aria-hidden={true} />
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.url || 'Kein Link'}</span>
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.url || strings.noLink}</span>
       </span>
-      <IconButton iconProps={{ iconName: 'Edit' }} title="Eigenschaften (Enter)" ariaLabel={`Bereich ${props.index + 1} bearbeiten`} onClick={props.onEdit} />
-      <IconButton iconProps={{ iconName: 'Copy' }} title="Duplizieren (Strg+D)" ariaLabel={`Bereich ${props.index + 1} duplizieren`} onClick={props.onDuplicate} />
-      <IconButton iconProps={{ iconName: 'Delete' }} title="Löschen (Entf)" ariaLabel={`Bereich ${props.index + 1} löschen`} onClick={props.onDelete} />
+      <IconButton iconProps={{ iconName: 'Edit' }} title={strings.propertiesShortcut} ariaLabel={strings.editNumberedAria(props.index + 1)} onClick={props.onEdit} />
+      <IconButton iconProps={{ iconName: 'Copy' }} title={strings.duplicateShortcut} ariaLabel={strings.duplicateAria(props.index + 1)} onClick={props.onDuplicate} />
+      <IconButton iconProps={{ iconName: 'Delete' }} title={strings.deleteShortcut} ariaLabel={strings.deleteAreaAria(props.index + 1)} onClick={props.onDelete} />
     </div>
   );
 };

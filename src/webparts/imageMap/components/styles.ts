@@ -3,10 +3,10 @@ import { getTheme, hiddenContentStyle, HighContrastSelector, mergeStyleSets } fr
 const theme = getTheme();
 
 export const classNames = mergeStyleSets({
-  /** Nur für Screenreader sichtbar */
+  /** Visible to screen readers only */
   srOnly: hiddenContentStyle,
 
-  // ---------- Anzeigemodus: Links über dem Bild ----------
+  // ---------- Display mode: links over the image ----------
   areaList: {
     position: 'absolute',
     left: 0,
@@ -23,7 +23,7 @@ export const classNames = mergeStyleSets({
     boxSizing: 'border-box',
     margin: 0,
     padding: 0,
-    // Mindest-Zielgröße 24 × 24 px (WCAG 2.5.8)
+    // Minimum target size 24 × 24 px (WCAG 2.5.8)
     minWidth: 24,
     minHeight: 24,
     pointerEvents: 'auto'
@@ -38,7 +38,7 @@ export const classNames = mergeStyleSets({
     }
   },
   newTabIcon: { fontSize: 12, marginLeft: 4, verticalAlign: 'middle' },
-  // ---------- gemeinsame Bildfläche (Anzeige + Editor) ----------
+  // ---------- shared image surface (display + editor) ----------
   outer: { width: '100%', textAlign: 'center' },
   outerStretch: { textAlign: 'left' },
   frame: {
@@ -75,7 +75,7 @@ export const classNames = mergeStyleSets({
     position: 'absolute',
     boxSizing: 'border-box',
     cursor: 'move',
-    // Hilfslinie, damit auch Bereiche ohne Rahmen/Füllung sichtbar sind
+    // Guide line so that areas without border/fill are visible too
     boxShadow: '0 0 0 1px rgba(255,255,255,.8), inset 0 0 0 1px rgba(0,0,0,.35)'
   },
   editAreaSelected: {
@@ -196,7 +196,7 @@ export const classNames = mergeStyleSets({
     marginRight: 8,
     verticalAlign: 'middle',
     border: `1px solid ${theme.palette.neutralTertiary}`,
-    // Schachbrett, damit Transparenz sichtbar wird
+    // Checkerboard so transparency becomes visible
     backgroundColor: '#fff',
     backgroundImage: 'linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%),linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%)',
     backgroundSize: '8px 8px',

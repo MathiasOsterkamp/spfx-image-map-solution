@@ -1,16 +1,17 @@
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
+import { strings } from '../loc/strings';
 
 export interface IPageResult {
   title: string;
-  /** Serverrelativer, URL-kodierter Pfad */
+  /** Server-relative, URL-encoded path */
   url: string;
   fileName: string;
 }
 
-/** Vorlagen-ID der Bibliothek „Websiteseiten“ (unabhängig von der Sprache) */
+/** Template ID of the "Site Pages" library (language-independent) */
 const SITE_PAGES_TEMPLATE = 119;
 
-/** Durchsucht die Websiteseiten der aktuellen Website nach Titel. */
+/** Searches the site pages of the current site by title. */
 export class PageService {
   private listId: Promise<string | undefined> | undefined;
 
@@ -24,7 +25,7 @@ export class PageService {
       const url = `${this.api()}/web/lists(guid'${id}')/items?$select=Title,FileRef,FileLeafRef&$orderby=Modified desc&$top=15${filter}`;
       return this.httpClient.get(url, SPHttpClient.configurations.v1)
         .then((r: SPHttpClientResponse) => {
-          if (!r.ok) { throw new Error('Die Seiten konnten nicht gesucht werden.'); }
+          if (!r.ok) { throw new Error(strings.pageSearchFailed); }
           return r.json();
         })
         .then((json: any) => {

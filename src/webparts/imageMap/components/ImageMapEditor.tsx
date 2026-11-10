@@ -16,11 +16,12 @@ import { checkImageUrl, collectIssues, IValidationIssue } from '../utils/validat
 import { ImageService } from '../services/ImageService';
 import { PageService } from '../services/PageService';
 import { useAreaHistory } from '../hooks/useAreaHistory';
+import { formatNumber, strings } from '../loc/strings';
 import { ImageMapViewer } from './ImageMapViewer';
 import { AreaPropertiesInline, AreaPropertiesPanel, FIRST_FIELD_CLASS, PropertiesTab } from './AreaPropertiesPanel';
 import { ImagePickerPanel } from './ImagePickerPanel';
 import { AltTextDialog } from './AltTextDialog';
-import { EditorTool, EditorToolbar, TOOL_NAMES } from './EditorToolbar';
+import { EditorTool, EditorToolbar } from './EditorToolbar';
 import { QuickActions } from './QuickActions';
 import { classNames } from './styles';
 
@@ -54,9 +55,7 @@ interface IDragState {
   moved: boolean;
 }
 
-const SHAPE_NAMES: { [key: string]: string } = { rect: 'Rechteck', circle: 'Kreis', ellipse: 'Ellipse' };
 const CORNER_HANDLES: ResizeHandle[] = ['nw', 'ne', 'se', 'sw'];
-const TOOL_KEYS: { [key: string]: EditorTool } = { v: 'select', r: 'rect', k: 'circle', e: 'ellipse' };
 const HANDLE_CURSOR: { [key: string]: string } = {
   nw: 'nwse-resize', se: 'nwse-resize', ne: 'nesw-resize', sw: 'nesw-resize',
   n: 'ns-resize', s: 'ns-resize', e: 'ew-resize', w: 'ew-resize'
@@ -78,13 +77,18 @@ function percentStyle(r: IRect): React.CSSProperties {
   return { left: `${r.x}%`, top: `${r.y}%`, width: `${r.width}%`, height: `${r.height}%` };
 }
 
-function fmt(n: number): string {
-  return String(Math.round(n * 10) / 10).replace('.', ',');
+/** Tool for a single-key shortcut of the current language (e.g. K = circle in German, C in English/French). */
+function toolForKey(key: string): EditorTool | undefined {
+  const keys = strings.toolKeys;
+  const tools: EditorTool[] = ['select', 'rect', 'circle', 'ellipse'];
+  return tools.filter((t: EditorTool) => keys[t].toLowerCase() === (key || '').toLowerCase())[0];
 }
 
+const fmt = (n: number): string => formatNumber(n);
+
 function describeRect(r: IRect, shape?: string): string {
-  const size = shape === 'circle' ? `Durchmesser ${fmt(r.width)} % der Bildbreite` : `${fmt(r.width)} mal ${fmt(r.height)} %`;
-  return `${fmt(r.x)} % von links, ${fmt(r.y)} % von oben, ${size}`;
+  const size = shape === 'circle' ? strings.circleDiameter(fmt(r.width)) : strings.rectSize(fmt(r.width), fmt(r.height));
+  return `${strings.rectPosition(fmt(r.x), fmt(r.y))}, ${size}`;
 }
 
 function sortByReadingOrder(areas: IImageArea[]): IImageArea[] {
@@ -106,7 +110,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   const areas = props.areas;
   const policy = props.policy;
 
-  // ---------- Refs (immer aktueller Stand – die CommandBar puffert Handler) ----------
+  // ---------- Refs (always current state – the CommandBar caches handlers) ----------
   const areasRef = React.useRef<IImageArea[]>(areas);
   areasRef.current = areas;
   const latest = (): IImageArea[] => areasRef.current;
@@ -119,7 +123,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     modalTitle: getId('imagemap-fullscreen')
   });
 
-  // ---------- Zustand ----------
+  // ---------- State ----------
   const [selectedId, setSelectedId] = React.useState<string | undefined>(undefined);
   const [panelOpen, setPanelOpen] = React.useState<boolean>(false);
   const [propsTab, setPropsTab] = React.useState<PropertiesTab>('link');
@@ -140,7 +144,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   const stateRef = React.useRef({ testMode, fullscreen, panelOpen });
   stateRef.current = { testMode, fullscreen, panelOpen };
 
-  /** Ansage für Screenreader. Gleiche Texte werden durch ein unsichtbares Zeichen erneut angesagt. */
+  /** Screen reader announcement. Identical texts are re-announced via an invisible character. */
   const announce = (message: string) => {
     setAnnouncement((prev: string) => (prev === message ? message + ' ' : message));
   };
@@ -149,7 +153,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
 
   React.useEffect(() => { setImageFailed(false); }, [props.imageUrl]);
 
-  // Fokus gezielt setzen (neuer Bereich, Löschen, Panel geschlossen, Vollbild beendet …)
+  // Set focus deliberately (new area, delete, panel closed, full screen exited …)
   React.useEffect(() => {
     if (!focusTarget) { return; }
     if (focusTarget === '#surface') {
@@ -173,7 +177,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     return imageRatio;
   };
 
-  // Kreise an ein neues Seitenverhältnis anpassen (z. B. nach Bildwechsel) – ohne Rückgängig-Schritt
+  // Adapt circles to a new aspect ratio (e.g. after changing the image) – without an undo step
   React.useEffect(() => {
     const current = latest();
     if (current.some((a: IImageArea) => a.shape === 'circle' && Math.abs(a.height - a.width * imageRatio) > 0.05)) {
@@ -203,32 +207,30 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   });
   const limitReached = areas.length >= policy.maxAreas;
 
-  // ---------------- Werkzeuge ----------------
+  // ---------------- Tools ----------------
   const setTool = (next: EditorTool) => {
     setToolState(next);
-    announce(next === 'select'
-      ? 'Werkzeug Auswählen.'
-      : `Werkzeug ${TOOL_NAMES[next]}. Mit der Maus aufziehen oder auf der Zeichenfläche Enter drücken.`);
+    announce(next === 'select' ? strings.announceToolSelect : strings.announceTool(strings.toolNames[next]));
   };
 
-  // ---------------- Datenänderungen (alle über den Verlauf → Rückgängig möglich) ----------------
+  // ---------------- Data changes (all via history → undo possible) ----------------
   const updateArea = (id: string, changes: Partial<IImageArea>, label: string, coalesceKey?: string) => {
     history.commit(latest().map((a: IImageArea) => (a.id === id ? { ...a, ...changes } : a)), label, coalesceKey);
   };
 
-  const addArea = (rect: IRect, shape: AreaShape, how: string) => {
+  const addArea = (rect: IRect, shape: AreaShape, drawn: boolean) => {
     const current = latest();
     if (current.length >= policy.maxAreas) {
-      announce(`Maximal ${policy.maxAreas} Bereiche erlaubt.`);
+      announce(strings.maxAreasReached(policy.maxAreas));
       return;
     }
     const area = createArea(rect, props.defaultHover, shape, getRatio());
-    history.commit(current.concat([area]), `${SHAPE_NAMES[shape]} ${how}`);
+    history.commit(current.concat([area]), strings.labelShapeAdded(strings.shapeNames[shape], drawn));
     setSelectedId(area.id);
     setPropsTab('link');
     setPanelOpen(true);
     if (stateRef.current.fullscreen) { setFocusTarget('#first-field'); }
-    announce(`${SHAPE_NAMES[shape]} als Bereich ${current.length + 1} ${how}. Bitte Ziel und Titel eingeben.`);
+    announce(strings.announceShapeAdded(strings.shapeNames[shape], current.length + 1, drawn));
   };
 
   const insertCentered = (shape: AreaShape) => {
@@ -236,18 +238,18 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     const rect = shape === 'circle'
       ? circleFromWidth(40, 50 - (20 * ratio) / 2, 20, ratio)
       : { x: 40, y: 40, width: 20, height: 20 };
-    addArea(rect, shape, 'eingefügt');
+    addArea(rect, shape, false);
     setToolState('select');
   };
 
   const duplicateArea = (area: IImageArea) => {
     const current = latest();
-    if (current.length >= policy.maxAreas) { announce(`Maximal ${policy.maxAreas} Bereiche erlaubt.`); return; }
+    if (current.length >= policy.maxAreas) { announce(strings.maxAreasReached(policy.maxAreas)); return; }
     const copy = { ...createArea(moveRect(toRect(area), 2, 2), area.hover, area.shape, getRatio()), url: area.url, title: area.title, tooltip: area.tooltip, openInNewTab: area.openInNewTab };
-    history.commit(current.concat([copy]), 'Bereich dupliziert');
+    history.commit(current.concat([copy]), strings.labelDuplicated);
     setSelectedId(copy.id);
     setFocusTarget(copy.id);
-    announce(`Bereich dupliziert als Bereich ${current.length + 1}.`);
+    announce(strings.announceDuplicated(current.length + 1));
   };
 
   const deleteArea = (id: string) => {
@@ -255,9 +257,9 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     const index = indexOf(id, current);
     if (index < 0) { return; }
     const remaining = current.filter((a: IImageArea) => a.id !== id);
-    history.commit(remaining, `Bereich ${index + 1} gelöscht`);
+    history.commit(remaining, strings.labelDeleted(index + 1));
     setPanelOpen(false);
-    announce(`Bereich ${index + 1} gelöscht. ${remaining.length} ${remaining.length === 1 ? 'Bereich' : 'Bereiche'} übrig. Strg+Z macht es rückgängig.`);
+    announce(strings.announceDeleted(index + 1, remaining.length));
     const next = remaining[Math.min(index, remaining.length - 1)];
     setSelectedId(next ? next.id : undefined);
     setFocusTarget(next ? next.id : '#surface');
@@ -269,8 +271,8 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     if (target < 0 || target >= copy.length) { return; }
     const item = copy.splice(index, 1)[0];
     copy.splice(target, 0, item);
-    history.commit(copy, 'Reihenfolge geändert');
-    announce(`Bereich steht jetzt an Position ${target + 1} von ${copy.length} in der Lesereihenfolge.`);
+    history.commit(copy, strings.labelReordered);
+    announce(strings.announceReordered(target + 1, copy.length));
   };
 
   const openProperties = (id: string, tab: PropertiesTab = 'link') => {
@@ -289,15 +291,15 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     const next = !stateRef.current.fullscreen;
     setFullscreen(next);
     setFocusTarget(selectedId || '#surface');
-    announce(next ? 'Vollbild. Esc beendet das Vollbild.' : 'Vollbild beendet.');
+    announce(next ? strings.announceFullscreenOn : strings.announceFullscreenOff);
   };
 
-  // ---------------- Zeiger (Maus, Stift, Touch) ----------------
+  // ---------------- Pointer (mouse, pen, touch) ----------------
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const surface = surfaceRef.current;
     if (testMode || e.button !== 0 || !surface) { return; }
     const target = e.target as HTMLElement;
-    if (findAttribute(target, 'data-ui', surface)) { return; } // Schnellaktionen
+    if (findAttribute(target, 'data-ui', surface)) { return; } // Quick actions
 
     const areaId = findAttribute(target, 'data-area-id', surface);
     const handle = findAttribute(target, 'data-handle', surface) as ResizeHandle | undefined;
@@ -322,7 +324,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       const r: IRect = { x: p.x, y: p.y, width: 0, height: 0 };
       next = { mode: 'draw', shape: current, pointerId: e.pointerId, startPoint: p, startRect: r, rect: r, moved: false };
     }
-    try { surface.setPointerCapture(e.pointerId); } catch (err) { /* nicht unterstützt */ }
+    try { surface.setPointerCapture(e.pointerId); } catch (err) { /* not supported */ }
     e.preventDefault();
     setDrag(next);
   };
@@ -351,18 +353,18 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     const d = dragRef.current;
     const surface = surfaceRef.current;
     if (!d || d.pointerId !== e.pointerId) { return; }
-    try { if (surface) { surface.releasePointerCapture(e.pointerId); } } catch (err) { /* ignorieren */ }
+    try { if (surface) { surface.releasePointerCapture(e.pointerId); } } catch (err) { /* ignore */ }
     setDrag(null);
     if (e.type === 'pointercancel' || !d.moved) { return; }
     if (d.mode === 'draw') {
       if (d.rect.width >= MIN_DRAW_SIZE && d.rect.height >= MIN_DRAW_SIZE) {
-        addArea(d.rect, d.shape, 'gezeichnet');
-        setToolState('select'); // wie in Office: nach dem Zeichnen zurück zu „Auswählen“
+        addArea(d.rect, d.shape, true);
+        setToolState('select'); // like in Office: return to "Select" after drawing
       }
     } else if (d.areaId) {
       const rect = normalizeShapeRect(d.rect, d.shape, getRatio());
-      updateArea(d.areaId, rect, d.mode === 'move' ? 'Bereich verschoben' : 'Größe geändert');
-      announce(`${d.mode === 'move' ? 'Verschoben' : 'Größe geändert'}: ${describeRect(rect, d.shape)}.`);
+      updateArea(d.areaId, rect, d.mode === 'move' ? strings.labelMoved : strings.labelResized);
+      announce(d.mode === 'move' ? strings.announceMoved(describeRect(rect, d.shape)) : strings.announceResized(describeRect(rect, d.shape)));
     }
   };
 
@@ -373,8 +375,8 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     if (areaId) { openProperties(areaId); }
   };
 
-  // ---------------- Tastatur ----------------
-  /** Editorweit: Rückgängig/Wiederholen (nicht in Textfeldern – dort gilt das native Rückgängig). */
+  // ---------------- Keyboard ----------------
+  /** Editor-wide: undo/redo (not in text fields – native undo applies there). */
   const onEditorKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (stateRef.current.testMode || isTextInput(e.target)) { return; }
     const key = (e.key || '').toLowerCase();
@@ -385,14 +387,14 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   };
 
   /**
-   * Zeichenfläche: Werkzeug-Kurztasten V/R/K/E und Enter zum Einfügen.
-   * Einzeltasten wirken NUR, wenn der Fokus auf der Zeichenfläche oder einem Bereich liegt (WCAG 2.1.4).
+   * Canvas: tool shortcuts V/R/K/E and Enter to insert.
+   * Single-key shortcuts work ONLY when focus is on the canvas or an area (WCAG 2.1.4).
    */
   const onSurfaceKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const surface = surfaceRef.current;
     if (!surface || stateRef.current.testMode || e.ctrlKey || e.metaKey || e.altKey) { return; }
     if (findAttribute(e.target as HTMLElement, 'data-ui', surface)) { return; }
-    const nextTool = TOOL_KEYS[(e.key || '').toLowerCase()];
+    const nextTool = (e.key || '').length === 1 ? toolForKey(e.key) : undefined;
     if (nextTool) {
       e.preventDefault();
       setTool(nextTool);
@@ -402,7 +404,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       e.preventDefault();
       const current = toolRef.current;
       if (current === 'select') {
-        announce('Wählen Sie zuerst eine Form: R für Rechteck, K für Kreis, E für Ellipse. Oder Tab zu einem Bereich.');
+        announce(strings.announceChooseShapeFirst);
       } else {
         insertCentered(current);
       }
@@ -419,16 +421,16 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       let label: string;
       if ((e.ctrlKey || e.metaKey) && area.shape === 'circle') {
         rect = circleFromWidth(area.x, area.y, round2(area.width + (arrow[0] + arrow[1]) * step), getRatio());
-        label = 'Größe geändert';
-        announce(`Durchmesser ${fmt(rect.width)} % der Bildbreite.`);
+        label = strings.labelResized;
+        announce(strings.announceDiameter(fmt(rect.width)));
       } else if (e.ctrlKey || e.metaKey) {
         rect = normalizeRect({ x: area.x, y: area.y, width: round2(area.width + arrow[0] * step), height: round2(area.height + arrow[1] * step) });
-        label = 'Größe geändert';
-        announce(`Größe ${fmt(rect.width)} mal ${fmt(rect.height)} %.`);
+        label = strings.labelResized;
+        announce(strings.announceSize(fmt(rect.width), fmt(rect.height)));
       } else {
         rect = normalizeShapeRect(moveRect(toRect(area), arrow[0] * step, arrow[1] * step), area.shape, getRatio());
-        label = 'Bereich verschoben';
-        announce(`${fmt(rect.x)} % von links, ${fmt(rect.y)} % von oben.`);
+        label = strings.labelMoved;
+        announce(`${strings.rectPosition(fmt(rect.x), fmt(rect.y))}.`);
       }
       updateArea(area.id, rect, label, `${label}-${area.id}`);
       return;
@@ -455,7 +457,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
         break;
       case 'Escape':
       case 'Esc':
-        // Erst das Panel schließen; sonst darf Esc das Vollbild beenden.
+        // Close the panel first; otherwise Esc may exit full screen.
         if (stateRef.current.panelOpen) {
           e.preventDefault();
           e.stopPropagation();
@@ -465,7 +467,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     }
   };
 
-  // ---------------- Teile ----------------
+  // ---------------- Parts ----------------
   const picker = (
     <ImagePickerPanel
       isOpen={pickerOpen}
@@ -474,7 +476,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       folder={props.uploadFolder}
       currentUrl={props.imageUrl}
       hasAreas={areas.length > 0}
-      onSelect={(url: string) => { props.onImageChange(url); setPickerOpen(false); announce('Bild übernommen.'); }}
+      onSelect={(url: string) => { props.onImageChange(url); setPickerOpen(false); announce(strings.announceImageApplied); }}
       onDismiss={() => setPickerOpen(false)}
     />
   );
@@ -483,7 +485,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       isOpen={altOpen}
       value={props.imageAlt}
       maxLength={policy.maxAltLength}
-      onSave={(alt: string) => { props.onImageAltChange(alt); setAltOpen(false); announce('Alternativtext gespeichert.'); }}
+      onSave={(alt: string) => { props.onImageAltChange(alt); setAltOpen(false); announce(strings.announceAltSaved); }}
       onDismiss={() => setAltOpen(false)}
     />
   );
@@ -493,11 +495,9 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     return (
       <div className={classNames.placeholder}>
         <Icon iconName="Photo2" className={classNames.placeholderIcon} aria-hidden={true} />
-        <Text block={true} variant="large" style={{ margin: '8px 0' }}>Bildbereiche verlinken</Text>
-        <Text block={true} style={{ marginBottom: 16 }}>
-          Wählen Sie ein Bild aus oder laden Sie eines hoch. Danach können Sie klickbare Bereiche festlegen.
-        </Text>
-        <PrimaryButton text="Bild auswählen" iconProps={{ iconName: 'Photo2' }} onClick={() => setPickerOpen(true)} />
+        <Text block={true} variant="large" style={{ margin: '8px 0' }}>{strings.placeholderTitle}</Text>
+        <Text block={true} style={{ marginBottom: 16 }}>{strings.placeholderText}</Text>
+        <PrimaryButton text={strings.chooseImage} iconProps={{ iconName: 'Photo2' }} onClick={() => setPickerOpen(true)} />
         {picker}
         {liveRegion}
       </div>
@@ -516,24 +516,20 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     onTabChange: setPropsTab,
     onChange: (changes: Partial<IImageArea>, label: string, coalesceKey?: string) => updateArea(selected.id, changes, label, coalesceKey),
     onApplyHoverToAll: (hover: IHoverStyle) => {
-      history.commit(latest().map((a: IImageArea) => ({ ...a, hover: { ...hover } })), 'Stil auf alle angewendet');
-      announce('Stil auf alle Bereiche angewendet.');
+      history.commit(latest().map((a: IImageArea) => ({ ...a, hover: { ...hover } })), strings.labelStyleAppliedToAll);
+      announce(strings.announceStyleAppliedToAll);
     },
     onSaveAsDefaultHover: (hover: IHoverStyle) => {
       props.onDefaultHoverChange({ ...hover });
-      announce('Als Standard für neue Bereiche gespeichert.');
+      announce(strings.announceSavedAsDefault);
     },
     onAnnounce: announce
   } : undefined;
 
   const canvas = (
     <div className={classNames.canvasCol}>
-      <Text block={true} variant="small" className={classNames.hint} id={ids.current.help}>
-        Werkzeug wählen (V Auswählen, R Rechteck, K Kreis, E Ellipse) und auf dem Bild aufziehen – oder Enter auf der Zeichenfläche
-        fügt die Form ein. Auf einem Bereich: Pfeiltasten verschieben, Strg + Pfeiltasten ändern die Größe, Umschalt für große Schritte,
-        Enter öffnet die Eigenschaften, Strg+D dupliziert, Entf löscht. Strg+Z macht rückgängig.
-      </Text>
-      {imageFailed && <MessageBar messageBarType={MessageBarType.error}>Das Bild konnte nicht geladen werden.</MessageBar>}
+      <Text block={true} variant="small" className={classNames.hint} id={ids.current.help}>{strings.editorHelp}</Text>
+      {imageFailed && <MessageBar messageBarType={MessageBarType.error}>{strings.imageLoadFailed}</MessageBar>}
       <div className={css(classNames.outer, props.stretch && classNames.outerStretch)}>
         <div
           ref={surfaceRef}
@@ -541,8 +537,8 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
           style={{ cursor: tool === 'select' ? 'default' : 'crosshair' }}
           tabIndex={0}
           role="application"
-          aria-roledescription="Zeichenfläche"
-          aria-label={`Zeichenfläche, Werkzeug ${TOOL_NAMES[tool]}, ${areas.length} ${areas.length === 1 ? 'Bereich' : 'Bereiche'}`}
+          aria-roledescription={strings.canvasRoleDescription}
+          aria-label={strings.canvasLabel(strings.toolNames[tool], areas.length)}
           aria-describedby={ids.current.help}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -570,8 +566,8 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
             const isDragged = !!drag && drag.mode !== 'draw' && drag.areaId === area.id;
             const rect = isDragged ? drag!.rect : area;
             const problems = areaIssues[area.id];
-            const label = `Bereich ${index + 1}, ${SHAPE_NAMES[area.shape]}: ${area.title || 'ohne Titel'}. ${describeRect(area, area.shape)}.` +
-              (problems ? ` ${problems.length === 1 ? 'Ein Problem' : `${problems.length} Probleme`}.` : '');
+            const label = strings.areaAriaLabel(index + 1, strings.shapeNames[area.shape], area.title || strings.untitled, describeRect(area, area.shape)) +
+              (problems ? ` ${strings.problemCount(problems.length)}.` : '');
             return (
               <React.Fragment key={area.id}>
                 <div
@@ -585,7 +581,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
                   className={css(classNames.editArea, getEditAreaClass(area), problems && classNames.editAreaMissingLink,
                     isSelected && classNames.editAreaSelected)}
                   style={percentStyle(rect)}
-                  title={area.tooltip || area.title || 'Ohne Titel'}
+                  title={area.tooltip || area.title || strings.untitled}
                   onFocus={() => setSelectedId(area.id)}
                   onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => onAreaKeyDown(e, area)}
                 >
@@ -614,14 +610,14 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
         </div>
       </div>
 
-      <h3 className={classNames.listHeading} id={ids.current.list}>Bereiche in Lesereihenfolge ({areas.length})</h3>
+      <h3 className={classNames.listHeading} id={ids.current.list}>{strings.listHeading(areas.length)}</h3>
       {areas.length === 0 ? (
-        <Text variant="small">Noch keine Bereiche festgelegt.</Text>
+        <Text variant="small">{strings.noAreas}</Text>
       ) : (
         <ul className={classNames.list} aria-labelledby={ids.current.list}>
           {areas.map((area: IImageArea, index: number) => {
             const problems = areaIssues[area.id];
-            const name = area.title || 'Ohne Titel';
+            const name = area.title || strings.untitled;
             return (
               <li key={area.id} className={css(classNames.listRow, area.id === selectedId && classNames.listRowSelected)}>
                 <button
@@ -633,21 +629,21 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
                   <span className={classNames.listIndex} aria-hidden={true}>{index + 1}</span>
                   <span className={classNames.listText}>
                     {problems && <Icon iconName="Warning" className={classNames.issueIcon} aria-hidden={true} />}
-                    <span className={classNames.srOnly}>Bereich {index + 1}, {SHAPE_NAMES[area.shape]}: </span>
-                    {name} – {area.url || 'kein Link'}
+                    <span className={classNames.srOnly}>{strings.area(index + 1)}, {strings.shapeNames[area.shape]}: </span>
+                    {name} – {area.url || strings.noLinkLower}
                     {area.openInNewTab && <span aria-hidden={true}> ↗</span>}
-                    {area.openInNewTab && <span className={classNames.srOnly}> (neuer Tab)</span>}
-                    {problems && <span className={classNames.srOnly}> Fehler: {problems.join(' ')}</span>}
+                    {area.openInNewTab && <span className={classNames.srOnly}>{strings.newTabShort}</span>}
+                    {problems && <span className={classNames.srOnly}> {strings.errorsPrefix} {problems.join(' ')}</span>}
                   </span>
                 </button>
-                <IconButton iconProps={{ iconName: 'ChevronUp' }} title="Nach vorne in der Lesereihenfolge"
-                  ariaLabel={`Bereich ${index + 1} in der Lesereihenfolge nach vorne`} disabled={index === 0} onClick={() => moveInOrder(index, -1)} />
-                <IconButton iconProps={{ iconName: 'ChevronDown' }} title="Nach hinten in der Lesereihenfolge"
-                  ariaLabel={`Bereich ${index + 1} in der Lesereihenfolge nach hinten`} disabled={index === areas.length - 1} onClick={() => moveInOrder(index, 1)} />
-                <IconButton iconProps={{ iconName: 'Edit' }} title="Bearbeiten"
-                  ariaLabel={`Bereich ${index + 1}, ${name}, bearbeiten`} onClick={() => openProperties(area.id)} />
-                <IconButton iconProps={{ iconName: 'Delete' }} title="Löschen"
-                  ariaLabel={`Bereich ${index + 1}, ${name}, löschen`} onClick={() => deleteArea(area.id)} />
+                <IconButton iconProps={{ iconName: 'ChevronUp' }} title={strings.moveForwardTitle}
+                  ariaLabel={strings.moveForwardAria(index + 1)} disabled={index === 0} onClick={() => moveInOrder(index, -1)} />
+                <IconButton iconProps={{ iconName: 'ChevronDown' }} title={strings.moveBackwardTitle}
+                  ariaLabel={strings.moveBackwardAria(index + 1)} disabled={index === areas.length - 1} onClick={() => moveInOrder(index, 1)} />
+                <IconButton iconProps={{ iconName: 'Edit' }} title={strings.edit}
+                  ariaLabel={strings.editAreaAria(index + 1, name)} onClick={() => openProperties(area.id)} />
+                <IconButton iconProps={{ iconName: 'Delete' }} title={strings.delete}
+                  ariaLabel={strings.deleteAreaNamedAria(index + 1, name)} onClick={() => deleteArea(area.id)} />
               </li>
             );
           })}
@@ -677,13 +673,13 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
         onEditAlt={() => setAltOpen(true)}
         onUndo={() => history.undo()}
         onRedo={() => history.redo()}
-        onSort={() => { history.commit(sortByReadingOrder(latest()), 'Lesereihenfolge sortiert'); announce('Lesereihenfolge von oben links nach unten rechts sortiert.'); }}
+        onSort={() => { history.commit(sortByReadingOrder(latest()), strings.labelSorted); announce(strings.announceSorted); }}
         onToggleTest={() => {
           const next = !stateRef.current.testMode;
           setTestMode(next);
           setTestMessage(undefined);
           setPanelOpen(false);
-          announce(next ? 'Vorschau: Links werden angezeigt, aber nicht geöffnet.' : 'Bearbeiten.');
+          announce(next ? strings.announcePreviewOn : strings.announceEditing);
         }}
         onToggleFullscreen={toggleFullscreen}
         onIssueSelect={(issue: IValidationIssue) => {
@@ -696,14 +692,14 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       />
 
       {!imageCheck.valid && (
-        <MessageBar messageBarType={MessageBarType.blocked}>Das Bild ist nicht erlaubt: {imageCheck.error}</MessageBar>
+        <MessageBar messageBarType={MessageBarType.blocked}>{strings.imageNotAllowed(imageCheck.error || '')}</MessageBar>
       )}
 
       {testMode ? (
         <div style={{ padding: 8, overflow: 'auto' }}>
           <div role="status" aria-live="polite">
             <MessageBar messageBarType={MessageBarType.info}>
-              {testMessage || 'Vorschau: Bereiche mit Maus oder Tab-Taste ansteuern. Links werden nicht geöffnet.'}
+              {testMessage || strings.previewInfo}
             </MessageBar>
           </div>
           <div style={{ marginTop: 8 }}>
@@ -716,7 +712,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
               showLinkList={props.showLinkList}
               policy={policy}
               onPreviewClick={(a: IImageArea) => setTestMessage(
-                `Klick auf „${a.title || 'Bereich'}“ würde ${a.url} öffnen (${a.openInNewTab ? 'neuer Tab' : 'gleiches Fenster'}).`)}
+                strings.previewClick(a.title || strings.untitled, a.url, a.openInNewTab))}
             />
           </div>
         </div>
@@ -750,7 +746,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   }
   return (
     <div>
-      <div className={classNames.fullscreenNote}>Die Bildbereiche werden im Vollbild bearbeitet.</div>
+      <div className={classNames.fullscreenNote}>{strings.fullscreenNote}</div>
       <Modal
         isOpen={true}
         onDismiss={toggleFullscreen}
@@ -761,7 +757,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
           scrollableContent: { height: '100%', display: 'flex', flexDirection: 'column' }
         }}
       >
-        <h2 id={ids.current.modalTitle} className={classNames.srOnly}>Bildbereiche bearbeiten – Vollbild</h2>
+        <h2 id={ids.current.modalTitle} className={classNames.srOnly}>{strings.fullscreenTitle}</h2>
         {body}
       </Modal>
     </div>

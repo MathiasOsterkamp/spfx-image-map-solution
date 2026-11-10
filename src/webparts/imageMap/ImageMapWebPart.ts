@@ -12,6 +12,7 @@ import { setIconOptions } from '@fluentui/react/lib/Styling';
 
 import { ImageMap, IImageMapProps } from './components/ImageMap';
 import { createSecurityPolicy, ISecurityPolicy } from './config/securityConfig';
+import { setLanguage, strings } from './loc/strings';
 import { IHoverStyle, IImageArea } from './models/IImageMap';
 import { ImageService } from './services/ImageService';
 import { PageService } from './services/PageService';
@@ -36,14 +37,16 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
   private pageService!: PageService;
   private policy!: ISecurityPolicy;
 
-  // Hinweis: Kein Override von `dataVersion` – die SPFx-1.4.1-Typings deklarieren es als Property,
-  // neuere TypeScript-Versionen lehnen einen Getter-Override ab (TS2611). Standard ist 1.0.
+  // Note: No override of `dataVersion` – the SPFx 1.4.1 typings declare it as a property,
+  // newer TypeScript versions reject a getter override (TS2611). Default is 1.0.
 
   protected onInit(): Promise<void> {
+    // UI language of the site: en-* → English, fr-* → French, everything else → German.
+    setLanguage(this.context.pageContext.cultureInfo.currentUICultureName);
     if (!iconsInitialized) {
-      // SharePoint registriert teilweise schon gleichnamige Icons → Warnungen unterdrücken.
+      // SharePoint sometimes already registers icons with the same name → suppress warnings.
       setIconOptions({ disableWarnings: true });
-      // On-Premises ohne Internet: Schriftdateien selbst hosten und initializeIcons('https://…/fonts/') aufrufen.
+      // On-premises without internet: host the font files yourself and call initializeIcons('https://…/fonts/').
       initializeIcons();
       iconsInitialized = true;
     }
@@ -63,7 +66,7 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
 
     const props: IImageMapProps = {
       isEditMode: this.displayMode === DisplayMode.Edit,
-      // Alle gespeicherten Werte gelten als nicht vertrauenswürdig und werden bereinigt.
+      // All stored values are considered untrusted and are sanitized.
       imageUrl: typeof p.imageUrl === 'string' ? p.imageUrl.substr(0, this.policy.maxUrlLength) : '',
       imageAlt: typeof p.imageAlt === 'string' ? p.imageAlt.substr(0, this.policy.maxAltLength) : '',
       areas: sanitizeAreas(p.areas, this.policy),
@@ -114,7 +117,7 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
       return error;
     }
     return this.service.folderExists(value).then((exists: boolean) =>
-      exists ? '' : 'Dieser Ordner existiert nicht oder Sie haben keinen Zugriff.'
+      exists ? '' : strings.folderNotFound
     );
   }
 
@@ -122,50 +125,50 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
     return {
       pages: [
         {
-          header: { description: 'Bild mit verlinkten Bereichen. Bereiche, Links und Alternativtext werden direkt im Webpart bearbeitet.' },
+          header: { description: strings.propertyPaneDescription },
           groups: [
             {
-              groupName: 'Bild',
+              groupName: strings.groupImage,
               groupFields: [
                 PropertyPaneTextField('imageUrl', {
-                  label: 'Bild-URL',
-                  description: 'Wird auch über „Bild auswählen“ im Webpart gesetzt.',
+                  label: strings.imageUrlLabel,
+                  description: strings.imageUrlDescription,
                   onGetErrorMessage: this.validateImageUrl.bind(this)
                 }),
                 PropertyPaneTextField('imageAlt', {
-                  label: 'Alternativtext (Pflicht)',
-                  description: 'Beschreibung des Bildes für Screenreader.',
+                  label: strings.altRequiredLabel,
+                  description: strings.altDescription,
                   multiline: true,
                   onGetErrorMessage: this.validateAlt.bind(this)
                 }),
                 PropertyPaneToggle('stretch', {
-                  label: 'Bild auf volle Breite strecken',
-                  onText: 'Ja',
-                  offText: 'Nein (max. Originalgröße)'
+                  label: strings.stretchLabel,
+                  onText: strings.yes,
+                  offText: strings.stretchOff
                 })
               ]
             },
             {
-              groupName: 'Darstellung und Barrierefreiheit',
+              groupName: strings.groupDisplay,
               groupFields: [
                 PropertyPaneToggle('hintAreas', {
-                  label: 'Bereiche dauerhaft andeuten',
-                  onText: 'Ja (empfohlen für Touch-Geräte)',
-                  offText: 'Nein, nur beim Überfahren und Fokus'
+                  label: strings.hintAreasLabel,
+                  onText: strings.hintAreasOn,
+                  offText: strings.hintAreasOff
                 }),
                 PropertyPaneToggle('showLinkList', {
-                  label: 'Links zusätzlich als Liste unter dem Bild anzeigen',
-                  onText: 'Ja (empfohlen für Barrierefreiheit)',
-                  offText: 'Nein (nur bei Ladefehler)'
+                  label: strings.linkListLabel,
+                  onText: strings.linkListOn,
+                  offText: strings.linkListOff
                 })
               ]
             },
             {
-              groupName: 'Upload',
+              groupName: strings.groupUpload,
               groupFields: [
                 PropertyPaneTextField('uploadFolder', {
-                  label: 'Bibliotheksordner',
-                  description: 'Relativ zur aktuellen Website, z. B. „SiteAssets“ oder „SiteAssets/Bilder“. Der Ordner muss existieren.',
+                  label: strings.uploadFolderLabel,
+                  description: strings.uploadFolderDescription,
                   onGetErrorMessage: this.validateFolder.bind(this),
                   deferredValidationTime: 600
                 })

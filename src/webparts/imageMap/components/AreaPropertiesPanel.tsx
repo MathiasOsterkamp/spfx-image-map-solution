@@ -22,11 +22,12 @@ import { circleFromWidth, normalizeRect, IRect } from '../utils/geometry';
 import { checkLinkUrl, checkTitle, checkTooltip } from '../utils/validation';
 import { getEditAreaClass, getHoverRawStyle, getVisibilityWarning } from '../utils/hoverStyles';
 import { IPageResult, PageService } from '../services/PageService';
+import { strings } from '../loc/strings';
 import { ColorField } from './ColorField';
 import { PageSearch } from './PageSearch';
 import { classNames } from './styles';
 
-/** CSS-Klasse am Link-Eingabefeld, damit das Panel beim Öffnen dorthin fokussiert. */
+/** CSS class on the link input so the panel focuses it when opened. */
 export const FIRST_FIELD_CLASS = 'imagemap-first-field';
 
 export type PropertiesTab = 'link' | 'style' | 'position';
@@ -36,43 +37,25 @@ export interface IAreaPropertiesFormProps {
   index: number;
   policy: ISecurityPolicy;
   pageService: PageService;
-  /** Bildbreite / Bildhöhe, damit Kreise rund bleiben */
+  /** Image width / image height, so circles stay round */
   imageRatio: number;
   tab: PropertiesTab;
   onTabChange: (tab: PropertiesTab) => void;
-  /** coalesceKey fasst Tippen in einem Feld zu einem Rückgängig-Schritt zusammen */
+  /** coalesceKey merges typing in one field into a single undo step */
   onChange: (changes: Partial<IImageArea>, label: string, coalesceKey?: string) => void;
   onApplyHoverToAll: (hover: IHoverStyle) => void;
   onSaveAsDefaultHover: (hover: IHoverStyle) => void;
   onAnnounce: (message: string) => void;
 }
 
-const SHAPE_OPTIONS: IChoiceGroupOption[] = [
-  { key: 'rect', text: 'Rechteck' },
-  { key: 'circle', text: 'Kreis (bleibt immer rund)' },
-  { key: 'ellipse', text: 'Ellipse' }
-];
-
-const BORDER_STYLE_OPTIONS: IDropdownOption[] = [
-  { key: 'solid', text: 'Durchgezogen' },
-  { key: 'dashed', text: 'Gestrichelt' },
-  { key: 'dotted', text: 'Gepunktet' },
-  { key: 'double', text: 'Doppelt' }
-];
-
-const KIND_TEXT: { [key: string]: string } = {
-  internal: 'Interner Link (dieser SharePoint).',
-  external: 'Externer Link. Er wird mit rel="noopener noreferrer" geöffnet.',
-  mailto: 'E-Mail-Link.',
-  tel: 'Telefon-Link.',
-  anchor: 'Sprungmarke auf dieser Seite.'
-};
+const SHAPES: AreaShape[] = ['rect', 'circle', 'ellipse'];
+const BORDER_STYLES: AreaBorderStyle[] = ['solid', 'dashed', 'dotted', 'double'];
 
 function counter(value: string | undefined, max: number): string {
-  return `${(value || '').length} von ${max} Zeichen`;
+  return strings.charCounter((value || '').length, max);
 }
 
-/** Farbmuster einer Vorlage (rein visuell, für Screenreader ausgeblendet). */
+/** Color swatch of a preset (purely visual, hidden from screen readers). */
 function PresetSwatch(props: { hover: IHoverStyle }): JSX.Element {
   const s = getHoverRawStyle(props.hover, 'rect');
   return (
@@ -88,7 +71,7 @@ function PresetSwatch(props: { hover: IHoverStyle }): JSX.Element {
   );
 }
 
-/** Reiter-Beschriftung mit unsichtbarem Zusatz für Screenreader (Fluent übernimmt kein aria-label am Reiter). */
+/** Tab label with invisible addition for screen readers (Fluent does not apply aria-label to the tab). */
 function tabWithHint(hint: string | undefined) {
   return hint
     ? (link?: IPivotItemProps, defaultRender?: IRenderFunction<IPivotItemProps>) => (
@@ -100,7 +83,7 @@ function tabWithHint(hint: string | undefined) {
     : undefined;
 }
 
-/** Formular mit drei Reitern. Wird im Panel und im Vollbild (inline) verwendet. */
+/** Form with three tabs. Used in the panel and in full screen (inline). */
 export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProps> = (props: IAreaPropertiesFormProps) => {
   const area = props.area;
   const hover: IHoverStyle = area.hover || DEFAULT_HOVER;
@@ -129,15 +112,15 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
     rect[key] = value;
     props.onChange(area.shape === 'circle'
       ? circleFromWidth(rect.x, rect.y, rect.width, props.imageRatio)
-      : normalizeRect(rect), 'Position geändert', `rect-${area.id}-${key}`);
+      : normalizeRect(rect), strings.labelPositionChanged, `rect-${area.id}-${key}`);
   };
 
   const setShape = (shape: AreaShape) => {
     if (shape === 'circle') {
       const diameter = Math.min(area.width, area.height / props.imageRatio);
-      props.onChange({ shape, ...circleFromWidth(area.x, area.y, diameter, props.imageRatio) }, 'Form geändert');
+      props.onChange({ shape, ...circleFromWidth(area.x, area.y, diameter, props.imageRatio) }, strings.labelShapeChanged);
     } else {
-      props.onChange({ shape }, 'Form geändert');
+      props.onChange({ shape }, strings.labelShapeChanged);
     }
   };
 
@@ -155,75 +138,78 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
       max={max}
       step={step}
       onChange={(ev: React.SyntheticEvent<HTMLElement>, v?: string) => onValue(v)}
-      incrementButtonAriaLabel={`${label} um ${step}${suffix || ''} erhöhen`}
-      decrementButtonAriaLabel={`${label} um ${step}${suffix || ''} verringern`}
+      incrementButtonAriaLabel={strings.increaseBy(label, `${step}${suffix || ''}`)}
+      decrementButtonAriaLabel={strings.decreaseBy(label, `${step}${suffix || ''}`)}
     />
   );
 
   const selectPage = (page: IPageResult) => {
     const changes: Partial<IImageArea> = { url: page.url };
     if (!(area.title || '').trim()) { changes.title = page.title; }
-    props.onChange(changes, 'Seite als Ziel gewählt');
+    props.onChange(changes, strings.labelPageSelected);
     setSearchOpen(false);
-    props.onAnnounce(`Ziel gesetzt: ${page.title}.`);
+    props.onAnnounce(strings.announceTargetSet(page.title));
     window.setTimeout(() => {
       const input = document.querySelector(`.${FIRST_FIELD_CLASS}`) as HTMLInputElement | null;
       if (input) { input.focus(); }
     }, 0);
   };
 
+  const shapeOptions: IChoiceGroupOption[] = SHAPES.map((s: AreaShape) => ({ key: s, text: strings.shapeOptions[s] }));
+  const borderStyleOptions: IDropdownOption[] = BORDER_STYLES.map((s: AreaBorderStyle) => ({ key: s, text: strings.borderStyles[s] }));
+
   const presetOptions: IChoiceGroupOption[] = HOVER_PRESETS.map((p: IHoverPreset): IChoiceGroupOption => ({
     key: p.key,
-    text: p.name,
-    ariaLabel: `${p.name}: ${p.description}`,
+    text: strings.presets[p.key].name,
+    ariaLabel: `${strings.presets[p.key].name}: ${strings.presets[p.key].description}`,
     onRenderLabel: (option?: IChoiceGroupOption) => (
       <span style={{ display: 'inline-flex', alignItems: 'center', paddingLeft: 26 }}>
         <PresetSwatch hover={p.hover} />
         <span>
-          <span style={{ display: 'block' }}>{option ? option.text : p.name}</span>
-          <span style={{ display: 'block', fontSize: 12, color: '#605e5c' }}>{p.description}</span>
+          <span style={{ display: 'block' }}>{option ? option.text : strings.presets[p.key].name}</span>
+          <span style={{ display: 'block', fontSize: 12, color: '#605e5c' }}>{strings.presets[p.key].description}</span>
         </span>
       </span>
     )
-  })).concat([{ key: 'custom', text: 'Eigener Stil', ariaLabel: 'Eigener Stil: Farben und Rahmen selbst festlegen' }]);
+  })).concat([{ key: 'custom', text: strings.customStyle, ariaLabel: strings.customStyleAria }]);
 
   return (
     <Pivot
       selectedKey={props.tab}
       onLinkClick={(item?: PivotItem) => item && props.onTabChange(item.props.itemKey as PropertiesTab)}
-      aria-label="Eigenschaften des Bereichs"
+      aria-label={strings.propertiesAria}
       overflowBehavior="none"
     >
       <PivotItem
-        headerText="Link"
+        headerText={strings.tabLink}
         itemKey="link"
         itemIcon={linkTabHasError ? 'Warning' : undefined}
-        onRenderItemLink={tabWithHint(linkTabHasError ? 'enthält Fehler' : undefined)}
+        onRenderItemLink={tabWithHint(linkTabHasError ? strings.tabHasErrors : undefined)}
       >
         <Stack tokens={{ childrenGap: 12 }} styles={{ root: { paddingTop: 12 } }}>
           <div>
             <Stack horizontal verticalAlign="end" tokens={{ childrenGap: 4 }}>
               <Stack.Item grow={1}>
                 <TextField
-                  label="Ziel (URL)"
+                  label={strings.targetUrlLabel}
                   required={true}
                   inputClassName={FIRST_FIELD_CLASS}
-                  placeholder="/sites/intranet/SitePages/Seite.aspx"
+                  placeholder={strings.linkPlaceholder}
                   value={area.url}
                   maxLength={props.policy.maxUrlLength}
                   autoComplete="off"
                   spellCheck={false}
                   onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) =>
-                    props.onChange({ url: v || '' }, 'Ziel geändert', `url-${area.id}`)}
+                    props.onChange({ url: v || '' }, strings.labelTargetChanged, `url-${area.id}`)}
                   errorMessage={link.error}
-                  description={link.valid && link.kind ? KIND_TEXT[link.kind] : undefined}
+                  description={link.valid && link.kind ? strings.linkKinds[link.kind] : undefined}
                 />
               </Stack.Item>
               <IconButton
                 elementRef={searchButtonRef}
                 iconProps={{ iconName: 'Search' }}
-                title="Seite suchen"
-                ariaLabel="Websiteseite suchen"
+                title={strings.searchPageTitle}
+                ariaLabel={strings.searchPageAria}
                 aria-expanded={searchOpen}
                 checked={searchOpen}
                 onClick={() => setSearchOpen(!searchOpen)}
@@ -245,130 +231,128 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
             {link.suggestion && (
               <ActionButton
                 iconProps={{ iconName: 'AutoEnhanceOn' }}
-                text={`Korrigieren zu ${link.suggestion}`}
-                onClick={() => props.onChange({ url: link.suggestion || '' }, 'Ziel korrigiert')}
+                text={strings.fixTo(link.suggestion)}
+                onClick={() => props.onChange({ url: link.suggestion || '' }, strings.labelTargetFixed)}
               />
             )}
             {link.warning && <MessageBar messageBarType={MessageBarType.warning}>{link.warning}</MessageBar>}
           </div>
 
           <TextField
-            label="Titel (Linktext)"
+            label={strings.titleLabel}
             required={true}
             maxLength={props.policy.maxTitleLength}
             value={area.title}
             onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) =>
-              props.onChange({ title: v || '' }, 'Titel geändert', `title-${area.id}`)}
+              props.onChange({ title: v || '' }, strings.labelTitleChanged, `title-${area.id}`)}
             errorMessage={title.error}
             description={title.error ? undefined :
-              `${counter(area.title, props.policy.maxTitleLength)}. Wird von Screenreadern als Linktext vorgelesen.`}
+              strings.titleDescription(counter(area.title, props.policy.maxTitleLength))}
           />
           {title.warning && <MessageBar messageBarType={MessageBarType.warning}>{title.warning}</MessageBar>}
 
           <TextField
-            label="Tooltip (optional)"
+            label={strings.tooltipLabel}
             multiline={true}
             autoAdjustHeight={true}
             rows={2}
             maxLength={props.policy.maxTooltipLength}
             value={area.tooltip || ''}
             onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) =>
-              props.onChange({ tooltip: (v || '').replace(/[\r\n]+/g, ' ') }, 'Tooltip geändert', `tooltip-${area.id}`)}
+              props.onChange({ tooltip: (v || '').replace(/[\r\n]+/g, ' ') }, strings.labelTooltipChanged, `tooltip-${area.id}`)}
             errorMessage={tooltip.error}
             description={tooltip.error ? undefined :
-              `${counter(area.tooltip, props.policy.maxTooltipLength)}. Leer = Titel wird angezeigt.`}
+              strings.tooltipDescription(counter(area.tooltip, props.policy.maxTooltipLength))}
           />
 
           <Toggle
-            label="In neuem Tab öffnen"
+            label={strings.newTabLabel}
             checked={area.openInNewTab}
-            onText="Ja"
-            offText="Nein"
+            onText={strings.yes}
+            offText={strings.no}
             onChange={(e: React.MouseEvent<HTMLElement>, checked?: boolean) =>
-              props.onChange({ openInNewTab: !!checked }, checked ? 'Neuer Tab aktiviert' : 'Neuer Tab deaktiviert')}
+              props.onChange({ openInNewTab: !!checked }, checked ? strings.labelNewTabOn : strings.labelNewTabOff)}
           />
         </Stack>
       </PivotItem>
 
       <PivotItem
-        headerText="Stil"
+        headerText={strings.tabStyle}
         itemKey="style"
         itemIcon={visibility ? 'Warning' : undefined}
-        onRenderItemLink={tabWithHint(visibility ? 'schlecht erkennbar' : undefined)}
+        onRenderItemLink={tabWithHint(visibility ? strings.tabPoorlyVisible : undefined)}
       >
         <Stack tokens={{ childrenGap: 12 }} styles={{ root: { paddingTop: 12 } }}>
           <ChoiceGroup
-            label="Form"
+            label={strings.shapeLabel}
             selectedKey={area.shape}
-            options={SHAPE_OPTIONS}
+            options={shapeOptions}
             onChange={(e?: React.FormEvent<HTMLElement | HTMLInputElement>, o?: IChoiceGroupOption) => o && setShape(o.key as AreaShape)}
           />
           <ChoiceGroup
             id={ids.current.presets}
-            label="Darstellung bei Hover und Tastaturfokus"
+            label={strings.presetLabel}
             selectedKey={preset || 'custom'}
             options={presetOptions}
             onChange={(e?: React.FormEvent<HTMLElement | HTMLInputElement>, o?: IChoiceGroupOption) => {
               if (!o) { return; }
               if (o.key === 'custom') {
                 setCustomize(true);
-                props.onAnnounce('Eigener Stil: Die Einstellungen für Rahmen und Füllung folgen unterhalb.');
+                props.onAnnounce(strings.announceCustomStyle);
                 return;
               }
               setCustomize(false);
               const p = HOVER_PRESETS.filter((x: IHoverPreset) => x.key === o.key)[0];
-              if (p) { props.onChange({ hover: { ...p.hover } }, `Stil „${p.name}“ gewählt`); }
+              if (p) { props.onChange({ hover: { ...p.hover } }, strings.labelPresetChosen(strings.presets[p.key].name)); }
             }}
           />
 
           {!preset && (
             <Stack tokens={{ childrenGap: 12 }}>
-              <ColorField label="Rahmenfarbe" value={hover.borderColor} fallback={DEFAULT_HOVER.borderColor} allowAlpha={true}
-                onChange={(v: string) => setHover({ borderColor: v }, 'Rahmenfarbe geändert')} />
-              {numberField('Rahmendicke in Pixel', hover.borderWidth, 0, 20, 1,
-                (v?: string) => setInt(v, 0, 20, (n: number) => setHover({ borderWidth: n }, 'Rahmendicke geändert')), ' px')}
-              <Dropdown label="Rahmenstil" selectedKey={hover.borderStyle} options={BORDER_STYLE_OPTIONS}
-                onChange={(e: React.FormEvent<HTMLDivElement>, o?: IDropdownOption) => o && setHover({ borderStyle: o.key as AreaBorderStyle }, 'Rahmenstil geändert')} />
-              <ColorField label="Füllfarbe (mit Transparenz)" value={hover.fillColor} fallback="rgba(0, 0, 0, 0)" allowAlpha={true}
-                onChange={(v: string) => setHover({ fillColor: v }, 'Füllfarbe geändert')} />
-              {area.shape === 'rect' && numberField('Eckenradius in Pixel', hover.borderRadius, 0, 200, 1,
-                (v?: string) => setInt(v, 0, 200, (n: number) => setHover({ borderRadius: n }, 'Eckenradius geändert')), ' px')}
+              <ColorField label={strings.borderColorLabel} value={hover.borderColor} fallback={DEFAULT_HOVER.borderColor} allowAlpha={true}
+                onChange={(v: string) => setHover({ borderColor: v }, strings.labelBorderColor)} />
+              {numberField(strings.borderWidthLabel, hover.borderWidth, 0, 20, 1,
+                (v?: string) => setInt(v, 0, 20, (n: number) => setHover({ borderWidth: n }, strings.labelBorderWidth)), ' px')}
+              <Dropdown label={strings.borderStyleLabel} selectedKey={hover.borderStyle} options={borderStyleOptions}
+                onChange={(e: React.FormEvent<HTMLDivElement>, o?: IDropdownOption) => o && setHover({ borderStyle: o.key as AreaBorderStyle }, strings.labelBorderStyle)} />
+              <ColorField label={strings.fillColorLabel} value={hover.fillColor} fallback="rgba(0, 0, 0, 0)" allowAlpha={true}
+                onChange={(v: string) => setHover({ fillColor: v }, strings.labelFillColor)} />
+              {area.shape === 'rect' && numberField(strings.cornerRadiusLabel, hover.borderRadius, 0, 200, 1,
+                (v?: string) => setInt(v, 0, 200, (n: number) => setHover({ borderRadius: n }, strings.labelCornerRadius)), ' px')}
             </Stack>
           )}
 
           {visibility && <MessageBar messageBarType={MessageBarType.warning}>{visibility}</MessageBar>}
 
           <div>
-            <Label id="imagemap-preview-label">Vorschau</Label>
+            <Label id="imagemap-preview-label">{strings.preview}</Label>
             <div className={classNames.previewStage} role="img" aria-labelledby="imagemap-preview-label">
               <div className={`${classNames.previewBox} ${getEditAreaClass(area)}`}
                 style={area.shape === 'circle' ? { left: '50%', width: 60, marginLeft: -30 } : undefined} />
             </div>
-            <Text variant="small" block={true} style={{ marginTop: 4 }}>
-              Bei Tastaturfokus erscheint zusätzlich ein schwarz-weißer Fokusrahmen.
-            </Text>
+            <Text variant="small" block={true} style={{ marginTop: 4 }}>{strings.focusRingNote}</Text>
           </div>
 
           <Stack horizontal wrap tokens={{ childrenGap: 4 }}>
-            <ActionButton iconProps={{ iconName: 'Copy' }} text="Auf alle Bereiche anwenden" onClick={() => props.onApplyHoverToAll(hover)} />
-            <ActionButton iconProps={{ iconName: 'Save' }} text="Als Standard für neue Bereiche" onClick={() => props.onSaveAsDefaultHover(hover)} />
+            <ActionButton iconProps={{ iconName: 'Copy' }} text={strings.applyToAll} onClick={() => props.onApplyHoverToAll(hover)} />
+            <ActionButton iconProps={{ iconName: 'Save' }} text={strings.saveAsDefault} onClick={() => props.onSaveAsDefaultHover(hover)} />
           </Stack>
         </Stack>
       </PivotItem>
 
-      <PivotItem headerText="Position" itemKey="position">
+      <PivotItem headerText={strings.tabPosition} itemKey="position">
         <Stack tokens={{ childrenGap: 12 }} styles={{ root: { paddingTop: 12 } }}>
-          <Text variant="small">Angaben in Prozent des Bildes. Auf der Zeichenfläche: Pfeiltasten verschieben, Strg + Pfeiltasten ändern die Größe.</Text>
+          <Text variant="small">{strings.positionHint}</Text>
           <Stack horizontal tokens={{ childrenGap: 8 }}>
-            <Stack.Item grow={1}>{numberField('Abstand links', area.x, 0, 100, 0.5, (v?: string) => setRect('x', v), ' %')}</Stack.Item>
-            <Stack.Item grow={1}>{numberField('Abstand oben', area.y, 0, 100, 0.5, (v?: string) => setRect('y', v), ' %')}</Stack.Item>
+            <Stack.Item grow={1}>{numberField(strings.leftLabel, area.x, 0, 100, 0.5, (v?: string) => setRect('x', v), ' %')}</Stack.Item>
+            <Stack.Item grow={1}>{numberField(strings.topLabel, area.y, 0, 100, 0.5, (v?: string) => setRect('y', v), ' %')}</Stack.Item>
           </Stack>
           {area.shape === 'circle' ? (
-            numberField('Durchmesser (% der Bildbreite)', area.width, 1, 100, 0.5, (v?: string) => setRect('width', v), ' %')
+            numberField(strings.diameterLabel, area.width, 1, 100, 0.5, (v?: string) => setRect('width', v), ' %')
           ) : (
             <Stack horizontal tokens={{ childrenGap: 8 }}>
-              <Stack.Item grow={1}>{numberField('Breite', area.width, 1, 100, 0.5, (v?: string) => setRect('width', v), ' %')}</Stack.Item>
-              <Stack.Item grow={1}>{numberField('Höhe', area.height, 1, 100, 0.5, (v?: string) => setRect('height', v), ' %')}</Stack.Item>
+              <Stack.Item grow={1}>{numberField(strings.widthLabel, area.width, 1, 100, 0.5, (v?: string) => setRect('width', v), ' %')}</Stack.Item>
+              <Stack.Item grow={1}>{numberField(strings.heightLabel, area.height, 1, 100, 0.5, (v?: string) => setRect('height', v), ' %')}</Stack.Item>
             </Stack>
           )}
         </Stack>
@@ -381,15 +365,15 @@ export interface IAreaPropertiesPanelProps extends IAreaPropertiesFormProps {
   isOpen: boolean;
   onDelete: () => void;
   onDismiss: () => void;
-  /** Nach dem Schließen (Fokus zurück an den Bereich) */
+  /** After closing (focus back to the area) */
   onDismissed: () => void;
 }
 
 export const AreaPropertiesPanel: React.FunctionComponent<IAreaPropertiesPanelProps> = (props: IAreaPropertiesPanelProps) => {
   const footer = () => (
     <Stack horizontal tokens={{ childrenGap: 8 }}>
-      <PrimaryButton text="Fertig" onClick={props.onDismiss} />
-      <DefaultButton text="Bereich löschen" iconProps={{ iconName: 'Delete' }} onClick={props.onDelete} />
+      <PrimaryButton text={strings.done} onClick={props.onDismiss} />
+      <DefaultButton text={strings.deleteArea} iconProps={{ iconName: 'Delete' }} onClick={props.onDelete} />
     </Stack>
   );
   return (
@@ -398,8 +382,8 @@ export const AreaPropertiesPanel: React.FunctionComponent<IAreaPropertiesPanelPr
       type={PanelType.custom}
       customWidth="360px"
       isBlocking={false}
-      headerText={`Bereich ${props.index + 1} bearbeiten`}
-      closeButtonAriaLabel="Eigenschaften schließen"
+      headerText={strings.editAreaTitle(props.index + 1)}
+      closeButtonAriaLabel={strings.closeProperties}
       onDismiss={props.onDismiss}
       onDismissed={props.onDismissed}
       onRenderFooterContent={footer}
@@ -411,15 +395,15 @@ export const AreaPropertiesPanel: React.FunctionComponent<IAreaPropertiesPanelPr
   );
 };
 
-/** Variante für das Vollbild: als Spalte neben der Zeichenfläche. */
+/** Full-screen variant: as a column next to the canvas. */
 export const AreaPropertiesInline: React.FunctionComponent<IAreaPropertiesFormProps & { onDelete: () => void; onClose: () => void }> =
   (props: IAreaPropertiesFormProps & { onDelete: () => void; onClose: () => void }) => (
-    <section aria-label={`Eigenschaften von Bereich ${props.index + 1}`} style={{ padding: '8px 16px' }}>
+    <section aria-label={strings.propertiesOf(props.index + 1)} style={{ padding: '8px 16px' }}>
       <Stack horizontal horizontalAlign="space-between" verticalAlign="center">
-        <Text variant="large" as="h2" style={{ margin: 0 }}>Bereich {props.index + 1}</Text>
+        <Text variant="large" as="h2" style={{ margin: 0 }}>{strings.area(props.index + 1)}</Text>
         <Stack horizontal>
-          <IconButton iconProps={{ iconName: 'Delete' }} title="Bereich löschen" ariaLabel={`Bereich ${props.index + 1} löschen`} onClick={props.onDelete} />
-          <IconButton iconProps={{ iconName: 'Cancel' }} title="Eigenschaften schließen" ariaLabel="Eigenschaften schließen" onClick={props.onClose} />
+          <IconButton iconProps={{ iconName: 'Delete' }} title={strings.deleteArea} ariaLabel={strings.deleteAreaAria(props.index + 1)} onClick={props.onDelete} />
+          <IconButton iconProps={{ iconName: 'Cancel' }} title={strings.closeProperties} ariaLabel={strings.closeProperties} onClick={props.onClose} />
         </Stack>
       </Stack>
       <Separator />

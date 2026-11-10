@@ -3,6 +3,7 @@ import { Dialog, DialogFooter, DialogType } from '@fluentui/react/lib/Dialog';
 import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import { TextField } from '@fluentui/react/lib/TextField';
 import { checkAlt } from '../utils/validation';
+import { strings } from '../loc/strings';
 
 export interface IAltTextDialogProps {
   isOpen: boolean;
@@ -23,14 +24,14 @@ export const AltTextDialog: React.FunctionComponent<IAltTextDialogProps> = (prop
       onDismiss={props.onDismiss}
       dialogContentProps={{
         type: DialogType.normal,
-        title: 'Alternativtext des Bildes',
-        subText: 'Beschreibt den Bildinhalt für Screenreader, z. B. „Lageplan des Erdgeschosses“. Die Links werden über ihren Titel angesagt.'
+        title: strings.altDialogTitle,
+        subText: strings.altDialogSubText
       }}
       modalProps={{ isBlocking: true }}
       minWidth={420}
     >
       <TextField
-        label="Alternativtext"
+        label={strings.altLabel}
         required={true}
         multiline={true}
         autoAdjustHeight={true}
@@ -39,11 +40,11 @@ export const AltTextDialog: React.FunctionComponent<IAltTextDialogProps> = (prop
         value={draft}
         onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) => setDraft((v || '').replace(/[\r\n]+/g, ' '))}
         errorMessage={error}
-        description={error ? undefined : `${draft.length} von ${props.maxLength} Zeichen`}
+        description={error ? undefined : strings.charCounter(draft.length, props.maxLength)}
       />
       <DialogFooter>
-        <PrimaryButton text="Speichern" disabled={!!error} onClick={() => props.onSave(draft.trim())} />
-        <DefaultButton text="Abbrechen" onClick={props.onDismiss} />
+        <PrimaryButton text={strings.save} disabled={!!error} onClick={() => props.onSave(draft.trim())} />
+        <DefaultButton text={strings.cancel} onClick={props.onDismiss} />
       </DialogFooter>
     </Dialog>
   );

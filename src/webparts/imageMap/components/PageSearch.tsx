@@ -5,6 +5,7 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import { getId } from '@fluentui/react/lib/Utilities';
 import { getTheme, mergeStyleSets } from '@fluentui/react/lib/Styling';
 import { IPageResult, PageService } from '../services/PageService';
+import { strings } from '../loc/strings';
 
 const theme = getTheme();
 const css = mergeStyleSets({
@@ -29,8 +30,8 @@ export interface IPageSearchProps {
 }
 
 /**
- * Suche in den Websiteseiten. Tastatur: Eingabe filtert, Pfeil runter springt in die Ergebnisse,
- * Pfeil hoch/runter wechselt, Enter wählt, Esc schließt. Die Trefferzahl wird angesagt.
+ * Search in site pages. Keyboard: typing filters, down arrow moves into the results,
+ * up/down arrow switches, Enter selects, Esc closes. The number of results is announced.
  */
 export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPageSearchProps) => {
   const [query, setQuery] = React.useState<string>('');
@@ -68,16 +69,16 @@ export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPa
     if (e.key === 'Escape' || e.key === 'Esc') { e.preventDefault(); e.stopPropagation(); props.onClose(); }
   };
 
-  const status = loading ? 'Suche läuft …'
+  const status = loading ? strings.searching
     : error ? error
-      : results.length === 0 ? 'Keine Seiten gefunden.'
-        : `${results.length} ${results.length === 1 ? 'Seite' : 'Seiten'} gefunden. Mit Pfeil runter zu den Ergebnissen.`;
+      : results.length === 0 ? strings.noPagesFound
+        : strings.pagesFound(results.length);
 
   return (
     <div>
       <SearchBox
-        placeholder="Seitentitel eingeben"
-        ariaLabel="Websiteseiten durchsuchen"
+        placeholder={strings.searchPlaceholder}
+        ariaLabel={strings.searchAria}
         aria-controls={ids.current.list}
         aria-describedby={ids.current.status}
         value={query}
@@ -90,10 +91,10 @@ export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPa
         onSearch={() => focusResult(0)}
       />
       <div id={ids.current.status} className={css.status} role="status" aria-live="polite">
-        {loading ? <Spinner size={SpinnerSize.xSmall} label="Suche läuft …" labelPosition="right" /> : status}
+        {loading ? <Spinner size={SpinnerSize.xSmall} label={strings.searching} labelPosition="right" /> : status}
       </div>
       {!loading && results.length > 0 && (
-        <ul id={ids.current.list} ref={listRef} className={css.list} aria-label="Gefundene Seiten" onKeyDown={onListKeyDown}>
+        <ul id={ids.current.list} ref={listRef} className={css.list} aria-label={strings.foundPages} onKeyDown={onListKeyDown}>
           {results.map((page: IPageResult) => (
             <li key={page.url}>
               <button type="button" className={css.item} onClick={() => props.onSelect(page)}>

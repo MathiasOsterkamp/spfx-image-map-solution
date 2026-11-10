@@ -70,6 +70,7 @@ Zusätzlich: `npm run typecheck` führt nur die Typprüfung aus.
 │   ├── config/securityConfig.ts    Zentrale Sicherheitsregeln
 │   ├── components/                 Viewer, Editor, Panels, Farbwahl, Styles
 │   ├── services/ImageService.ts    SharePoint-REST (SPHttpClient)
+│   ├── loc/                        Texte: de.ts (Standard), en.ts, fr.ts, IStrings.ts, strings.ts
 │   ├── models/IImageMap.ts         Datenmodell
 │   └── utils/                      Validierung, Datei-Prüfung, Geometrie, Hover-CSS, Sanitizing
 ├── gulpfile.js                     Build-Anpassungen (s. o.)
@@ -94,6 +95,17 @@ Zusätzlich: `npm run typecheck` führt nur die Typprüfung aus.
 
 Etwa 720 KB minifiziert, davon React 16 ca. 120 KB, den Großteil macht Fluent UI aus. Fluent wird über Deep-Imports (`@fluentui/react/lib/…`)
 eingebunden. Webpack 3 aus SPFx 1.4.1 kennt kein Tree-Shaking über Paketgrenzen hinweg.
+
+## Sprachen
+
+Unterstützt werden **Deutsch (Standard)**, **Englisch** und **Französisch**. Die Sprache richtet sich nach der Oberflächensprache der Website
+(`pageContext.cultureInfo.currentUICultureName`): `en-*` → Englisch, `fr-*` → Französisch, alle anderen → Deutsch.
+
+- Alle Texte liegen in `src/webparts/imageMap/loc/` (`de.ts`, `en.ts`, `fr.ts`). Die Schnittstelle `IStrings.ts` sorgt dafür, dass jede Sprache
+  vollständig ist: Fehlt ein Text, bricht der Build ab.
+- Bewusst nicht über die SPFx-Ressourcen (`loc/*.js` + `localizedResources`): Diese fallen immer auf `en-us` zurück, Deutsch soll aber Standard sein.
+- Die Werkzeug-Kurztasten folgen der Sprache: Kreis ist im Deutschen **K**, im Englischen und Französischen **C**.
+- Titel und Beschreibung in der Webpart-Toolbox stehen im Manifest (`ImageMapWebPart.manifest.json`).
 
 ## Versionierung
 

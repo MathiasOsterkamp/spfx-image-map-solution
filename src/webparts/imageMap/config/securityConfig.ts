@@ -1,33 +1,33 @@
 /**
- * ZENTRALE SICHERHEITSKONFIGURATION
+ * CENTRAL SECURITY CONFIGURATION
  *
- * Diese Werte sind bewusst NICHT im Eigenschaftenbereich änderbar: Seitenbearbeiter sollen die
- * Regeln nicht lockern können. Änderungen erfolgen hier im Code und werden mit dem Paket ausgerollt.
- * Alle Regeln gelten beim Bearbeiten UND erneut beim Anzeigen (manipulierte Webpart-Daten werden ignoriert).
+ * These values are deliberately NOT editable in the property pane: page editors must not be able to
+ * relax the rules. Changes are made here in code and rolled out with the package.
+ * All rules apply when editing AND again when displaying (tampered web part data is ignored).
  */
 
 export type ImageType = 'png' | 'jpeg' | 'gif' | 'webp';
 
 export const SECURITY_SETTINGS = {
-  /** Externe Links nur über https. http ist nur für den eigenen SharePoint-Host erlaubt. */
+  /** External links via https only. http is only allowed for the own SharePoint host. */
   httpsOnly: true,
-  /** Freigegebene externe Domains (inkl. Subdomains), z. B. ['firma.de', 'microsoft.com']. Leer = alle Domains erlaubt. */
+  /** Allowed external domains (incl. subdomains), e.g. ['firma.de', 'microsoft.com']. Empty = all domains allowed. */
   allowedLinkDomains: [] as string[],
-  /** Bilder nur aus dem eigenen SharePoint (verhindert Tracking-Pixel und fremde Inhalte). */
+  /** Images only from the own SharePoint (prevents tracking pixels and third-party content). */
   imagesSameHostOnly: true,
-  /** Zusätzlich erlaubte Bild-Hosts, falls imagesSameHostOnly = true (z. B. ein eigenes CDN). */
+  /** Additional allowed image hosts if imagesSameHostOnly = true (e.g. a custom CDN). */
   allowedImageHosts: [] as string[],
-  /** Maximale Upload-Größe in MB. */
+  /** Maximum upload size in MB. */
   maxUploadMB: 10,
-  /** Erlaubte Upload-Formate. Geprüft wird der Dateiinhalt (Signatur), nicht nur die Endung. SVG ist absichtlich ausgeschlossen (kann Skripte enthalten). */
+  /** Allowed upload formats. The file content (signature) is checked, not just the extension. SVG is intentionally excluded (can contain scripts). */
   allowedUploadTypes: ['png', 'jpeg', 'gif', 'webp'] as ImageType[],
-  /** Maximale Anzahl Bereiche pro Bild. */
+  /** Maximum number of areas per image. */
   maxAreas: 100,
-  /** Maximale Gesamtlänge eines Links (praxisübliche Browser-/Servergrenze). */
+  /** Maximum total length of a link (common browser/server limit). */
   maxUrlLength: 2048,
-  /** Maximale Länge des Pfads innerhalb von SharePoint (dekodiert, Grenze von SharePoint Online/2019). */
+  /** Maximum path length within SharePoint (decoded, SharePoint Online/2019 limit). */
   maxSharePointPathLength: 400,
-  /** Maximale Länge von Titel, Tooltip und Alternativtext. */
+  /** Maximum length of title, tooltip and alt text. */
   maxTitleLength: 255,
   maxTooltipLength: 255,
   maxAltLength: 255

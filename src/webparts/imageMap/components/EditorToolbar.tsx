@@ -5,15 +5,10 @@ import { VerticalDivider } from '@fluentui/react/lib/Divider';
 import { AreaShape } from '../models/IImageMap';
 import { IssuesButton } from './IssuesButton';
 import { IValidationIssue } from '../utils/validation';
+import { strings } from '../loc/strings';
 
 export type EditorTool = 'select' | AreaShape;
 
-export const TOOL_NAMES: { [key: string]: string } = {
-  select: 'Auswählen', rect: 'Rechteck', circle: 'Kreis', ellipse: 'Ellipse'
-};
-export const TOOL_SHORTCUTS: { [key: string]: string } = {
-  select: 'V', rect: 'R', circle: 'K', ellipse: 'E'
-};
 const TOOL_ICONS: { [key: string]: string } = {
   select: 'TouchPointer', rect: 'RectangleShape', circle: 'CircleRing', ellipse: 'Ellipse'
 };
@@ -42,7 +37,7 @@ export interface IEditorToolbarProps {
   onIssueSelect: (issue: IValidationIssue) => void;
 }
 
-/** Markiert Einträge, die bei Platzmangel ins „…“-Menü wandern dürfen (von hinten nach vorn). */
+/** Marks items that may move into the "…" menu when space is limited (from last to first). */
 interface ICollapsible { collapsible?: boolean; }
 
 function divider(key: string): ICommandBarItemProps {
@@ -63,9 +58,9 @@ function cacheKeyOf(data: ICommandBarData, iconOnly: boolean): string {
 }
 
 /**
- * Responsives Verhalten bei wenig Platz:
- *  1. Beschriftungen ausblenden (nur Icons, Name bleibt als aria-label/Tooltip erhalten)
- *  2. Einträge von hinten ins „…“-Menü verschieben (Werkzeuge bleiben am längsten sichtbar)
+ * Responsive behavior when space is limited:
+ *  1. Hide labels (icons only, name remains as aria-label/tooltip)
+ *  2. Move items from the end into the "…" menu (tools stay visible the longest)
  */
 function onReduceData(data: ICommandBarData): ICommandBarData | undefined {
   if (data.primaryItems.some((i: ICommandBarItemProps) => !!i.text && !i.iconOnly)) {
@@ -105,13 +100,13 @@ function onGrowData(data: ICommandBarData): ICommandBarData | undefined {
 }
 
 /**
- * Werkzeugleiste im Fluent-Design (CommandBar).
- * Tastatur: Tab springt in die Leiste, Pfeiltasten links/rechts wechseln zwischen den Einträgen,
- * Enter/Leertaste löst aus, Pfeil runter öffnet Untermenüs. Die Werkzeuge bilden eine
- * Optionsgruppe (menuitemradio + aria-checked).
+ * Toolbar in Fluent design (CommandBar).
+ * Keyboard: Tab moves into the bar, left/right arrow keys switch between items,
+ * Enter/Space triggers, down arrow opens submenus. The tools form a
+ * radio group (menuitemradio + aria-checked).
  */
 export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (props: IEditorToolbarProps) => {
-  // Der Zustand fließt in die Keys ein, damit die CommandBar keine veralteten Einträge aus ihrem Cache rendert.
+  // The state is included in the keys so the CommandBar does not render stale items from its cache.
   const v = [props.tool, props.canUndo, props.canRedo, props.testMode, props.fullscreen, props.hasImage, props.issues.length].join('-');
   const editing = props.hasImage && !props.testMode;
 
@@ -119,10 +114,10 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
     const checked = props.tool === tool;
     return {
       key: `tool-${tool}-${v}`,
-      text: TOOL_NAMES[tool],
+      text: strings.toolNames[tool],
       title: tool === 'select'
-        ? `Auswählen (${TOOL_SHORTCUTS[tool]})`
-        : `${TOOL_NAMES[tool]} zeichnen (${TOOL_SHORTCUTS[tool]}). Per Tastatur: Enter auf der Zeichenfläche fügt ein.`,
+        ? strings.selectTitle(strings.toolKeys[tool])
+        : strings.drawTitle(strings.toolNames[tool], strings.toolKeys[tool]),
       iconProps: { iconName: TOOL_ICONS[tool] },
       disabled: !editing,
       canCheck: true,
@@ -136,12 +131,12 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
   const items: ICommandBarItemProps[] = [
     {
       key: `image-${v}`,
-      text: 'Bild',
+      text: strings.image,
       iconProps: { iconName: 'Photo2' },
       subMenuProps: {
         items: [
-          { key: 'choose', text: props.hasImage ? 'Bild ändern …' : 'Bild auswählen …', iconProps: { iconName: 'Photo2' }, onClick: () => props.onChooseImage() },
-          { key: 'alt', text: 'Alternativtext bearbeiten …', iconProps: { iconName: 'TextField' }, disabled: !props.hasImage, onClick: () => props.onEditAlt() }
+          { key: 'choose', text: props.hasImage ? strings.changeImageMenu : strings.chooseImageMenu, iconProps: { iconName: 'Photo2' }, onClick: () => props.onChooseImage() },
+          { key: 'alt', text: strings.editAltMenu, iconProps: { iconName: 'TextField' }, disabled: !props.hasImage, onClick: () => props.onEditAlt() }
         ]
       }
     },
@@ -153,10 +148,10 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
     divider(`d2-${v}`),
     {
       key: `undo-${v}`,
-      text: 'Rückgängig',
+      text: strings.undo,
       iconOnly: true,
-      ariaLabel: props.undoLabel ? `Rückgängig: ${props.undoLabel}` : 'Rückgängig',
-      title: props.undoLabel ? `Rückgängig: ${props.undoLabel} (Strg+Z)` : 'Rückgängig (Strg+Z)',
+      ariaLabel: props.undoLabel ? strings.undoWith(props.undoLabel) : strings.undo,
+      title: strings.undoTitle(props.undoLabel),
       iconProps: { iconName: 'Undo' },
       disabled: !props.canUndo || props.testMode,
       onClick: () => props.onUndo(),
@@ -164,10 +159,10 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
     },
     {
       key: `redo-${v}`,
-      text: 'Wiederholen',
+      text: strings.redo,
       iconOnly: true,
-      ariaLabel: props.redoLabel ? `Wiederholen: ${props.redoLabel}` : 'Wiederholen',
-      title: props.redoLabel ? `Wiederholen: ${props.redoLabel} (Strg+Y)` : 'Wiederholen (Strg+Y)',
+      ariaLabel: props.redoLabel ? strings.redoWith(props.redoLabel) : strings.redo,
+      title: strings.redoTitle(props.redoLabel),
       iconProps: { iconName: 'Redo' },
       disabled: !props.canRedo || props.testMode,
       onClick: () => props.onRedo(),
@@ -178,21 +173,21 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
   const overflowItems: ICommandBarItemProps[] = [
     {
       key: `insert-${v}`,
-      text: 'Bereich einfügen',
+      text: strings.insertArea,
       iconProps: { iconName: 'Add' },
       disabled: !editing || props.limitReached,
       subMenuProps: {
         items: (['rect', 'circle', 'ellipse'] as AreaShape[]).map((shape: AreaShape) => ({
           key: shape,
-          text: `${TOOL_NAMES[shape]} in der Bildmitte`,
+          text: strings.insertCentered(strings.toolNames[shape]),
           onClick: () => props.onInsert(shape)
         }))
       }
     },
     {
       key: `sort-${v}`,
-      text: 'Lesereihenfolge sortieren',
-      title: 'Bereiche von oben links nach unten rechts sortieren (Tab-Reihenfolge)',
+      text: strings.sortOrder,
+      title: strings.sortOrderTitle,
       iconProps: { iconName: 'SortLines' },
       disabled: !editing || !props.canSort,
       onClick: () => props.onSort()
@@ -206,8 +201,8 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
     },
     {
       key: `test-${v}`,
-      text: props.testMode ? 'Bearbeiten' : 'Vorschau',
-      title: props.testMode ? 'Zurück zum Bearbeiten' : 'Vorschau testen: Links werden angezeigt, aber nicht geöffnet',
+      text: props.testMode ? strings.edit : strings.preview,
+      title: props.testMode ? strings.backToEditTitle : strings.previewTitle,
       iconProps: { iconName: props.testMode ? 'Edit' : 'Play' },
       disabled: !props.hasImage,
       canCheck: true,
@@ -218,9 +213,9 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
     },
     {
       key: `full-${v}`,
-      text: props.fullscreen ? 'Vollbild beenden' : 'Vollbild',
+      text: props.fullscreen ? strings.exitFullscreen : strings.fullscreen,
       iconOnly: true,
-      title: props.fullscreen ? 'Vollbild beenden (Esc)' : 'Im Vollbild bearbeiten',
+      title: props.fullscreen ? strings.exitFullscreenTooltip : strings.fullscreenTooltip,
       iconProps: { iconName: props.fullscreen ? 'BackToWindow' : 'FullScreen' },
       disabled: !props.hasImage,
       onClick: () => props.onToggleFullscreen()
@@ -234,8 +229,8 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
       farItems={farItems}
       onReduceData={onReduceData}
       onGrowData={onGrowData}
-      ariaLabel="Werkzeuge für Bildbereiche. Pfeiltasten wechseln zwischen den Einträgen."
-      overflowButtonProps={{ ariaLabel: 'Weitere Befehle', title: 'Weitere Befehle' }}
+      ariaLabel={strings.toolbarAria}
+      overflowButtonProps={{ ariaLabel: strings.moreCommands, title: strings.moreCommands }}
       styles={{ root: { padding: '0 4px', height: 40 } }}
     />
   );

@@ -6,7 +6,7 @@ const COLOR_PATTERN = /^(#[0-9a-f]{3,8}|rgba?\(\s*[\d.\s,%]+\)|hsla?\(\s*[\d.\s,
 const BORDER_STYLES: AreaBorderStyle[] = ['solid', 'dashed', 'dotted', 'double'];
 const ID_PATTERN = /^[a-z0-9_\-]{1,64}$/i;
 
-/** Lässt nur gültige CSS-Farbwerte zu (verhindert CSS-Injection über Farbwerte). */
+/** Allows only valid CSS color values (prevents CSS injection via color values). */
 export function safeColor(value: string | undefined, fallback: string): string {
   const v = typeof value === 'string' ? value.trim() : '';
   return COLOR_PATTERN.test(v) ? v : fallback;
@@ -28,7 +28,7 @@ function safeString(value: any, maxLength: number): string {
   return typeof value === 'string' ? value.substr(0, maxLength) : '';
 }
 
-/** Deckkraft einer CSS-Farbe (0–1), für den Sichtbarkeits-Hinweis. */
+/** Opacity of a CSS color (0–1), for the visibility warning. */
 export function colorAlpha(color: string): number {
   const c = (color || '').trim().toLowerCase();
   if (c === 'transparent') { return 0; }
@@ -55,8 +55,8 @@ export function sanitizeHover(raw: any): IHoverStyle {
 }
 
 /**
- * Webpart-Properties sind nicht vertrauenswürdig (sie lassen sich z. B. per REST oder durch
- * Bearbeiten des Seiten-JSON manipulieren). Deshalb wird alles beim Laden typisiert, begrenzt und bereinigt.
+ * Web part properties are untrusted (they can be tampered with e.g. via REST or by
+ * editing the page JSON). Therefore everything is typed, limited and sanitized on load.
  */
 export function sanitizeAreas(raw: any, policy: ISecurityPolicy): IImageArea[] {
   if (!Array.isArray(raw)) {

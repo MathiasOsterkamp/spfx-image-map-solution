@@ -3,8 +3,8 @@ import * as React from 'react';
 const FOCUSABLE = 'button:not([disabled]), a[href], [role="button"]:not([aria-disabled="true"]), .ms-Link';
 
 /**
- * Pfeiltasten-Navigation innerhalb eines Containers (ARIA-Toolbar-/Listen-Muster), ohne FocusZone.
- * horizontal: links/rechts, vertical: hoch/runter. Pos1/Ende springen an Anfang/Ende.
+ * Arrow key navigation within a container (ARIA toolbar/list pattern), without FocusZone.
+ * horizontal: left/right, vertical: up/down. Home/End jump to start/end.
  */
 export function handleRovingKeyDown(e: React.KeyboardEvent<HTMLElement>, orientation: 'horizontal' | 'vertical'): void {
   const prevKeys = orientation === 'horizontal' ? ['ArrowLeft', 'Left'] : ['ArrowUp', 'Up'];
@@ -25,7 +25,7 @@ export function handleRovingKeyDown(e: React.KeyboardEvent<HTMLElement>, orienta
   }
 }
 
-/** Setzt beim ersten Rendern nur das erste Element in die Tab-Reihenfolge (ein Tab-Stopp). */
+/** On first render, puts only the first element into the tab order (one tab stop). */
 export function initRovingTabIndex(container: HTMLElement | null): void {
   if (!container) { return; }
   const all = Array.prototype.slice.call(container.querySelectorAll(FOCUSABLE)) as HTMLElement[];

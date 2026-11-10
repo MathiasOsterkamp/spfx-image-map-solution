@@ -1,11 +1,12 @@
 import { HighContrastSelector, IRawStyle, mergeStyles } from '@fluentui/react/lib/Styling';
 import { AreaShape, DEFAULT_HOVER, IHoverStyle, IImageArea } from '../models/IImageMap';
 import { colorAlpha, safeBorderStyle, safeColor, safeNumber } from './sanitize';
+import { strings } from '../loc/strings';
 
-/** Fokusring mit zwei Farben (weiß + schwarz): auf jedem Bildhintergrund sichtbar (WCAG 2.4.7 / 2.4.11). */
+/** Two-color focus ring (white + black): visible on any image background (WCAG 2.4.7 / 2.4.11). */
 const FOCUS_RING = '0 0 0 2px #ffffff, 0 0 0 5px #000000';
 
-/** Liefert die (bereinigten) CSS-Werte des Hover-Zustands. */
+/** Returns the (sanitized) CSS values of the hover state. */
 export function getHoverRawStyle(hover: IHoverStyle | undefined, shape: AreaShape): IRawStyle {
   const h = hover || DEFAULT_HOVER;
   return {
@@ -17,24 +18,24 @@ export function getHoverRawStyle(hover: IHoverStyle | undefined, shape: AreaShap
   };
 }
 
-/** Hinweis, wenn der Hover-Zustand kaum sichtbar ist (WCAG 1.4.11 Nicht-Text-Kontrast). */
+/** Warning when the hover state is barely visible (WCAG 1.4.11 non-text contrast). */
 export function getVisibilityWarning(hover: IHoverStyle): string | undefined {
   const border = safeNumber(hover.borderWidth, 0, 20, 0);
   const borderAlpha = colorAlpha(hover.borderColor);
   const fillAlpha = colorAlpha(hover.fillColor);
   const borderVisible = border >= 2 && borderAlpha >= 0.6;
   if (!borderVisible && fillAlpha < 0.25) {
-    return 'Der Bereich ist beim Überfahren kaum erkennbar. Empfohlen: Rahmen ab 2 px mit deckender Farbe (WCAG 1.4.11).';
+    return strings.visibilityWarning;
   }
   return undefined;
 }
 
 /**
- * CSS-Klasse für den Link eines Bereichs im Anzeigemodus.
- *  - :hover zeigt den konfigurierten Stil
- *  - :focus zeigt zusätzlich einen kontraststarken Fokusring
- *  - Windows-Kontrastmodus: Systemfarben (Highlight) statt eigener Farben
- *  - prefers-reduced-motion: keine Übergangsanimation
+ * CSS class for an area's link in display mode.
+ *  - :hover shows the configured style
+ *  - :focus additionally shows a high-contrast focus ring
+ *  - Windows high contrast mode: system colors (Highlight) instead of custom colors
+ *  - prefers-reduced-motion: no transition animation
  */
 export function getViewAreaClass(area: IImageArea, hint: boolean): string {
   const hover = getHoverRawStyle(area.hover, area.shape);
@@ -49,7 +50,7 @@ export function getViewAreaClass(area: IImageArea, hint: boolean): string {
     };
 
   return mergeStyles({
-    // Füllt das <li> inkl. Innenabstand (nötig für Kreise, deren Höhe per padding-bottom entsteht)
+    // Fills the <li> incl. padding (needed for circles whose height comes from padding-bottom)
     position: 'absolute',
     left: 0,
     top: 0,
@@ -76,7 +77,7 @@ export function getViewAreaClass(area: IImageArea, hint: boolean): string {
   });
 }
 
-/** Im Editor wird der Hover-Stil dauerhaft angezeigt, damit man das Ergebnis sieht. */
+/** In the editor the hover style is shown permanently so the result is visible. */
 export function getEditAreaClass(area: IImageArea): string {
   return mergeStyles({
     ...getHoverRawStyle(area.hover, area.shape),

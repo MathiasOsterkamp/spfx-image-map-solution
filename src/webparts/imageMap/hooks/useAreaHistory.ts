@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { IImageArea } from '../models/IImageMap';
+import { strings } from '../loc/strings';
 
 interface IHistoryEntry {
   areas: IImageArea[];
@@ -8,8 +9,8 @@ interface IHistoryEntry {
 
 export interface IAreaHistory {
   /**
-   * Übernimmt einen neuen Stand und merkt sich den alten für „Rückgängig“.
-   * Gleicher coalesceKey innerhalb kurzer Zeit (z. B. Tippen, Pfeiltasten) ergibt EINEN Schritt.
+   * Applies a new state and remembers the old one for "undo".
+   * The same coalesceKey within a short time (e.g. typing, arrow keys) results in ONE step.
    */
   commit: (next: IImageArea[], label: string, coalesceKey?: string) => void;
   undo: () => void;
@@ -49,21 +50,21 @@ export function useAreaHistory(
 
   const undo = () => {
     const entry = past.current.pop();
-    if (!entry) { announce('Nichts rückgängig zu machen.'); return; }
+    if (!entry) { announce(strings.nothingToUndo); return; }
     future.current.push({ areas: getCurrent(), label: entry.label });
     last.current = { time: 0 };
     apply(entry.areas);
-    announce(`Rückgängig: ${entry.label}.`);
+    announce(strings.undone(entry.label));
     bump();
   };
 
   const redo = () => {
     const entry = future.current.pop();
-    if (!entry) { announce('Nichts zu wiederholen.'); return; }
+    if (!entry) { announce(strings.nothingToRedo); return; }
     past.current.push({ areas: getCurrent(), label: entry.label });
     last.current = { time: 0 };
     apply(entry.areas);
-    announce(`Wiederholt: ${entry.label}.`);
+    announce(strings.redone(entry.label));
     bump();
   };
 

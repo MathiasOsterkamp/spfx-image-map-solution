@@ -7,6 +7,7 @@ import { IColor } from '@fluentui/react/lib/Color';
 import { getId } from '@fluentui/react/lib/Utilities';
 import { safeColor } from '../utils/sanitize';
 import { classNames } from './styles';
+import { strings } from '../loc/strings';
 
 export interface IColorFieldProps {
   label: string;
@@ -29,7 +30,7 @@ export const ColorField: React.FunctionComponent<IColorFieldProps> = (props: ICo
         <DefaultButton
           className={classNames.swatchButton}
           onClick={() => setOpen(!open)}
-          ariaLabel={`${props.label}: ${value}. Farbauswahl öffnen`}
+          ariaLabel={strings.openColorPicker(props.label, value)}
           aria-haspopup="dialog"
           aria-expanded={open}
         >

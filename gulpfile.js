@@ -6,25 +6,25 @@ const build = require('@microsoft/sp-build-web');
 build.addSuppression(`Warning - [sass] The local CSS class 'ms-Grid' is not camelCase and will not be type-safe.`);
 
 // ---------------------------------------------------------------------------
-// TypeScript überschreiben
-// SPFx 1.4.1 bringt TypeScript 2.4 mit. Fluent UI 8 und @types/react 16
-// benötigen TypeScript 4.x. Die Version kommt aus package.json ("typescript").
+// Override TypeScript
+// SPFx 1.4.1 ships with TypeScript 2.4. Fluent UI 8 and @types/react 16
+// require TypeScript 4.x. The version comes from package.json ("typescript").
 // ---------------------------------------------------------------------------
 build.TypeScriptConfiguration.setTypescriptCompiler(require('typescript'));
 
 // ---------------------------------------------------------------------------
-// React 16 ins Bundle aufnehmen
-// SPFx 1.4.1 behandelt react/react-dom als Framework-Komponenten und lädt zur
-// Laufzeit die React-Version von SharePoint (SP2019: React 15.6 → Hooks
-// funktionieren nicht). Mit linkedExternalsToBundle wird React 16 aus
-// node_modules fest in das Webpart-Bundle eingebaut.
+// Include React 16 in the bundle
+// SPFx 1.4.1 treats react/react-dom as framework components and loads
+// SharePoint's React version at runtime (SP2019: React 15.6 → hooks
+// do not work). With linkedExternalsToBundle, React 16 from
+// node_modules is built directly into the web part bundle.
 // ---------------------------------------------------------------------------
 build.configureWebpack.mergeConfig({
   linkedExternalsToBundle: ['react', 'react-dom']
 });
 
-// Das tslint aus SPFx 1.4.1 ist nicht mit TypeScript 4.x kompatibel
-// ("Invalid source file …"). Typprüfung übernimmt der Compiler (strict).
+// The tslint from SPFx 1.4.1 is not compatible with TypeScript 4.x
+// ("Invalid source file …"). Type checking is done by the compiler (strict).
 build.tslint.enabled = false;
 
 build.initialize(gulp);

@@ -10,8 +10,13 @@
   "preconfiguredEntries": [{
     "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
     "group": { "default": "Other" },
-    "title": { "default": "Bildbereiche verlinken", "en-US": "Image map" },
-    "description": { "default": "Bild mit klickbaren, verlinkten Bereichen", "en-US": "Image with clickable linked areas" },
+    "title": { "default": "Bildbereiche verlinken", "de-DE": "Bildbereiche verlinken", "en-US": "Image map", "fr-FR": "Image avec zones liées" },
+    "description": {
+      "default": "Bild mit klickbaren, verlinkten Bereichen",
+      "de-DE": "Bild mit klickbaren, verlinkten Bereichen",
+      "en-US": "Image with clickable linked areas",
+      "fr-FR": "Image avec des zones cliquables et liées"
+    },
     "officeFabricIconFontName": "Photo2",
     "properties": {
       "imageUrl": "",

@@ -12,6 +12,7 @@ import { ISecurityPolicy } from '../config/securityConfig';
 import { IImageFile, ImageService } from '../services/ImageService';
 import { acceptAttribute, describeAllowedTypes, IValidatedImage, validateImageFile } from '../utils/fileValidation';
 import { checkImageUrl } from '../utils/validation';
+import { strings } from '../loc/strings';
 import { classNames } from './styles';
 
 export interface IImagePickerPanelProps {
@@ -46,9 +47,9 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
       .then((result: IImageFile[]) => {
         if (!alive.current) { return; }
         setImages(result);
-        setStatus(`${result.length} ${result.length === 1 ? 'Bild' : 'Bilder'} gefunden.`);
+        setStatus(strings.imagesFound(result.length));
       })
-      .catch((e: Error) => { if (alive.current) { setError(`Bilder konnten nicht geladen werden. ${e.message}`); } })
+      .catch((e: Error) => { if (alive.current) { setError(strings.imagesLoadFailed(e.message)); } })
       .then(() => { if (alive.current) { setLoading(false); } });
   };
 
@@ -64,20 +65,20 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
     if (!file) { return; }
     setError(undefined);
     setUploading(true);
-    setStatus('Bild wird geprüft und hochgeladen.');
+    setStatus(strings.checkingAndUploading);
     validateImageFile(file, props.policy)
       .then((valid: IValidatedImage) => props.service.upload(props.folder, file, valid.fileName))
       .then((uploaded: IImageFile) => {
         if (!alive.current) { return; }
         setUploading(false);
-        setStatus(`${uploaded.name} wurde hochgeladen und ausgewählt.`);
+        setStatus(strings.uploadedAndSelected(uploaded.name));
         props.onSelect(uploaded.serverRelativeUrl);
       })
       .catch((e: Error) => {
         if (!alive.current) { return; }
         setUploading(false);
         setStatus('');
-        setError(`Upload fehlgeschlagen: ${e.message}`);
+        setError(strings.uploadFailed(e.message));
       });
   };
 
@@ -89,19 +90,17 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
     <Panel
       isOpen={props.isOpen}
       type={PanelType.medium}
-      headerText="Bild auswählen"
-      closeButtonAriaLabel="Bildauswahl schließen"
+      headerText={strings.chooseImage}
+      closeButtonAriaLabel={strings.closePicker}
       onDismiss={props.onDismiss}
       isLightDismiss={true}
     >
       <div className={classNames.srOnly} role="status" aria-live="polite">{status}</div>
       {props.hasAreas && (
-        <MessageBar messageBarType={MessageBarType.info}>
-          Vorhandene Bereiche bleiben erhalten (relative Position). Prüfen Sie sie nach einem Bildwechsel.
-        </MessageBar>
+        <MessageBar messageBarType={MessageBarType.info}>{strings.areasKept}</MessageBar>
       )}
       {error && (
-        <MessageBar messageBarType={MessageBarType.error} onDismiss={() => setError(undefined)} dismissButtonAriaLabel="Meldung schließen">
+        <MessageBar messageBarType={MessageBarType.error} onDismiss={() => setError(undefined)} dismissButtonAriaLabel={strings.closeMessage}>
           {error}
         </MessageBar>
       )}
@@ -109,19 +108,19 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
       <Pivot
         selectedKey={tab}
         onLinkClick={(item?: PivotItem) => item && setTab(item.props.itemKey || 'library')}
-        aria-label="Quelle des Bildes"
+        aria-label={strings.imageSource}
       >
-        <PivotItem headerText="Bibliothek" itemKey="library" itemIcon="Library">
+        <PivotItem headerText={strings.tabLibrary} itemKey="library" itemIcon="Library">
           <Text block={true} variant="small" style={{ marginTop: 8 }}>
-            Ordner: {props.service.resolveFolder(props.folder)}
+            {strings.folderInfo(props.service.resolveFolder(props.folder))}
           </Text>
-          <ActionButton iconProps={{ iconName: 'Refresh' }} text="Liste aktualisieren" onClick={load} disabled={loading} />
-          {loading && <Spinner size={SpinnerSize.large} label="Bilder werden geladen…" ariaLive="polite" />}
+          <ActionButton iconProps={{ iconName: 'Refresh' }} text={strings.refreshList} onClick={load} disabled={loading} />
+          {loading && <Spinner size={SpinnerSize.large} label={strings.loadingImages} ariaLive="polite" />}
           {!loading && images.length === 0 && !error && (
-            <Text block={true} style={{ marginTop: 8 }}>In diesem Ordner sind keine Bilder vorhanden.</Text>
+            <Text block={true} style={{ marginTop: 8 }}>{strings.noImages}</Text>
           )}
           {!loading && images.length > 0 && (
-            <ul className={classNames.grid} style={{ listStyle: 'none', padding: 0 }} aria-label="Bilder im Ordner">
+            <ul className={classNames.grid} style={{ listStyle: 'none', padding: 0 }} aria-label={strings.imagesInFolder}>
               {images.map((img: IImageFile) => {
                 const current = img.serverRelativeUrl === props.currentUrl;
                 return (
@@ -131,7 +130,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
                       style={{ width: '100%', border: 'none', background: 'transparent', padding: 4, cursor: 'pointer', textAlign: 'left' }}
                       onClick={() => props.onSelect(img.serverRelativeUrl)}
                       aria-pressed={current}
-                      aria-label={`${img.name} auswählen${current ? ' (aktuell ausgewählt)' : ''}`}
+                      aria-label={strings.selectImageAria(img.name, current)}
                     >
                       <div
                         className={classNames.tileImage}
@@ -147,7 +146,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
           )}
         </PivotItem>
 
-        <PivotItem headerText="Hochladen" itemKey="upload" itemIcon="Upload">
+        <PivotItem headerText={strings.tabUpload} itemKey="upload" itemIcon="Upload">
           <div
             className={css(classNames.dropZone, dragOver && classNames.dropZoneActive)}
             onDragOver={(e: React.DragEvent<HTMLDivElement>) => { e.preventDefault(); setDragOver(true); }}
@@ -159,19 +158,18 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
             }}
           >
             {uploading ? (
-              <Spinner size={SpinnerSize.large} label="Wird geprüft und hochgeladen…" ariaLive="polite" />
+              <Spinner size={SpinnerSize.large} label={strings.uploadingSpinner} ariaLive="polite" />
             ) : (
               <div>
                 <Icon iconName="CloudUpload" className={classNames.placeholderIcon} aria-hidden={true} />
-                <Text block={true} style={{ margin: '8px 0 12px' }}>Bild hierher ziehen oder</Text>
+                <Text block={true} style={{ margin: '8px 0 12px' }}>{strings.dropHere}</Text>
                 <PrimaryButton
-                  text="Datei auswählen…"
+                  text={strings.chooseFile}
                   onClick={() => fileInput.current && fileInput.current.click()}
                   aria-describedby="imagemap-upload-rules"
                 />
                 <Text block={true} variant="small" style={{ marginTop: 12 }} id="imagemap-upload-rules">
-                  Erlaubt: {allowed}, maximal {maxMb} MB. SVG ist aus Sicherheitsgründen nicht erlaubt.
-                  Ziel: {props.service.resolveFolder(props.folder)}
+                  {strings.uploadRules(allowed, maxMb)} {strings.uploadTarget(props.service.resolveFolder(props.folder))}
                 </Text>
               </div>
             )}
@@ -190,26 +188,26 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
           </div>
         </PivotItem>
 
-        <PivotItem headerText="Adresse" itemKey="url" itemIcon="Link">
+        <PivotItem headerText={strings.tabAddress} itemKey="url" itemIcon="Link">
           <TextField
-            label="Bild-URL"
+            label={strings.imageUrlField}
             required={true}
-            placeholder="/sites/intranet/SiteAssets/bild.png"
+            placeholder={strings.imageUrlPlaceholder}
             value={urlInput}
             maxLength={props.policy.maxUrlLength}
             autoComplete="off"
             spellCheck={false}
             onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) => setUrlInput(v || '')}
             errorMessage={urlInput ? urlCheck.error : undefined}
-            description={props.policy.imagesSameHostOnly ? 'Nur Bilder aus diesem SharePoint sind erlaubt.' : undefined}
+            description={props.policy.imagesSameHostOnly ? strings.sameHostOnly : undefined}
           />
           {urlInput && urlCheck.suggestion && (
-            <ActionButton iconProps={{ iconName: 'AutoEnhanceOn' }} text={`Korrigieren zu ${urlCheck.suggestion}`}
+            <ActionButton iconProps={{ iconName: 'AutoEnhanceOn' }} text={strings.fixTo(urlCheck.suggestion)}
               onClick={() => setUrlInput(urlCheck.suggestion || '')} />
           )}
           <div style={{ marginTop: 12 }}>
-            <PrimaryButton text="Übernehmen" disabled={!urlCheck.valid} onClick={() => props.onSelect(urlCheck.url)} />
-            <DefaultButton text="Abbrechen" style={{ marginLeft: 8 }} onClick={props.onDismiss} />
+            <PrimaryButton text={strings.apply} disabled={!urlCheck.valid} onClick={() => props.onSelect(urlCheck.url)} />
+            <DefaultButton text={strings.cancel} style={{ marginLeft: 8 }} onClick={props.onDismiss} />
           </div>
         </PivotItem>
       </Pivot>

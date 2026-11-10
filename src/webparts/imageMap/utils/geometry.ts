@@ -6,9 +6,9 @@ export interface IRect { x: number; y: number; width: number; height: number; }
 export type ResizeHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w';
 export const RESIZE_HANDLES: ResizeHandle[] = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
 
-/** Mindestgröße eines Bereichs in % */
+/** Minimum size of an area in % */
 export const MIN_AREA_SIZE = 1;
-/** Mindestgröße beim Aufziehen, damit ein einfacher Klick keinen Bereich erzeugt */
+/** Minimum size when dragging, so a simple click does not create an area */
 export const MIN_DRAW_SIZE = 2;
 
 export function clamp(value: number, min: number, max: number): number {
@@ -19,7 +19,7 @@ export function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-/** Wandelt Bildschirmkoordinaten in Prozent-Koordinaten relativ zum Element um. */
+/** Converts screen coordinates into percentage coordinates relative to the element. */
 export function toPercentPoint(clientX: number, clientY: number, element: HTMLElement): IPoint {
   const box = element.getBoundingClientRect();
   if (!box.width || !box.height) {
@@ -44,7 +44,7 @@ export function toRect(area: IRect): IRect {
   return { x: area.x, y: area.y, width: area.width, height: area.height };
 }
 
-/** Begrenzt ein Rechteck auf die Bildfläche und rundet auf 2 Nachkommastellen. */
+/** Clamps a rectangle to the image area and rounds to 2 decimal places. */
 export function normalizeRect(r: IRect): IRect {
   const width = clamp(r.width, MIN_AREA_SIZE, 100);
   const height = clamp(r.height, MIN_AREA_SIZE, 100);
@@ -77,11 +77,11 @@ export function resizeRect(r: IRect, handle: ResizeHandle, p: IPoint): IRect {
   return { x: left, y: top, width: right - left, height: bottom - top };
 }
 
-// ---------------- Kreise ----------------
-// Prozentwerte beziehen sich horizontal auf die Bildbreite und vertikal auf die Bildhöhe.
-// Damit ein Kreis rund bleibt, gilt: Höhe% = Breite% × ratio  (ratio = Bildbreite / Bildhöhe).
+// ---------------- Circles ----------------
+// Percentages refer horizontally to the image width and vertically to the image height.
+// For a circle to stay round: height% = width% × ratio  (ratio = image width / image height).
 
-/** Kreis aus linker/oberer Kante und Durchmesser (in % der Bildbreite), auf das Bild begrenzt. */
+/** Circle from left/top edge and diameter (in % of image width), clamped to the image. */
 export function circleFromWidth(x: number, y: number, diameter: number, ratio: number): IRect {
   const r = ratio > 0 && isFinite(ratio) ? ratio : 1;
   let width = clamp(diameter, MIN_AREA_SIZE, 100);
@@ -98,10 +98,10 @@ export function circleFromWidth(x: number, y: number, diameter: number, ratio: n
   };
 }
 
-/** Kreis beim Aufziehen: Durchmesser = größere der beiden Zugrichtungen (in Pixeln gemessen). */
+/** Circle while dragging: diameter = the larger of the two drag directions (measured in pixels). */
 export function circleFromDrag(start: IPoint, p: IPoint, ratio: number): IRect {
   const dx = p.x - start.x;
-  const dy = (p.y - start.y) / ratio; // in "Breiten-Prozent" umgerechnet
+  const dy = (p.y - start.y) / ratio; // converted to "width percent"
   const d = Math.max(Math.abs(dx), Math.abs(dy));
   const width = d;
   const height = d * ratio;
@@ -113,7 +113,7 @@ export function circleFromDrag(start: IPoint, p: IPoint, ratio: number): IRect {
   };
 }
 
-/** Kreis an einem Griff skalieren; die gegenüberliegende Seite bleibt fest. */
+/** Resize a circle via a handle; the opposite side stays fixed. */
 export function resizeCircle(r: IRect, handle: ResizeHandle, p: IPoint, ratio: number): IRect {
   const hasW = handle.indexOf('w') >= 0;
   const hasE = handle.indexOf('e') >= 0;
@@ -134,7 +134,7 @@ export function resizeCircle(r: IRect, handle: ResizeHandle, p: IPoint, ratio: n
   };
 }
 
-/** Normalisiert je nach Form (Kreise bleiben rund). */
+/** Normalizes depending on shape (circles stay round). */
 export function normalizeShapeRect(r: IRect, shape: string, ratio: number): IRect {
   return shape === 'circle' ? circleFromWidth(r.x, r.y, r.width, ratio) : normalizeRect(r);
 }
@@ -156,7 +156,7 @@ export function createArea(rect: IRect, hover: IHoverStyle, shape: 'rect' | 'cir
   };
 }
 
-/** Sucht ab `start` aufwärts bis `stop` nach einem Attribut (IE11 kennt Element.closest nicht). */
+/** Searches upward from `start` to `stop` for an attribute (IE11 does not support Element.closest). */
 export function findAttribute(start: HTMLElement | null, attribute: string, stop: HTMLElement): string | undefined {
   let el: HTMLElement | null = start;
   while (el && el !== stop) {

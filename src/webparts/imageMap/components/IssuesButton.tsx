@@ -6,26 +6,27 @@ import { Text } from '@fluentui/react/lib/Text';
 import { handleRovingKeyDown } from '../utils/rovingFocus';
 import { getId } from '@fluentui/react/lib/Utilities';
 import { IValidationIssue } from '../utils/validation';
+import { strings } from '../loc/strings';
 
 export interface IIssuesButtonProps {
   issues: IValidationIssue[];
   onSelect: (issue: IValidationIssue) => void;
 }
 
-/** Zähler „n Hinweise“ in der Toolbar. Öffnet eine Liste mit Sprunglinks zu den betroffenen Stellen. */
+/** "n issues" counter in the toolbar. Opens a list with jump links to the affected locations. */
 export const IssuesButton: React.FunctionComponent<IIssuesButtonProps> = (props: IIssuesButtonProps) => {
   const [open, setOpen] = React.useState<boolean>(false);
   const buttonRef = React.useRef<HTMLDivElement>(null);
   const titleId = React.useRef<string>(getId('imagemap-issues'));
   const count = props.issues.length;
-  const label = count === 0 ? 'Keine Hinweise' : `${count} ${count === 1 ? 'Hinweis' : 'Hinweise'}`;
+  const label = strings.issuesLabel(count);
 
   return (
     <div ref={buttonRef} style={{ display: 'flex', height: '100%' }}>
       <CommandBarButton
         text={String(count)}
         iconProps={{ iconName: count ? 'Warning' : 'CheckMark' }}
-        ariaLabel={`${label}${count ? ', Liste öffnen' : ''}`}
+        ariaLabel={`${label}${count ? strings.openList : ''}`}
         title={label}
         role="menuitem"
         aria-haspopup={count ? 'dialog' : undefined}
@@ -59,9 +60,7 @@ export const IssuesButton: React.FunctionComponent<IIssuesButtonProps> = (props:
               ))}
             </ul>
           </div>
-          <Text variant="small" block={true} style={{ marginTop: 8 }}>
-            Fehlerhafte Bereiche werden im Anzeigemodus nicht als Link ausgegeben.
-          </Text>
+          <Text variant="small" block={true} style={{ marginTop: 8 }}>{strings.issuesFooter}</Text>
         </Callout>
       )}
     </div>
