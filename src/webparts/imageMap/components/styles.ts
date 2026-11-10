@@ -151,6 +151,33 @@ export const classNames = mergeStyleSets({
   listIndex: { width: 28, flexShrink: 0, fontWeight: 600, color: theme.palette.themePrimary },
   listText: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   issueIcon: { color: theme.palette.redDark, marginRight: 6 },
+  issueBadge: {
+    position: 'absolute',
+    right: -8,
+    top: -8,
+    width: 18,
+    height: 18,
+    borderRadius: '50%',
+    background: theme.palette.redDark,
+    color: theme.palette.white,
+    fontSize: 12,
+    fontWeight: 700,
+    lineHeight: '18px',
+    textAlign: 'center',
+    pointerEvents: 'none',
+    zIndex: 4,
+    selectors: { [HighContrastSelector]: { background: 'Mark', color: 'MarkText', forcedColorAdjust: 'none' } }
+  },
+  canvasRow: { display: 'flex', alignItems: 'flex-start', minHeight: 0 },
+  canvasCol: { flex: 1, minWidth: 0, padding: 8 },
+  sideCol: {
+    width: 360,
+    flexShrink: 0,
+    alignSelf: 'stretch',
+    overflowY: 'auto',
+    borderLeft: `1px solid ${theme.palette.neutralLight}`
+  },
+  fullscreenNote: { padding: 16, textAlign: 'center', color: theme.palette.neutralSecondary },
   issueList: { margin: '4px 0 0', paddingLeft: 18 },
   placeholder: {
     padding: '32px 16px',

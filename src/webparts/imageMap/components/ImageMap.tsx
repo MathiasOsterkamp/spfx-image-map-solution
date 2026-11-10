@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ISecurityPolicy } from '../config/securityConfig';
 import { IHoverStyle, IImageArea } from '../models/IImageMap';
 import { ImageService } from '../services/ImageService';
+import { PageService } from '../services/PageService';
 import { ImageMapEditor } from './ImageMapEditor';
 import { ImageMapViewer } from './ImageMapViewer';
 
@@ -16,6 +17,7 @@ export interface IImageMapProps {
   defaultHover: IHoverStyle;
   uploadFolder: string;
   service: ImageService;
+  pageService: PageService;
   policy: ISecurityPolicy;
   onAreasChange: (areas: IImageArea[]) => void;
   onImageChange: (url: string) => void;

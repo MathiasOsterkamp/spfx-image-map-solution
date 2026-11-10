@@ -83,7 +83,11 @@ Zusätzlich: `npm run typecheck` führt nur die Typprüfung aus.
 - Das minifizierte Bundle ist reines ES5 (läuft auch im IE11), etwa 720 KB groß und enthält React 16.14 im Production-Build.
 - Das ausgelieferte Bundle wurde in jsdom mit nachgebauten SPFx-Schnittstellen geladen. Anzeige- und Bearbeitungsmodus rendern,
   unsichere Links werden verworfen, Texte bereinigt, Kreise korrekt positioniert.
-- Unit-Checks: über 90 Fälle zu Validierung, Längen, Sonderzeichen, Geometrie und Sanitizing, außerdem ein Smoke-Test der Tastatur- und Zeigerbedienung.
+- Unit-Checks: über 90 Fälle zu Validierung, Längen, Sonderzeichen, Geometrie und Sanitizing.
+- **Tastatur und ARIA:** 26 automatisierte Tests in jsdom, u. a. Werkzeug-Kurztasten, Einfügen per Enter, Seitensuche nur mit Pfeiltasten,
+  keine Kurztasten in Textfeldern, Undo fasst Pfeiltasten zusammen, Schnellaktionen mit einem Tab-Stopp, Esc-Rückweg, Fokus nach dem Löschen, Vollbild.
+- **axe-core 4:** 0 Verstöße im Anzeigemodus, im Editor, mit geöffnetem Panel (Reiter Link) und im Reiter Stil.
+  Farbkontrast lässt sich in jsdom nicht messen und muss im Browser geprüft werden.
 - **Nicht** geprüft: Lauf in einem echten SharePoint-Tenant bzw. SharePoint 2019 und Test mit einem echten Screenreader.
 
 ## Bundle-Größe
@@ -97,6 +101,61 @@ Für Updates `version` in `config/package-solution.json` erhöhen (z. B. `1.0.1.
 Gespeicherte Webpart-Daten bleiben kompatibel, denn neue Felder (z. B. `tooltip`) sind optional und werden beim Laden ergänzt.
 
 ---
+
+## Bedienung im Editor
+
+### Toolbar (Fluent `CommandBar`)
+
+| Gruppe | Einträge |
+|---|---|
+| Bild | Untermenü: Bild auswählen/ändern, Alternativtext bearbeiten |
+| Werkzeuge | Auswählen · Rechteck · Kreis · Ellipse (Optionsgruppe, `menuitemradio` + `aria-checked`) |
+| Verlauf | Rückgängig · Wiederholen (Name nennt den Schritt, z. B. „Rückgängig: Bereich verschoben“) |
+| „…“ | Bereich einfügen (Rechteck/Kreis/Ellipse in der Bildmitte) · Lesereihenfolge sortieren |
+| rechts | Hinweis-Zähler (öffnet Liste mit Sprunglinks) · Vorschau · Vollbild |
+
+Bei wenig Platz verschwinden zuerst die Beschriftungen (nur Icons, der Name bleibt als `aria-label`/Tooltip erhalten),
+danach rutschen Verlauf und Trennlinien ins „…“-Menü. Die Werkzeuge bleiben sichtbar.
+
+### Tastatur
+
+| Wo | Taste | Wirkung |
+|---|---|---|
+| Toolbar | Tab / Umschalt+Tab | In die Leiste hinein bzw. heraus |
+| Toolbar | ← → | Zwischen den Einträgen wechseln |
+| Toolbar | Enter / Leertaste, ↓ | Auslösen bzw. Untermenü öffnen |
+| Zeichenfläche | V · R · K · E | Werkzeug Auswählen · Rechteck · Kreis · Ellipse |
+| Zeichenfläche | Enter | Gewählte Form in der Bildmitte einfügen |
+| Bereich | ← → ↑ ↓ (+Umschalt) | Verschieben um 0,5 % (5 %) |
+| Bereich | Strg + Pfeile (+Umschalt) | Größe ändern, bei Kreisen den Durchmesser |
+| Bereich | Enter / Leertaste | Eigenschaften öffnen |
+| Bereich | Strg+D | Duplizieren |
+| Bereich | Entf | Löschen (Fokus springt zum nächsten Bereich) |
+| Bereich | Tab | Zu den Schnellaktionen (ein Tab-Stopp, dort ← → und Esc zurück) |
+| überall im Editor | Strg+Z · Strg+Y / Strg+Umschalt+Z | Rückgängig · Wiederholen (in Textfeldern gilt das native Rückgängig) |
+| Panel / Vollbild | Esc | Erst Panel schließen, dann Vollbild beenden. Der Fokus kehrt zum Bereich zurück |
+| Seitensuche | ↓ ↑, Enter, Esc | Ergebnisse durchgehen, wählen, schließen |
+
+**Kurztasten mit einem Buchstaben (V/R/K/E)** wirken nur, wenn der Fokus auf der Zeichenfläche oder einem Bereich liegt,
+nicht in Textfeldern und nicht in der Toolbar (WCAG 2.1.4). Die Zeichenfläche hat `role="application"`, damit Screenreader
+die Tasten durchreichen.
+
+**Rückgängig:** Bis zu 50 Schritte. Aufeinanderfolgende gleichartige Änderungen (Tippen in einem Feld, mehrere Pfeiltasten)
+werden zu einem Schritt zusammengefasst.
+
+### Eigenschaften (Reiter Link · Stil · Position)
+
+- **Link:** Ziel mit **Seitensuche** (durchsucht die Bibliothek „Websiteseiten“ der aktuellen Website nach Titel; ein leerer Titel
+  wird mit dem Seitentitel gefüllt), Titel, Tooltip, neuer Tab.
+- **Stil:** Form und **Stil-Vorlagen** (Markant, Dezent, Nur Rahmen, Hervorheben) oder „Eigener Stil“ mit allen Einzelwerten.
+- **Position:** Abstand, Breite/Höhe bzw. Durchmesser in %.
+- Enthält ein Reiter Fehler, zeigt er ein Warnsymbol und Screenreader hören „Link, enthält Fehler“.
+- Normal öffnen die Eigenschaften als Panel rechts, im **Vollbild** als Spalte neben der Zeichenfläche.
+
+### Schnellaktionen am Bereich
+
+Am ausgewählten Bereich erscheint eine kleine Leiste mit Ziel, Bearbeiten, Duplizieren und Löschen (`role="toolbar"`).
+Sie steht im DOM direkt hinter dem Bereich und ist deshalb mit einem Tab erreichbar.
 
 ## Formen
 
@@ -188,9 +247,8 @@ Die Felder begrenzen die Eingabe auf die Maximallänge und zeigen einen Zeichenz
 
 ### Bearbeitungsmodus
 
-- **Vollständig per Tastatur bedienbar (2.1.1):** Jeder Bereich ist ein fokussierbarer Button.
-  Pfeiltasten verschieben, **Strg + Pfeiltasten** ändern die Größe (bei Kreisen den Durchmesser: rechts/unten größer, links/oben kleiner), mit Umschalt in großen Schritten (5 %).
-  Enter/Leertaste öffnet die Eigenschaften, Entf löscht. Neue Bereiche über „Bereich hinzufügen“, also ohne Maus-Ziehen (2.5.7).
+- **Vollständig per Tastatur bedienbar (2.1.1):** siehe Tabelle „Tastatur“. Neue Bereiche entstehen auch ohne Ziehen
+  (Enter auf der Zeichenfläche oder „…“ → „Bereich einfügen“), damit ist WCAG 2.5.7 erfüllt.
 - **Ansagen per Live-Region (4.1.3):** Position, Größe, Anlegen, Löschen, Reihenfolge und Upload-Status.
 - **Fokusmanagement:** Nach dem Löschen geht der Fokus zum nächsten Bereich, nach dem Schließen des Panels zurück zum Bereich.
   Das Panel fokussiert beim Öffnen das Link-Feld.
@@ -200,6 +258,7 @@ Die Felder begrenzen die Eingabe auf die Maximallänge und zeigen einen Zeichenz
 ### Was trotzdem manuell zu prüfen ist
 
 - Den Farbkontrast von Rahmen und Füllung zum **konkreten Bild** kann der Code nicht messen.
+- Die Kontraste der Oberfläche (Fluent-Standardtheme) mit axe oder Accessibility Insights im echten Browser prüfen.
 - Test mit NVDA/JAWS und VoiceOver in eurer SharePoint-Umgebung.
 - Inhaltliche Qualität von Alternativ- und Linktexten.
 

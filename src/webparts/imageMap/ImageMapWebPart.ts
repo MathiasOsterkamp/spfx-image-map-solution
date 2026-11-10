@@ -14,6 +14,7 @@ import { ImageMap, IImageMapProps } from './components/ImageMap';
 import { createSecurityPolicy, ISecurityPolicy } from './config/securityConfig';
 import { IHoverStyle, IImageArea } from './models/IImageMap';
 import { ImageService } from './services/ImageService';
+import { PageService } from './services/PageService';
 import { sanitizeAreas, sanitizeHover } from './utils/sanitize';
 import { checkAlt, checkImageUrl, validateFolderPath } from './utils/validation';
 
@@ -32,6 +33,7 @@ let iconsInitialized = false;
 
 export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebPartProps> {
   private service!: ImageService;
+  private pageService!: PageService;
   private policy!: ISecurityPolicy;
 
   // Hinweis: Kein Override von `dataVersion` – die SPFx-1.4.1-Typings deklarieren es als Property,
@@ -51,6 +53,7 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
       this.context.pageContext.web.absoluteUrl,
       this.context.pageContext.web.serverRelativeUrl
     );
+    this.pageService = new PageService(this.context.spHttpClient, this.context.pageContext.web.absoluteUrl);
     return super.onInit();
   }
 
@@ -70,6 +73,7 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
       defaultHover: sanitizeHover(p.defaultHover),
       uploadFolder: folder,
       service: this.service,
+      pageService: this.pageService,
       policy: this.policy,
       onAreasChange: (areas: IImageArea[]) => {
         this.properties.areas = areas;
