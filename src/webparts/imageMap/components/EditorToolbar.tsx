@@ -5,7 +5,7 @@ import { VerticalDivider } from '@fluentui/react/lib/Divider';
 import { AreaShape } from '../models/IImageMap';
 import { IssuesButton } from './IssuesButton';
 import { IValidationIssue } from '../utils/validation';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 
 export type EditorTool = 'select' | AreaShape;
 

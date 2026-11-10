@@ -6,7 +6,7 @@ import { ISecurityPolicy } from '../config/securityConfig';
 import { IImageArea } from '../models/IImageMap';
 import { getViewAreaClass } from '../utils/hoverStyles';
 import { checkImageUrl, checkLinkUrl, cleanText, IUrlCheck } from '../utils/validation';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 import { classNames } from './styles';
 
 export interface IImageMapViewerProps {

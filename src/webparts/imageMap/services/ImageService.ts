@@ -1,5 +1,5 @@
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 
 export interface IImageFile {
   name: string;

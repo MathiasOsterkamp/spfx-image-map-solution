@@ -7,7 +7,7 @@ import { IColor } from '@fluentui/react/lib/Color';
 import { getId } from '@fluentui/react/lib/Utilities';
 import { safeColor } from '../utils/sanitize';
 import { classNames } from './styles';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 
 export interface IColorFieldProps {
   label: string;

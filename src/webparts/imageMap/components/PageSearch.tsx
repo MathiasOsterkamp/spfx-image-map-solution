@@ -5,7 +5,7 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import { getId } from '@fluentui/react/lib/Utilities';
 import { getTheme, mergeStyleSets } from '@fluentui/react/lib/Styling';
 import { IPageResult, PageService } from '../services/PageService';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 
 const theme = getTheme();
 const css = mergeStyleSets({

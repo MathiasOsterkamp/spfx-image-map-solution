@@ -4,7 +4,7 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import { handleRovingKeyDown, initRovingTabIndex } from '../utils/rovingFocus';
 import { getTheme, mergeStyleSets } from '@fluentui/react/lib/Styling';
 import { IImageArea } from '../models/IImageMap';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 
 const theme = getTheme();
 const css = mergeStyleSets({

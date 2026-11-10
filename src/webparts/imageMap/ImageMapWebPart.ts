@@ -12,7 +12,7 @@ import { setIconOptions } from '@fluentui/react/lib/Styling';
 
 import { ImageMap, IImageMapProps } from './components/ImageMap';
 import { createSecurityPolicy, ISecurityPolicy } from './config/securityConfig';
-import { setLanguage, strings } from './loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 import { IHoverStyle, IImageArea } from './models/IImageMap';
 import { ImageService } from './services/ImageService';
 import { PageService } from './services/PageService';
@@ -41,8 +41,6 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
   // newer TypeScript versions reject a getter override (TS2611). Default is 1.0.
 
   protected onInit(): Promise<void> {
-    // UI language of the site: en-* → English, fr-* → French, everything else → German.
-    setLanguage(this.context.pageContext.cultureInfo.currentUICultureName);
     if (!iconsInitialized) {
       // SharePoint sometimes already registers icons with the same name → suppress warnings.
       setIconOptions({ disableWarnings: true });

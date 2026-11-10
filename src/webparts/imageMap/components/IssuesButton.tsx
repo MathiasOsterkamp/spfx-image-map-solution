@@ -6,7 +6,7 @@ import { Text } from '@fluentui/react/lib/Text';
 import { handleRovingKeyDown } from '../utils/rovingFocus';
 import { getId } from '@fluentui/react/lib/Utilities';
 import { IValidationIssue } from '../utils/validation';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 
 export interface IIssuesButtonProps {
   issues: IValidationIssue[];

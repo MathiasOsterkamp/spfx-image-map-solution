@@ -3,7 +3,7 @@ import { Dialog, DialogFooter, DialogType } from '@fluentui/react/lib/Dialog';
 import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import { TextField } from '@fluentui/react/lib/TextField';
 import { checkAlt } from '../utils/validation';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 
 export interface IAltTextDialogProps {
   isOpen: boolean;

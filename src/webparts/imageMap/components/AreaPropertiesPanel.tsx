@@ -22,7 +22,7 @@ import { circleFromWidth, normalizeRect, IRect } from '../utils/geometry';
 import { checkLinkUrl, checkTitle, checkTooltip } from '../utils/validation';
 import { getEditAreaClass, getHoverRawStyle, getVisibilityWarning } from '../utils/hoverStyles';
 import { IPageResult, PageService } from '../services/PageService';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 import { ColorField } from './ColorField';
 import { PageSearch } from './PageSearch';
 import { classNames } from './styles';

@@ -12,7 +12,7 @@ import { ISecurityPolicy } from '../config/securityConfig';
 import { IImageFile, ImageService } from '../services/ImageService';
 import { acceptAttribute, describeAllowedTypes, IValidatedImage, validateImageFile } from '../utils/fileValidation';
 import { checkImageUrl } from '../utils/validation';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 import { classNames } from './styles';
 
 export interface IImagePickerPanelProps {

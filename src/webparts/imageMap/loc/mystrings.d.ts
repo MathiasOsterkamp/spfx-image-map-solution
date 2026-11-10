@@ -1,13 +1,11 @@
-import { AreaBorderStyle, AreaShape, HoverPresetKey } from '../models/IImageMap';
-
-type ShapeMap = { [K in AreaShape]: string };
-type ToolMap = { [K in AreaShape | 'select']: string };
+declare type ImageMapStringsShapeMap = { [K in import('../models/IImageMap').AreaShape]: string };
+declare type ImageMapStringsToolMap = { [K in import('../models/IImageMap').AreaShape | 'select']: string };
 
 /**
  * All user-facing texts of the web part. Texts with parameters are functions so that
  * every language can handle word order and plural forms itself.
  */
-export interface IStrings {
+declare interface IImageMapWebPartStrings {
   // ---------- General ----------
   /** Decimal separator for displayed numbers */
   decimalSeparator: string;
@@ -24,10 +22,10 @@ export interface IStrings {
   area: (n: number) => string;
   areaCount: (n: number) => string;
   charCounter: (length: number, max: number) => string;
-  shapeNames: ShapeMap;
-  toolNames: ToolMap;
+  shapeNames: ImageMapStringsShapeMap;
+  toolNames: ImageMapStringsToolMap;
   /** Single-key shortcuts of the tools (letters, upper case) */
-  toolKeys: ToolMap;
+  toolKeys: ImageMapStringsToolMap;
   imageLoadFailed: string;
 
   // ---------- Property pane ----------
@@ -110,10 +108,10 @@ export interface IStrings {
   fullscreenTitle: string;
 
   // ---------- Area properties ----------
-  shapeOptions: ShapeMap;
-  borderStyles: { [K in AreaBorderStyle]: string };
+  shapeOptions: ImageMapStringsShapeMap;
+  borderStyles: { [K in import('../models/IImageMap').AreaBorderStyle]: string };
   linkKinds: { internal: string; external: string; mailto: string; tel: string; anchor: string };
-  presets: { [K in HoverPresetKey]: { name: string; description: string } };
+  presets: { [K in import('../models/IImageMap').HoverPresetKey]: { name: string; description: string } };
   labelPositionChanged: string;
   labelShapeChanged: string;
   increaseBy: (label: string, step: string) => string;
@@ -342,4 +340,9 @@ export interface IStrings {
   issueArea: (n: number, error: string) => string;
   issueTitle: (n: number, error: string) => string;
   issueTooltip: (n: number, error: string) => string;
+}
+
+declare module 'ImageMapWebPartStrings' {
+  const strings: IImageMapWebPartStrings;
+  export = strings;
 }

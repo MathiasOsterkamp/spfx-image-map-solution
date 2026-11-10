@@ -12,5 +12,7 @@
     }
   },
   "externals": {},
-  "localizedResources": {}
+  "localizedResources": {
+    "ImageMapWebPartStrings": "lib/webparts/imageMap/loc/{locale}.js"
+  }
 }
