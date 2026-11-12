@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { Label } from '@fluentui/react/lib/Label';
 import { DefaultButton } from '@fluentui/react/lib/Button';
 import { Callout, DirectionalHint } from '@fluentui/react/lib/Callout';
-import { ColorPicker } from '@fluentui/react/lib/ColorPicker';
 import { IColor } from '@fluentui/react/lib/Color';
+import { ColorPicker } from '@fluentui/react/lib/ColorPicker';
+import { Label } from '@fluentui/react/lib/Label';
 import { getId } from '@fluentui/react/lib/Utilities';
-import { safeColor } from '../utils/sanitize';
 import { useClassNames } from './styles';
 import { strings } from '../loc/strings';
+import { safeColor } from '../utils/sanitize';
 
 export interface IColorFieldProps {
   label: string;

@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { Callout, DirectionalHint } from '@fluentui/react/lib/Callout';
 import { CommandBarButton } from '@fluentui/react/lib/Button';
+import { Callout, DirectionalHint } from '@fluentui/react/lib/Callout';
 import { Link } from '@fluentui/react/lib/Link';
 import { Text } from '@fluentui/react/lib/Text';
-import { handleRovingKeyDown } from '../utils/rovingFocus';
 import { getId } from '@fluentui/react/lib/Utilities';
-import { IValidationIssue } from '../utils/validation';
 import { strings } from '../loc/strings';
+import { handleRovingKeyDown } from '../utils/rovingFocus';
+import { IValidationIssue } from '../utils/validation';
 
 export interface IIssuesButtonProps {
   issues: IValidationIssue[];
@@ -52,7 +52,8 @@ export const IssuesButton: React.FunctionComponent<IIssuesButtonProps> = (props:
           <Text id={titleId.current} variant="mediumPlus" block={true} style={{ fontWeight: 600, marginBottom: 8 }}>
             {label}
           </Text>
-          <div onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => handleRovingKeyDown(e, 'vertical')}>
+          {/* role="presentation": only catches the arrow keys bubbling up from the links. */}
+          <div role="presentation" onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => handleRovingKeyDown(e, 'vertical')}>
             <ul style={{ margin: 0, paddingLeft: 18 }}>
               {issues.map((issue: IValidationIssue, i: number) => (
                 <li key={i} style={{ marginBottom: 6 }}>

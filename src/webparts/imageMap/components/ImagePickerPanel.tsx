@@ -1,21 +1,21 @@
 import * as React from 'react';
+import { Breadcrumb, IBreadcrumbItem } from '@fluentui/react/lib/Breadcrumb';
+import { PrimaryButton, DefaultButton, ActionButton, IconButton } from '@fluentui/react/lib/Button';
+import { Icon } from '@fluentui/react/lib/Icon';
+import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { Panel, PanelType } from '@fluentui/react/lib/Panel';
 import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
-import { TextField } from '@fluentui/react/lib/TextField';
-import { PrimaryButton, DefaultButton, ActionButton, IconButton } from '@fluentui/react/lib/Button';
-import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
+import { SearchBox } from '@fluentui/react/lib/SearchBox';
 import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
 import { Text } from '@fluentui/react/lib/Text';
-import { Icon } from '@fluentui/react/lib/Icon';
+import { TextField } from '@fluentui/react/lib/TextField';
 import { css } from '@fluentui/react/lib/Utilities';
+import { useClassNames } from './styles';
 import { ISecurityPolicy } from '../config/securityConfig';
-import { Breadcrumb, IBreadcrumbItem } from '@fluentui/react/lib/Breadcrumb';
-import { SearchBox } from '@fluentui/react/lib/SearchBox';
+import { strings } from '../loc/strings';
 import { IImageFile, IImageFolder, IImagePage, ImageService, isSameImageUrl } from '../services/ImageService';
 import { acceptAttribute, describeAllowedTypes, IValidatedImage, validateImageFile } from '../utils/fileValidation';
 import { checkImageUrl } from '../utils/validation';
-import { strings } from '../loc/strings';
-import { useClassNames } from './styles';
 
 export interface IImagePickerPanelProps {
   isOpen: boolean;

@@ -1,12 +1,12 @@
 import * as React from 'react';
+import { Icon } from '@fluentui/react/lib/Icon';
 import { SearchBox } from '@fluentui/react/lib/SearchBox';
 import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
-import { Icon } from '@fluentui/react/lib/Icon';
-import { getId, memoizeFunction } from '@fluentui/react/lib/Utilities';
 import { mergeStyleSets } from '@fluentui/react/lib/Styling';
 import { ITheme, useTheme } from '@fluentui/react/lib/Theme';
-import { IPageResult, PageService } from '../services/PageService';
+import { getId, memoizeFunction } from '@fluentui/react/lib/Utilities';
 import { strings } from '../loc/strings';
+import { IPageResult, PageService } from '../services/PageService';
 
 const getCss = memoizeFunction((theme: ITheme) => mergeStyleSets({
   list: { listStyle: 'none', margin: '4px 0 0', padding: 0, border: `1px solid ${theme.palette.neutralLight}`, borderRadius: 2, maxHeight: 220, overflowY: 'auto' },
@@ -63,7 +63,7 @@ export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPa
     }
   };
 
-  const onListKeyDown = (e: React.KeyboardEvent<HTMLUListElement>) => {
+  const onListKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const buttons = listRef.current ? Array.prototype.slice.call(listRef.current.querySelectorAll('button')) : [];
     const index = buttons.indexOf(document.activeElement);
     if (e.key === 'ArrowDown' || e.key === 'Down') { e.preventDefault(); focusResult(index + 1); }
@@ -84,6 +84,8 @@ export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPa
         aria-controls={ids.current.list}
         aria-describedby={ids.current.status}
         value={query}
+        // The search only appears after the user opened it: moving the focus there is intended.
+        // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={true}
         onChange={(e?: React.ChangeEvent<HTMLInputElement>, v?: string) => setQuery(v || '')}
         onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -96,17 +98,20 @@ export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPa
         {loading ? <Spinner size={SpinnerSize.xSmall} label={strings.searching} labelPosition="right" /> : status}
       </div>
       {!loading && results.length > 0 && (
-        <ul id={ids.current.list} ref={listRef} className={css.list} aria-label={strings.foundPages} onKeyDown={onListKeyDown}>
-          {results.map((page: IPageResult) => (
-            <li key={page.url}>
-              <button type="button" className={css.item} onClick={() => onSelect(page)}>
-                <Icon iconName="Page" aria-hidden={true} />
-                <span className={css.title}>{page.title}</span>
-                <span className={css.file} aria-hidden={true}>{page.fileName}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+        // role="presentation": only catches the arrow keys bubbling up from the result buttons.
+        <div role="presentation" onKeyDown={onListKeyDown}>
+          <ul id={ids.current.list} ref={listRef} className={css.list} aria-label={strings.foundPages}>
+            {results.map((page: IPageResult) => (
+              <li key={page.url}>
+                <button type="button" className={css.item} onClick={() => onSelect(page)}>
+                  <Icon iconName="Page" aria-hidden={true} />
+                  <span className={css.title}>{page.title}</span>
+                  <span className={css.file} aria-hidden={true}>{page.fileName}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

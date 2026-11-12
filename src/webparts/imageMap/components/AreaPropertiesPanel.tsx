@@ -1,31 +1,31 @@
 import * as React from 'react';
+import { DefaultButton, PrimaryButton, ActionButton, IconButton } from '@fluentui/react/lib/Button';
+import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup';
+import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
+import { Label } from '@fluentui/react/lib/Label';
+import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { Panel, PanelType } from '@fluentui/react/lib/Panel';
 import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
+import { IPivotItemProps } from '@fluentui/react/lib/Pivot';
+import { Separator } from '@fluentui/react/lib/Separator';
+import { SpinButton } from '@fluentui/react/lib/SpinButton';
+import { Stack } from '@fluentui/react/lib/Stack';
+import { Text } from '@fluentui/react/lib/Text';
 import { TextField } from '@fluentui/react/lib/TextField';
 import { Toggle } from '@fluentui/react/lib/Toggle';
-import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
-import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup';
-import { SpinButton } from '@fluentui/react/lib/SpinButton';
-import { Separator } from '@fluentui/react/lib/Separator';
-import { Stack } from '@fluentui/react/lib/Stack';
-import { DefaultButton, PrimaryButton, ActionButton, IconButton } from '@fluentui/react/lib/Button';
-import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
-import { Label } from '@fluentui/react/lib/Label';
-import { Text } from '@fluentui/react/lib/Text';
 import { getId, IRenderFunction } from '@fluentui/react/lib/Utilities';
-import { IPivotItemProps } from '@fluentui/react/lib/Pivot';
-import { ISecurityPolicy } from '../config/securityConfig';
-import {
-  AreaBorderStyle, AreaShape, DEFAULT_HOVER, HOVER_PRESETS, IHoverPreset, IHoverStyle, IImageArea, matchPreset
-} from '../models/IImageMap';
-import { circleFromWidth, normalizeRect, IRect } from '../utils/geometry';
-import { checkLinkUrl, checkTitle, checkTooltip } from '../utils/validation';
-import { getEditAreaClass, getHoverRawStyle, getVisibilityWarning } from '../utils/hoverStyles';
-import { IPageResult, PageService } from '../services/PageService';
-import { strings } from '../loc/strings';
 import { ColorField } from './ColorField';
 import { PageSearch } from './PageSearch';
 import { useClassNames } from './styles';
+import { ISecurityPolicy } from '../config/securityConfig';
+import { strings } from '../loc/strings';
+import {
+  AreaBorderStyle, AreaShape, DEFAULT_HOVER, HOVER_PRESETS, IHoverPreset, IHoverStyle, IImageArea, matchPreset
+} from '../models/IImageMap';
+import { IPageResult, PageService } from '../services/PageService';
+import { circleFromWidth, normalizeRect, IRect } from '../utils/geometry';
+import { getEditAreaClass, getHoverRawStyle, getVisibilityWarning } from '../utils/hoverStyles';
+import { checkLinkUrl, checkTitle, checkTooltip } from '../utils/validation';
 
 /** CSS class on the link input so the panel focuses it when opened. */
 export const FIRST_FIELD_CLASS = 'imagemap-first-field';

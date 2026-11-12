@@ -2,10 +2,10 @@ import * as React from 'react';
 import { CommandBar, ICommandBarData, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
 import { ContextualMenuItemType } from '@fluentui/react/lib/ContextualMenu';
 import { VerticalDivider } from '@fluentui/react/lib/Divider';
-import { AreaShape } from '../models/IImageMap';
 import { IssuesButton } from './IssuesButton';
-import { IValidationIssue } from '../utils/validation';
 import { strings } from '../loc/strings';
+import { AreaShape } from '../models/IImageMap';
+import { IValidationIssue } from '../utils/validation';
 
 export type EditorTool = 'select' | AreaShape;
 

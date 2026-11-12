@@ -1,6 +1,6 @@
+import { formatNumber } from './format';
 import { ImageType, ISecurityPolicy } from '../config/securityConfig';
 import { strings } from '../loc/strings';
-import { formatNumber } from './format';
 
 const TYPE_LABEL: { [key: string]: string } = { png: 'PNG', jpeg: 'JPEG', gif: 'GIF', webp: 'WebP' };
 const TYPE_EXTENSION: { [key: string]: string } = { png: 'png', jpeg: 'jpg', gif: 'gif', webp: 'webp' };

@@ -1,5 +1,7 @@
 import * as React from 'react';
-import * as ReactDom from 'react-dom';
+import { initializeIcons } from '@fluentui/react/lib/Icons';
+import { setIconOptions } from '@fluentui/react/lib/Styling';
+import { ITheme } from '@fluentui/react/lib/Theme';
 import { DisplayMode } from '@microsoft/sp-core-library';
 import {
   BaseClientSideWebPart,
@@ -10,10 +12,7 @@ import {
   PropertyPaneTextField,
   PropertyPaneToggle
 } from '@microsoft/sp-webpart-base';
-import { initializeIcons } from '@fluentui/react/lib/Icons';
-import { setIconOptions } from '@fluentui/react/lib/Styling';
-import { ITheme } from '@fluentui/react/lib/Theme';
-
+import * as ReactDom from 'react-dom';
 import { ImageMap, IImageMapProps } from './components/ImageMap';
 import { createSecurityPolicy, ISecurityPolicy } from './config/securityConfig';
 import { strings } from './loc/strings';

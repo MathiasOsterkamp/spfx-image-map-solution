@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { IconButton } from '@fluentui/react/lib/Button';
 import { Icon } from '@fluentui/react/lib/Icon';
-import { handleRovingKeyDown, initRovingTabIndex } from '../utils/rovingFocus';
 import { mergeStyleSets } from '@fluentui/react/lib/Styling';
 import { ITheme, useTheme } from '@fluentui/react/lib/Theme';
 import { memoizeFunction } from '@fluentui/react/lib/Utilities';
-import { IImageArea } from '../models/IImageMap';
 import { strings } from '../loc/strings';
+import { IImageArea } from '../models/IImageMap';
+import { handleRovingKeyDown, initRovingTabIndex } from '../utils/rovingFocus';
 
 const getCss = memoizeFunction((theme: ITheme) => mergeStyleSets({
   bar: {

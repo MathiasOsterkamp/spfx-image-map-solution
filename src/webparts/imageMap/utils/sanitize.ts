@@ -1,7 +1,7 @@
-import { AreaBorderStyle, DEFAULT_HOVER, IHoverStyle, IImageArea } from '../models/IImageMap';
-import { ISecurityPolicy } from '../config/securityConfig';
 import { normalizeRect } from './geometry';
 import { asRecord } from './untyped';
+import { ISecurityPolicy } from '../config/securityConfig';
+import { AreaBorderStyle, DEFAULT_HOVER, IHoverStyle, IImageArea } from '../models/IImageMap';
 
 const COLOR_PATTERN = /^(#[0-9a-f]{3,8}|rgba?\(\s*[\d.\s,%]+\)|hsla?\(\s*[\d.\s,%deg]+\)|[a-z]{3,30})$/i;
 const BORDER_STYLES: AreaBorderStyle[] = ['solid', 'dashed', 'dotted', 'double'];

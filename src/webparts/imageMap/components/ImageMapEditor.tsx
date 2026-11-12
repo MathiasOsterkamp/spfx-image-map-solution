@@ -1,30 +1,30 @@
 import * as React from 'react';
 import { IconButton, PrimaryButton } from '@fluentui/react/lib/Button';
+import { Icon } from '@fluentui/react/lib/Icon';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { Modal } from '@fluentui/react/lib/Modal';
-import { Icon } from '@fluentui/react/lib/Icon';
 import { Text } from '@fluentui/react/lib/Text';
 import { css, getId } from '@fluentui/react/lib/Utilities';
+import { AltTextDialog } from './AltTextDialog';
+import { AreaPropertiesInline, AreaPropertiesPanel, FIRST_FIELD_CLASS, PropertiesTab } from './AreaPropertiesPanel';
+import { EditorTool, EditorToolbar } from './EditorToolbar';
+import { ImageMapViewer } from './ImageMapViewer';
+import { ImagePickerPanel } from './ImagePickerPanel';
+import { QuickActions } from './QuickActions';
+import { useClassNames } from './styles';
 import { ISecurityPolicy } from '../config/securityConfig';
+import { useAreaHistory } from '../hooks/useAreaHistory';
+import { strings } from '../loc/strings';
 import { AreaShape, IHoverStyle, IImageArea } from '../models/IImageMap';
+import { ImageService } from '../services/ImageService';
+import { PageService } from '../services/PageService';
+import { formatNumber } from '../utils/format';
 import {
   circleFromDrag, circleFromWidth, createArea, findAttribute, IPoint, IRect, MIN_DRAW_SIZE, moveRect, normalizeRect,
   normalizeShapeRect, rectFromPoints, resizeCircle, resizeRect, ResizeHandle, RESIZE_HANDLES, round2, toPercentPoint, toRect
 } from '../utils/geometry';
 import { getEditAreaClass } from '../utils/hoverStyles';
 import { checkImageUrl, collectIssues, IValidationIssue } from '../utils/validation';
-import { ImageService } from '../services/ImageService';
-import { PageService } from '../services/PageService';
-import { useAreaHistory } from '../hooks/useAreaHistory';
-import { strings } from '../loc/strings';
-import { formatNumber } from '../utils/format';
-import { ImageMapViewer } from './ImageMapViewer';
-import { AreaPropertiesInline, AreaPropertiesPanel, FIRST_FIELD_CLASS, PropertiesTab } from './AreaPropertiesPanel';
-import { ImagePickerPanel } from './ImagePickerPanel';
-import { AltTextDialog } from './AltTextDialog';
-import { EditorTool, EditorToolbar } from './EditorToolbar';
-import { QuickActions } from './QuickActions';
-import { useClassNames } from './styles';
 
 export interface IImageMapEditorProps {
   imageUrl: string;
@@ -535,10 +535,13 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       <Text block={true} variant="small" className={classNames.hint} id={ids.current.help}>{strings.editorHelp}</Text>
       {imageFailed && <MessageBar messageBarType={MessageBarType.error}>{strings.imageLoadFailed}</MessageBar>}
       <div className={css(classNames.outer, stretch && classNames.outerStretch)}>
+        {/* The drawing surface is a custom widget (role="application") operated with pointer and keyboard. */}
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
         <div
           ref={surfaceRef}
           className={css(classNames.frame, stretch && classNames.frameStretch, classNames.surface)}
           style={{ cursor: tool === 'select' ? 'default' : 'crosshair' }}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- the surface must be reachable by keyboard
           tabIndex={0}
           role="application"
           aria-roledescription={strings.canvasRoleDescription}
@@ -657,7 +660,8 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   );
 
   const body = (
-    <div className={classNames.editor} onKeyDown={onEditorKeyDown} style={fullscreen ? { border: 'none', height: '100%', display: 'flex', flexDirection: 'column' } : undefined}>
+    // role="presentation": the container only catches keyboard shortcuts bubbling up from its content.
+    <div className={classNames.editor} role="presentation" onKeyDown={onEditorKeyDown} style={fullscreen ? { border: 'none', height: '100%', display: 'flex', flexDirection: 'column' } : undefined}>
       {liveRegion}
       <EditorToolbar
         tool={tool}

@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Dialog, DialogFooter, DialogType } from '@fluentui/react/lib/Dialog';
 import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
+import { Dialog, DialogFooter, DialogType } from '@fluentui/react/lib/Dialog';
 import { TextField } from '@fluentui/react/lib/TextField';
-import { checkAlt } from '../utils/validation';
 import { strings } from '../loc/strings';
+import { checkAlt } from '../utils/validation';
 
 export interface IAltTextDialogProps {
   isOpen: boolean;

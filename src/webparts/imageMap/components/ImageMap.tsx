@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { ITheme, ThemeProvider } from '@fluentui/react/lib/Theme';
+import { ImageMapEditor } from './ImageMapEditor';
+import { ImageMapViewer } from './ImageMapViewer';
 import { ISecurityPolicy } from '../config/securityConfig';
 import { IHoverStyle, IImageArea } from '../models/IImageMap';
 import { ImageService } from '../services/ImageService';
 import { PageService } from '../services/PageService';
-import { ImageMapEditor } from './ImageMapEditor';
-import { ImageMapViewer } from './ImageMapViewer';
 
 export interface IImageMapProps {
   /** Theme of the SharePoint site, calculated by the web part (see utils/theme.ts) */

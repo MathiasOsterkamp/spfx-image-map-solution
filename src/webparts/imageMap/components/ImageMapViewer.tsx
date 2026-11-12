@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { css } from '@fluentui/react/lib/Utilities';
 import { Icon } from '@fluentui/react/lib/Icon';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
+import { css } from '@fluentui/react/lib/Utilities';
+import { useClassNames } from './styles';
 import { ISecurityPolicy } from '../config/securityConfig';
+import { strings } from '../loc/strings';
 import { IImageArea } from '../models/IImageMap';
 import { getViewAreaClass } from '../utils/hoverStyles';
 import { checkImageUrl, checkLinkUrl, cleanText, IUrlCheck } from '../utils/validation';
-import { strings } from '../loc/strings';
-import { useClassNames } from './styles';
 
 export interface IImageMapViewerProps {
   imageUrl: string;
@@ -39,6 +39,7 @@ function positionStyle(area: IImageArea): React.CSSProperties {
   return { left: `${area.x}%`, top: `${area.y}%`, width: `${area.width}%`, height: `${area.height}%` };
 }
 
+/** target, rel and routing attributes of a link. The href is set at the element itself. */
 function linkAttributes(link: IRenderableLink): React.AnchorHTMLAttributes<HTMLAnchorElement> & { 'data-interception'?: string } {
   const external = link.check.kind === 'external';
   const relParts: string[] = [];
@@ -49,7 +50,6 @@ function linkAttributes(link: IRenderableLink): React.AnchorHTMLAttributes<HTMLA
     relParts.push('nofollow');
   }
   return {
-    href: link.check.url,
     target: link.area.openInNewTab ? '_blank' : undefined,
     rel: relParts.length ? relParts.join(' ') : undefined,
     // Do not route external links through SharePoint page routing
@@ -122,6 +122,7 @@ export const ImageMapViewer: React.FunctionComponent<IImageMapViewerProps> = (pr
                 return (
                   <li key={link.area.id} className={classNames.areaItem} style={positionStyle(link.area)}>
                     <a
+                      href={link.check.url}
                       {...linkAttributes(link)}
                       aria-label={link.label + suffix}
                       title={link.tooltip + suffix}
@@ -141,6 +142,7 @@ export const ImageMapViewer: React.FunctionComponent<IImageMapViewerProps> = (pr
           {links.map((link: IRenderableLink) => (
             <li key={link.area.id}>
               <a
+                href={link.check.url}
                 {...linkAttributes(link)}
                 className={classNames.textLink}
                 title={link.tooltip !== link.label ? link.tooltip : undefined}
