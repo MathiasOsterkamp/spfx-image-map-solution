@@ -30,10 +30,14 @@ export const classNames = mergeStyleSets({
   },
   textLinks: { margin: '12px 0 0', paddingLeft: 20, lineHeight: 1.6, fontSize: 14 },
   textLink: {
-    color: theme.palette.themePrimary,
-    textDecoration: 'underline',
+    color: theme.semanticColors.bodyText,
+    textDecoration: 'none',
     selectors: {
-      ':hover': { color: theme.palette.themeDarker },
+      // SharePoint's global a:link / a:visited rules would otherwise win over the class.
+      ':link': { color: theme.semanticColors.bodyText, textDecoration: 'none' },
+      ':visited': { color: theme.semanticColors.bodyText, textDecoration: 'none' },
+      ':hover': { color: theme.semanticColors.bodyText, textDecoration: 'underline' },
+      ':active': { color: theme.semanticColors.bodyText, textDecoration: 'underline' },
       ':focus': { outline: `2px solid ${theme.palette.neutralPrimary}`, outlineOffset: 2 }
     }
   },
