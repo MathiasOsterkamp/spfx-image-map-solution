@@ -5,6 +5,7 @@ import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { Modal } from '@fluentui/react/lib/Modal';
 import { Text } from '@fluentui/react/lib/Text';
 import { css, getId } from '@fluentui/react/lib/Utilities';
+import * as strings from 'ImageMapWebPartStrings';
 import { AltTextDialog } from './AltTextDialog';
 import { AreaPropertiesInline, AreaPropertiesPanel, FIRST_FIELD_CLASS, PropertiesTab } from './AreaPropertiesPanel';
 import { EditorTool, EditorToolbar } from './EditorToolbar';
@@ -14,7 +15,7 @@ import { QuickActions } from './QuickActions';
 import { useClassNames } from './styles';
 import { ISecurityPolicy } from '../config/securityConfig';
 import { useAreaHistory } from '../hooks/useAreaHistory';
-import { strings } from '../loc/strings';
+import { formatText } from '../loc/template';
 import { AreaShape, IHoverStyle, IImageArea } from '../models/IImageMap';
 import { ImageService } from '../services/ImageService';
 import { PageService } from '../services/PageService';
@@ -88,8 +89,8 @@ function toolForKey(key: string): EditorTool | undefined {
 const fmt = (n: number): string => formatNumber(n);
 
 function describeRect(r: IRect, shape?: string): string {
-  const size = shape === 'circle' ? strings.circleDiameter(fmt(r.width)) : strings.rectSize(fmt(r.width), fmt(r.height));
-  return `${strings.rectPosition(fmt(r.x), fmt(r.y))}, ${size}`;
+  const size = shape === 'circle' ? formatText(strings.circleDiameter, fmt(r.width)) : formatText(strings.rectSize, fmt(r.width), fmt(r.height));
+  return `${formatText(strings.rectPosition, fmt(r.x), fmt(r.y))}, ${size}`;
 }
 
 function sortByReadingOrder(areas: IImageArea[]): IImageArea[] {
@@ -214,7 +215,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   // ---------------- Tools ----------------
   const setTool = (next: EditorTool) => {
     setToolState(next);
-    announce(next === 'select' ? strings.announceToolSelect : strings.announceTool(strings.toolNames[next]));
+    announce(next === 'select' ? strings.announceToolSelect : formatText(strings.announceTool, strings.toolNames[next]));
   };
 
   // ---------------- Data changes (all via history → undo possible) ----------------
@@ -225,16 +226,16 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   const addArea = (rect: IRect, shape: AreaShape, drawn: boolean) => {
     const current = latest();
     if (current.length >= policy.maxAreas) {
-      announce(strings.maxAreasReached(policy.maxAreas));
+      announce(formatText(strings.maxAreasReached, policy.maxAreas));
       return;
     }
     const area = createArea(rect, defaultHover, shape, getRatio());
-    history.commit(current.concat([area]), strings.labelShapeAdded(strings.shapeNames[shape], drawn));
+    history.commit(current.concat([area]), formatText(strings.labelShapeAdded, strings.shapeNames[shape], drawn));
     setSelectedId(area.id);
     setPropsTab('link');
     setPanelOpen(true);
     if (stateRef.current.fullscreen) { setFocusTarget('#first-field'); }
-    announce(strings.announceShapeAdded(strings.shapeNames[shape], current.length + 1, drawn));
+    announce(formatText(strings.announceShapeAdded, strings.shapeNames[shape], current.length + 1, drawn));
   };
 
   const insertCentered = (shape: AreaShape) => {
@@ -248,12 +249,12 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
 
   const duplicateArea = (area: IImageArea) => {
     const current = latest();
-    if (current.length >= policy.maxAreas) { announce(strings.maxAreasReached(policy.maxAreas)); return; }
+    if (current.length >= policy.maxAreas) { announce(formatText(strings.maxAreasReached, policy.maxAreas)); return; }
     const copy = { ...createArea(moveRect(toRect(area), 2, 2), area.hover, area.shape, getRatio()), url: area.url, title: area.title, tooltip: area.tooltip, openInNewTab: area.openInNewTab };
     history.commit(current.concat([copy]), strings.labelDuplicated);
     setSelectedId(copy.id);
     setFocusTarget(copy.id);
-    announce(strings.announceDuplicated(current.length + 1));
+    announce(formatText(strings.announceDuplicated, current.length + 1));
   };
 
   const deleteArea = (id: string) => {
@@ -261,9 +262,9 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     const index = indexOf(id, current);
     if (index < 0) { return; }
     const remaining = current.filter((a: IImageArea) => a.id !== id);
-    history.commit(remaining, strings.labelDeleted(index + 1));
+    history.commit(remaining, formatText(strings.labelDeleted, index + 1));
     setPanelOpen(false);
-    announce(strings.announceDeleted(index + 1, remaining.length));
+    announce(formatText(strings.announceDeleted, index + 1, remaining.length));
     const next = remaining[Math.min(index, remaining.length - 1)];
     setSelectedId(next ? next.id : undefined);
     setFocusTarget(next ? next.id : '#surface');
@@ -276,7 +277,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     const item = copy.splice(index, 1)[0];
     copy.splice(target, 0, item);
     history.commit(copy, strings.labelReordered);
-    announce(strings.announceReordered(target + 1, copy.length));
+    announce(formatText(strings.announceReordered, target + 1, copy.length));
   };
 
   const openProperties = (id: string, tab: PropertiesTab = 'link') => {
@@ -368,7 +369,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     } else if (d.areaId) {
       const rect = normalizeShapeRect(d.rect, d.shape, getRatio());
       updateArea(d.areaId, rect, d.mode === 'move' ? strings.labelMoved : strings.labelResized);
-      announce(d.mode === 'move' ? strings.announceMoved(describeRect(rect, d.shape)) : strings.announceResized(describeRect(rect, d.shape)));
+      announce(d.mode === 'move' ? formatText(strings.announceMoved, describeRect(rect, d.shape)) : formatText(strings.announceResized, describeRect(rect, d.shape)));
     }
   };
 
@@ -426,15 +427,15 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       if ((e.ctrlKey || e.metaKey) && area.shape === 'circle') {
         rect = circleFromWidth(area.x, area.y, round2(area.width + (arrow[0] + arrow[1]) * step), getRatio());
         label = strings.labelResized;
-        announce(strings.announceDiameter(fmt(rect.width)));
+        announce(formatText(strings.announceDiameter, fmt(rect.width)));
       } else if (e.ctrlKey || e.metaKey) {
         rect = normalizeRect({ x: area.x, y: area.y, width: round2(area.width + arrow[0] * step), height: round2(area.height + arrow[1] * step) });
         label = strings.labelResized;
-        announce(strings.announceSize(fmt(rect.width), fmt(rect.height)));
+        announce(formatText(strings.announceSize, fmt(rect.width), fmt(rect.height)));
       } else {
         rect = normalizeShapeRect(moveRect(toRect(area), arrow[0] * step, arrow[1] * step), area.shape, getRatio());
         label = strings.labelMoved;
-        announce(`${strings.rectPosition(fmt(rect.x), fmt(rect.y))}.`);
+        announce(`${formatText(strings.rectPosition, fmt(rect.x), fmt(rect.y))}.`);
       }
       updateArea(area.id, rect, label, `${label}-${area.id}`);
       return;
@@ -545,7 +546,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
           tabIndex={0}
           role="application"
           aria-roledescription={strings.canvasRoleDescription}
-          aria-label={strings.canvasLabel(strings.toolNames[tool], areas.length)}
+          aria-label={formatText(strings.canvasLabel, strings.toolNames[tool], areas.length)}
           aria-describedby={ids.current.help}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -573,8 +574,8 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
             const isDragged = !!drag && drag.mode !== 'draw' && drag.areaId === area.id;
             const rect = isDragged ? drag!.rect : area;
             const problems = areaIssues[area.id];
-            const label = strings.areaAriaLabel(index + 1, strings.shapeNames[area.shape], area.title || strings.untitled, describeRect(area, area.shape)) +
-              (problems ? ` ${strings.problemCount(problems.length)}.` : '');
+            const label = formatText(strings.areaAriaLabel, index + 1, strings.shapeNames[area.shape], area.title || strings.untitled, describeRect(area, area.shape)) +
+              (problems ? ` ${formatText(strings.problemCount, problems.length)}.` : '');
             return (
               <React.Fragment key={area.id}>
                 <div
@@ -617,7 +618,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
         </div>
       </div>
 
-      <h3 className={classNames.listHeading} id={ids.current.list}>{strings.listHeading(areas.length)}</h3>
+      <h3 className={classNames.listHeading} id={ids.current.list}>{formatText(strings.listHeading, areas.length)}</h3>
       {areas.length === 0 ? (
         <Text variant="small">{strings.noAreas}</Text>
       ) : (
@@ -636,7 +637,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
                   <span className={classNames.listIndex} aria-hidden={true}>{index + 1}</span>
                   <span className={classNames.listText}>
                     {problems && <Icon iconName="Warning" className={classNames.issueIcon} aria-hidden={true} title={problems.join(' ')} />}
-                    <span className={classNames.srOnly}>{strings.area(index + 1)}, {strings.shapeNames[area.shape]}: </span>
+                    <span className={classNames.srOnly}>{formatText(strings.area, index + 1)}, {strings.shapeNames[area.shape]}: </span>
                     {name} – {area.url || strings.noLinkLower}
                     {area.openInNewTab && <span aria-hidden={true}> ↗</span>}
                     {area.openInNewTab && <span className={classNames.srOnly}>{strings.newTabShort}</span>}
@@ -644,13 +645,13 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
                   </span>
                 </button>
                 <IconButton iconProps={{ iconName: 'ChevronUp' }} title={strings.moveForwardTitle}
-                  ariaLabel={strings.moveForwardAria(index + 1)} disabled={index === 0} onClick={() => moveInOrder(index, -1)} />
+                  ariaLabel={formatText(strings.moveForwardAria, index + 1)} disabled={index === 0} onClick={() => moveInOrder(index, -1)} />
                 <IconButton iconProps={{ iconName: 'ChevronDown' }} title={strings.moveBackwardTitle}
-                  ariaLabel={strings.moveBackwardAria(index + 1)} disabled={index === areas.length - 1} onClick={() => moveInOrder(index, 1)} />
+                  ariaLabel={formatText(strings.moveBackwardAria, index + 1)} disabled={index === areas.length - 1} onClick={() => moveInOrder(index, 1)} />
                 <IconButton iconProps={{ iconName: 'Edit' }} title={strings.edit}
-                  ariaLabel={strings.editAreaAria(index + 1, name)} onClick={() => openProperties(area.id)} />
+                  ariaLabel={formatText(strings.editAreaAria, index + 1, name)} onClick={() => openProperties(area.id)} />
                 <IconButton iconProps={{ iconName: 'Delete' }} title={strings.delete}
-                  ariaLabel={strings.deleteAreaNamedAria(index + 1, name)} onClick={() => deleteArea(area.id)} />
+                  ariaLabel={formatText(strings.deleteAreaNamedAria, index + 1, name)} onClick={() => deleteArea(area.id)} />
               </li>
             );
           })}
@@ -700,7 +701,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       />
 
       {!imageCheck.valid && (
-        <MessageBar messageBarType={MessageBarType.blocked}>{strings.imageNotAllowed(imageCheck.error || '')}</MessageBar>
+        <MessageBar messageBarType={MessageBarType.blocked}>{formatText(strings.imageNotAllowed, imageCheck.error || '')}</MessageBar>
       )}
 
       {testMode ? (
@@ -720,7 +721,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
               showLinkList={showLinkList}
               policy={policy}
               onPreviewClick={(a: IImageArea) => setTestMessage(
-                strings.previewClick(a.title || strings.untitled, a.url, a.openInNewTab))}
+                formatText(strings.previewClick, a.title || strings.untitled, a.url, a.openInNewTab))}
             />
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
+import { formatText } from '../loc/template';
 import { logError, logInfo, logVerbose } from '../utils/logging';
 import { asRecord, IUntyped, odataEntity, odataItems } from '../utils/untyped';
 
@@ -229,7 +230,7 @@ function friendlyMessage(status: number): string {
     case 423: return strings.httpLocked;
     case 429:
     case 503: return strings.httpBusy;
-    default: return strings.httpError(status);
+    default: return formatText(strings.httpError, status);
   }
 }
 

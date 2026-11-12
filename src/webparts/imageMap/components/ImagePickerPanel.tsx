@@ -10,9 +10,10 @@ import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
 import { Text } from '@fluentui/react/lib/Text';
 import { TextField } from '@fluentui/react/lib/TextField';
 import { css } from '@fluentui/react/lib/Utilities';
+import * as strings from 'ImageMapWebPartStrings';
 import { useClassNames } from './styles';
 import { ISecurityPolicy } from '../config/securityConfig';
-import { strings } from '../loc/strings';
+import { formatText } from '../loc/template';
 import { IImageFile, IImageFolder, IImagePage, ImageService, isSameImageUrl } from '../services/ImageService';
 import { acceptAttribute, describeAllowedTypes, IValidatedImage, validateImageFile } from '../utils/fileValidation';
 import { checkImageUrl } from '../utils/validation';
@@ -56,7 +57,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
   React.useEffect(() => () => { alive.current = false; }, []);
 
   const announceCount = (count: number, more: boolean) =>
-    setStatus(strings.imagesFound(count) + (more ? ' ' + strings.moreAvailable : ''));
+    setStatus(formatText(strings.imagesFound, count) + (more ? ' ' + strings.moreAvailable : ''));
 
   /** Loads the first page of a folder. Responses of outdated requests are discarded. */
   const load = (path: string[], search: string) => {
@@ -81,7 +82,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
         setNext(result[1].next);
         announceCount(result[1].images.length, !!result[1].next);
       })
-      .catch((e: Error) => { if (isCurrent()) { setError(strings.imagesLoadFailed(e.message)); } })
+      .catch((e: Error) => { if (isCurrent()) { setError(formatText(strings.imagesLoadFailed, e.message)); } })
       .then(() => { if (isCurrent()) { setLoading(false); } });
   };
 
@@ -99,7 +100,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
         setNext(page.next);
         announceCount(all.length, !!page.next);
       })
-      .catch((e: Error) => { if (isCurrent()) { setError(strings.imagesLoadFailed(e.message)); } })
+      .catch((e: Error) => { if (isCurrent()) { setError(formatText(strings.imagesLoadFailed, e.message)); } })
       .then(() => { if (isCurrent()) { setLoadingMore(false); } });
   };
 
@@ -162,14 +163,14 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
       .then((uploaded: IImageFile) => {
         if (!alive.current) { return; }
         setUploading(false);
-        setStatus(strings.uploadedAndSelected(uploaded.name));
+        setStatus(formatText(strings.uploadedAndSelected, uploaded.name));
         onSelect(uploaded.serverRelativeUrl);
       })
       .catch((e: Error) => {
         if (!alive.current) { return; }
         setUploading(false);
         setStatus('');
-        setError(strings.uploadFailed(e.message));
+        setError(formatText(strings.uploadFailed, e.message));
       });
   };
 
@@ -227,7 +228,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
           </div>
           {loading && <Spinner size={SpinnerSize.large} label={strings.loadingImages} ariaLive="polite" style={{ marginTop: 16 }} />}
           {!loading && images.length === 0 && visibleFolders.length === 0 && !next && !error && (
-            <Text block={true} style={{ marginTop: 8 }}>{query ? strings.noImagesFound(query) : strings.noImages}</Text>
+            <Text block={true} style={{ marginTop: 8 }}>{query ? formatText(strings.noImagesFound, query) : strings.noImages}</Text>
           )}
           {!loading && (images.length > 0 || visibleFolders.length > 0) && (
             <ul className={classNames.grid} style={{ listStyle: 'none', padding: 0 }} aria-label={strings.imagesInFolder}>
@@ -237,7 +238,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
                     type="button"
                     style={tileButtonStyle}
                     onClick={() => openFolder(subFolders.concat([f.name]))}
-                    aria-label={strings.openFolderAria(f.name)}
+                    aria-label={formatText(strings.openFolderAria, f.name)}
                   >
                     <div
                       className={classNames.tileImage}
@@ -259,7 +260,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
                       style={tileButtonStyle}
                       onClick={() => onSelect(img.serverRelativeUrl)}
                       aria-pressed={current}
-                      aria-label={strings.selectImageAria(img.name, current)}
+                      aria-label={formatText(strings.selectImageAria, img.name, current)}
                     >
                       <div
                         className={classNames.tileImage}
@@ -305,7 +306,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
                   aria-describedby="imagemap-upload-rules"
                 />
                 <Text block={true} variant="small" style={{ marginTop: 12 }} id="imagemap-upload-rules">
-                  {strings.uploadRules(allowed, maxMb)} {strings.uploadTarget(service.resolveFolder(folder))}
+                  {formatText(strings.uploadRules, allowed, maxMb)} {formatText(strings.uploadTarget, service.resolveFolder(folder))}
                 </Text>
               </div>
             )}
@@ -338,7 +339,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
             description={policy.imagesSameHostOnly ? strings.sameHostOnly : undefined}
           />
           {urlInput && urlCheck.suggestion && (
-            <ActionButton iconProps={{ iconName: 'AutoEnhanceOn' }} text={strings.fixTo(urlCheck.suggestion)}
+            <ActionButton iconProps={{ iconName: 'AutoEnhanceOn' }} text={formatText(strings.fixTo, urlCheck.suggestion)}
               onClick={() => setUrlInput(urlCheck.suggestion || '')} />
           )}
           <div style={{ marginTop: 12 }}>

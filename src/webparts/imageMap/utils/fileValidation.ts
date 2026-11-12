@@ -1,6 +1,7 @@
+import * as strings from 'ImageMapWebPartStrings';
 import { formatNumber } from './format';
 import { ImageType, ISecurityPolicy } from '../config/securityConfig';
-import { strings } from '../loc/strings';
+import { formatText } from '../loc/template';
 
 const TYPE_LABEL: { [key: string]: string } = { png: 'PNG', jpeg: 'JPEG', gif: 'GIF', webp: 'WebP' };
 const TYPE_EXTENSION: { [key: string]: string } = { png: 'png', jpeg: 'jpg', gif: 'gif', webp: 'webp' };
@@ -66,12 +67,12 @@ export function validateImageFile(file: File, policy: ISecurityPolicy): Promise<
   }
   if (file.size > policy.maxUploadBytes) {
     const mb = (n: number) => formatNumber(n / 1024 / 1024);
-    return Promise.reject(new Error(strings.fileTooLarge(mb(file.size), mb(policy.maxUploadBytes))));
+    return Promise.reject(new Error(formatText(strings.fileTooLarge, mb(file.size), mb(policy.maxUploadBytes))));
   }
   return readHeader(file, 16).then((header: Uint8Array) => {
     const type = detectImageType(header);
     if (!type || policy.allowedUploadTypes.indexOf(type) < 0) {
-      throw new Error(strings.invalidImageContent(describeAllowedTypes(policy)));
+      throw new Error(formatText(strings.invalidImageContent, describeAllowedTypes(policy)));
     }
     return { type, fileName: sanitizeFileName(file.name, TYPE_EXTENSION[type]) };
   });

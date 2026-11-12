@@ -1,3 +1,13 @@
+import * as strings from 'ImageMapWebPartStrings';
+
+/**
+ * Fills a text template of the language files with values, using the plural rule of the
+ * current language. Example: formatText(strings.imagesFound, 3)
+ */
+export function formatText(template: string, ...args: unknown[]): string {
+  return formatTemplate(template, args, !!strings.zeroIsSingular);
+}
+
 /**
  * Formats a text template of the language files.
  *

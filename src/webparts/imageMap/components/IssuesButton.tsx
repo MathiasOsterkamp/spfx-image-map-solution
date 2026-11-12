@@ -4,7 +4,8 @@ import { Callout, DirectionalHint } from '@fluentui/react/lib/Callout';
 import { Link } from '@fluentui/react/lib/Link';
 import { Text } from '@fluentui/react/lib/Text';
 import { getId } from '@fluentui/react/lib/Utilities';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
+import { formatText } from '../loc/template';
 import { handleRovingKeyDown } from '../utils/rovingFocus';
 import { IValidationIssue } from '../utils/validation';
 
@@ -20,7 +21,7 @@ export const IssuesButton: React.FunctionComponent<IIssuesButtonProps> = (props:
   const buttonRef = React.useRef<HTMLDivElement>(null);
   const titleId = React.useRef<string>(getId('imagemap-issues'));
   const count = issues.length;
-  const label = strings.issuesLabel(count);
+  const label = formatText(strings.issuesLabel, count);
 
   return (
     <div ref={buttonRef} style={{ display: 'flex', height: '100%' }}>

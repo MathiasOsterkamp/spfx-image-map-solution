@@ -12,10 +12,11 @@ import {
   PropertyPaneTextField,
   PropertyPaneToggle
 } from '@microsoft/sp-webpart-base';
+import * as strings from 'ImageMapWebPartStrings';
 import * as ReactDom from 'react-dom';
 import { ImageMap, IImageMapProps } from './components/ImageMap';
 import { createSecurityPolicy, ISecurityPolicy } from './config/securityConfig';
-import { strings } from './loc/strings';
+import { formatText } from './loc/template';
 import { IHoverStyle, IImageArea } from './models/IImageMap';
 import { ImageService } from './services/ImageService';
 import { PageService } from './services/PageService';
@@ -201,7 +202,7 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
               groupName: strings.groupDiagnostics,
               groupFields: [
                 PropertyPaneLabel('', {
-                  text: strings.solutionInfo(SOLUTION_NAME, SOLUTION_VERSION)
+                  text: formatText(strings.solutionInfo, SOLUTION_NAME, SOLUTION_VERSION)
                 }),
                 PropertyPaneDropdown('logLevel', {
                   label: strings.logLevelLabel,

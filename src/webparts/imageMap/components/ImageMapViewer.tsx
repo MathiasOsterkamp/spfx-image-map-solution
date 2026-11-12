@@ -2,9 +2,10 @@ import * as React from 'react';
 import { Icon } from '@fluentui/react/lib/Icon';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { css } from '@fluentui/react/lib/Utilities';
+import * as strings from 'ImageMapWebPartStrings';
 import { useClassNames } from './styles';
 import { ISecurityPolicy } from '../config/securityConfig';
-import { strings } from '../loc/strings';
+import { formatText } from '../loc/template';
 import { IImageArea } from '../models/IImageMap';
 import { getViewAreaClass } from '../utils/hoverStyles';
 import { checkImageUrl, checkLinkUrl, cleanText, IUrlCheck } from '../utils/validation';
@@ -80,7 +81,7 @@ export const ImageMapViewer: React.FunctionComponent<IImageMapViewerProps> = (pr
     const check = checkLinkUrl(area.url, policy);
     if (check.valid) {
       // Accessible name: title, otherwise a neutral fallback. The URL is never used as link text.
-      const label = cleanText(area.title, policy.maxTitleLength) || strings.linkFallback(index + 1);
+      const label = cleanText(area.title, policy.maxTitleLength) || formatText(strings.linkFallback, index + 1);
       const tooltip = cleanText(area.tooltip, policy.maxTooltipLength) || label;
       links.push({ area, check, label, tooltip });
     }
@@ -106,7 +107,7 @@ export const ImageMapViewer: React.FunctionComponent<IImageMapViewerProps> = (pr
         <div
           className={css(classNames.frame, stretch && classNames.frameStretch)}
           role="group"
-          aria-label={links.length > 0 ? strings.interactiveGraphic(links.length) : undefined}
+          aria-label={links.length > 0 ? formatText(strings.interactiveGraphic, links.length) : undefined}
         >
           <img
             src={imageCheck.url}

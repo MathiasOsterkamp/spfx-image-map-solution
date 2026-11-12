@@ -1,6 +1,6 @@
 import { HighContrastSelector, IRawStyle, mergeStyles } from '@fluentui/react/lib/Styling';
+import * as strings from 'ImageMapWebPartStrings';
 import { colorAlpha, safeBorderStyle, safeColor, safeNumber } from './sanitize';
-import { strings } from '../loc/strings';
 import { AreaShape, DEFAULT_HOVER, IHoverStyle, IImageArea } from '../models/IImageMap';
 
 /** Two-color focus ring (white + black): visible on any image background (WCAG 2.4.7 / 2.4.11). */

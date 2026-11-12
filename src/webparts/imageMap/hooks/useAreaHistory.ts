@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
+import { formatText } from '../loc/template';
 import { IImageArea } from '../models/IImageMap';
 
 interface IHistoryEntry {
@@ -54,7 +55,7 @@ export function useAreaHistory(
     future.current.push({ areas: getCurrent(), label: entry.label });
     last.current = { time: 0 };
     apply(entry.areas);
-    announce(strings.undone(entry.label));
+    announce(formatText(strings.undone, entry.label));
     bump();
   };
 
@@ -64,7 +65,7 @@ export function useAreaHistory(
     past.current.push({ areas: getCurrent(), label: entry.label });
     last.current = { time: 0 };
     apply(entry.areas);
-    announce(strings.redone(entry.label));
+    announce(formatText(strings.redone, entry.label));
     bump();
   };
 

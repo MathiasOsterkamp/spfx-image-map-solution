@@ -2,7 +2,8 @@ import * as React from 'react';
 import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import { Dialog, DialogFooter, DialogType } from '@fluentui/react/lib/Dialog';
 import { TextField } from '@fluentui/react/lib/TextField';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
+import { formatText } from '../loc/template';
 import { checkAlt } from '../utils/validation';
 
 export interface IAltTextDialogProps {
@@ -41,7 +42,7 @@ export const AltTextDialog: React.FunctionComponent<IAltTextDialogProps> = (prop
         value={draft}
         onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) => setDraft((v || '').replace(/[\r\n]+/g, ' '))}
         errorMessage={error}
-        description={error ? undefined : strings.charCounter(draft.length, maxLength)}
+        description={error ? undefined : formatText(strings.charCounter, draft.length, maxLength)}
       />
       <DialogFooter>
         <PrimaryButton text={strings.save} disabled={!!error} onClick={() => onSave(draft.trim())} />

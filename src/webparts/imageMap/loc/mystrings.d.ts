@@ -2,16 +2,21 @@ declare type ImageMapStringsShapeMap = { [K in import('../models/IImageMap').Are
 declare type ImageMapStringsToolMap = { [K in import('../models/IImageMap').AreaShape | 'select']: string };
 
 /**
- * All user-facing texts of the web part, as provided by "strings" from loc/strings.
- * Texts with parameters are functions here. In the language files they are templates, so that
- * every language can handle word order and plural forms itself (see template.ts).
+ * All user-facing texts of the web part (module "ImageMapWebPartStrings").
+ * The SPFx build writes the language files as plain data, so they cannot contain functions.
+ * Texts with parameters are templates and are filled in with formatText from loc/template:
+ * every language can handle word order and plural forms itself.
  */
 declare interface IImageMapWebPartStrings {
+  /** Plural rule: '1' = 0 and 1 are singular (French), '' = only 1 is singular */
+  zeroIsSingular: string;
+
   // ---------- General ----------
   /** Decimal separator for displayed numbers */
   decimalSeparator: string;
   /** Quotes a single character or word, e.g. „x“ / "x" / « x » */
-  quote: (text: string) => string;
+  /** Template: {0} = text */
+  quote: string;
   yes: string;
   no: string;
   save: string;
@@ -20,9 +25,12 @@ declare interface IImageMapWebPartStrings {
   edit: string;
   delete: string;
   untitled: string;
-  area: (n: number) => string;
-  areaCount: (n: number) => string;
-  charCounter: (length: number, max: number) => string;
+  /** Template: {0} = n */
+  area: string;
+  /** Template: {0} = n */
+  areaCount: string;
+  /** Template: {0} = length, {1} = max */
+  charCounter: string;
   shapeNames: ImageMapStringsShapeMap;
   toolNames: ImageMapStringsToolMap;
   /** Single-key shortcuts of the tools (letters, upper case) */
@@ -50,35 +58,51 @@ declare interface IImageMapWebPartStrings {
   /** Title of the second page of the property pane */
   developerPageTitle: string;
   groupDiagnostics: string;
-  solutionInfo: (name: string, version: string) => string;
+  /** Template: {0} = name, {1} = version */
+  solutionInfo: string;
   logLevelLabel: string;
   logLevels: { [K in import('../utils/logging').LogLevelName]: string };
   uploadFolderLabel: string;
   uploadFolderDescription: string;
 
   // ---------- Editor ----------
-  rectPosition: (x: string, y: string) => string;
-  rectSize: (width: string, height: string) => string;
-  circleDiameter: (diameter: string) => string;
+  /** Template: {0} = x, {1} = y */
+  rectPosition: string;
+  /** Template: {0} = width, {1} = height */
+  rectSize: string;
+  /** Template: {0} = diameter */
+  circleDiameter: string;
   announceToolSelect: string;
-  announceTool: (toolName: string) => string;
-  maxAreasReached: (max: number) => string;
-  labelShapeAdded: (shapeName: string, drawn: boolean) => string;
-  announceShapeAdded: (shapeName: string, n: number, drawn: boolean) => string;
+  /** Template: {0} = toolName */
+  announceTool: string;
+  /** Template: {0} = max */
+  maxAreasReached: string;
+  /** Template: {0} = shapeName, {1} = drawn */
+  labelShapeAdded: string;
+  /** Template: {0} = shapeName, {1} = n, {2} = drawn */
+  announceShapeAdded: string;
   labelDuplicated: string;
-  announceDuplicated: (n: number) => string;
-  labelDeleted: (n: number) => string;
-  announceDeleted: (n: number, remaining: number) => string;
+  /** Template: {0} = n */
+  announceDuplicated: string;
+  /** Template: {0} = n */
+  labelDeleted: string;
+  /** Template: {0} = n, {1} = remaining */
+  announceDeleted: string;
   labelReordered: string;
-  announceReordered: (position: number, total: number) => string;
+  /** Template: {0} = position, {1} = total */
+  announceReordered: string;
   announceFullscreenOn: string;
   announceFullscreenOff: string;
   labelMoved: string;
   labelResized: string;
-  announceMoved: (description: string) => string;
-  announceResized: (description: string) => string;
-  announceDiameter: (diameter: string) => string;
-  announceSize: (width: string, height: string) => string;
+  /** Template: {0} = description */
+  announceMoved: string;
+  /** Template: {0} = description */
+  announceResized: string;
+  /** Template: {0} = diameter */
+  announceDiameter: string;
+  /** Template: {0} = width, {1} = height */
+  announceSize: string;
   announceChooseShapeFirst: string;
   announceImageApplied: string;
   announceAltSaved: string;
@@ -90,27 +114,37 @@ declare interface IImageMapWebPartStrings {
   announceSavedAsDefault: string;
   editorHelp: string;
   canvasRoleDescription: string;
-  canvasLabel: (toolName: string, areaCount: number) => string;
-  areaAriaLabel: (n: number, shapeName: string, title: string, description: string) => string;
-  problemCount: (n: number) => string;
-  listHeading: (n: number) => string;
+  /** Template: {0} = toolName, {1} = areaCount */
+  canvasLabel: string;
+  /** Template: {0} = n, {1} = shapeName, {2} = title, {3} = description */
+  areaAriaLabel: string;
+  /** Template: {0} = n */
+  problemCount: string;
+  /** Template: {0} = n */
+  listHeading: string;
   noAreas: string;
   noLinkLower: string;
   newTabShort: string;
   errorsPrefix: string;
   moveForwardTitle: string;
-  moveForwardAria: (n: number) => string;
+  /** Template: {0} = n */
+  moveForwardAria: string;
   moveBackwardTitle: string;
-  moveBackwardAria: (n: number) => string;
-  editAreaAria: (n: number, name: string) => string;
-  deleteAreaNamedAria: (n: number, name: string) => string;
+  /** Template: {0} = n */
+  moveBackwardAria: string;
+  /** Template: {0} = n, {1} = name */
+  editAreaAria: string;
+  /** Template: {0} = n, {1} = name */
+  deleteAreaNamedAria: string;
   labelSorted: string;
   announceSorted: string;
   announcePreviewOn: string;
   announceEditing: string;
-  imageNotAllowed: (error: string) => string;
+  /** Template: {0} = error */
+  imageNotAllowed: string;
   previewInfo: string;
-  previewClick: (title: string, url: string, newTab: boolean) => string;
+  /** Template: {0} = title, {1} = url, {2} = newTab */
+  previewClick: string;
   fullscreenNote: string;
   fullscreenTitle: string;
 
@@ -121,10 +155,13 @@ declare interface IImageMapWebPartStrings {
   presets: { [K in import('../models/IImageMap').HoverPresetKey]: { name: string; description: string } };
   labelPositionChanged: string;
   labelShapeChanged: string;
-  increaseBy: (label: string, step: string) => string;
-  decreaseBy: (label: string, step: string) => string;
+  /** Template: {0} = label, {1} = step */
+  increaseBy: string;
+  /** Template: {0} = label, {1} = step */
+  decreaseBy: string;
   labelPageSelected: string;
-  announceTargetSet: (title: string) => string;
+  /** Template: {0} = title */
+  announceTargetSet: string;
   customStyle: string;
   customStyleAria: string;
   propertiesAria: string;
@@ -138,21 +175,25 @@ declare interface IImageMapWebPartStrings {
   labelTargetChanged: string;
   searchPageTitle: string;
   searchPageAria: string;
-  fixTo: (suggestion: string) => string;
+  /** Template: {0} = suggestion */
+  fixTo: string;
   labelTargetFixed: string;
   titleLabel: string;
   labelTitleChanged: string;
-  titleDescription: (counter: string) => string;
+  /** Template: {0} = counter */
+  titleDescription: string;
   tooltipLabel: string;
   labelTooltipChanged: string;
-  tooltipDescription: (counter: string) => string;
+  /** Template: {0} = counter */
+  tooltipDescription: string;
   newTabLabel: string;
   labelNewTabOn: string;
   labelNewTabOff: string;
   shapeLabel: string;
   presetLabel: string;
   announceCustomStyle: string;
-  labelPresetChosen: (name: string) => string;
+  /** Template: {0} = name */
+  labelPresetChosen: string;
   borderColorLabel: string;
   labelBorderColor: string;
   borderWidthLabel: string;
@@ -175,26 +216,36 @@ declare interface IImageMapWebPartStrings {
   heightLabel: string;
   done: string;
   deleteArea: string;
-  deleteAreaAria: (n: number) => string;
-  editAreaTitle: (n: number) => string;
+  /** Template: {0} = n */
+  deleteAreaAria: string;
+  /** Template: {0} = n */
+  editAreaTitle: string;
   closeProperties: string;
-  propertiesOf: (n: number) => string;
+  /** Template: {0} = n */
+  propertiesOf: string;
 
   // ---------- Toolbar ----------
-  selectTitle: (key: string) => string;
-  drawTitle: (toolName: string, key: string) => string;
+  /** Template: {0} = key */
+  selectTitle: string;
+  /** Template: {0} = toolName, {1} = key */
+  drawTitle: string;
   image: string;
   changeImageMenu: string;
   chooseImageMenu: string;
   editAltMenu: string;
   undo: string;
   redo: string;
-  undoWith: (label: string) => string;
-  redoWith: (label: string) => string;
-  undoTitle: (label?: string) => string;
-  redoTitle: (label?: string) => string;
+  /** Template: {0} = label */
+  undoWith: string;
+  /** Template: {0} = label */
+  redoWith: string;
+  /** Template: {0} = label */
+  undoTitle: string;
+  /** Template: {0} = label */
+  redoTitle: string;
   insertArea: string;
-  insertCentered: (toolName: string) => string;
+  /** Template: {0} = toolName */
+  insertCentered: string;
   sortOrder: string;
   sortOrderTitle: string;
   previewTitle: string;
@@ -207,27 +258,33 @@ declare interface IImageMapWebPartStrings {
   moreCommands: string;
 
   // ---------- Issues ----------
-  issuesLabel: (n: number) => string;
+  /** Template: {0} = n */
+  issuesLabel: string;
   openList: string;
   issuesFooter: string;
 
   // ---------- Page search ----------
   searching: string;
   noPagesFound: string;
-  pagesFound: (n: number) => string;
+  /** Template: {0} = n */
+  pagesFound: string;
   searchPlaceholder: string;
   searchAria: string;
   foundPages: string;
 
   // ---------- Quick actions ----------
-  actionsFor: (n: number) => string;
+  /** Template: {0} = n */
+  actionsFor: string;
   noLink: string;
-  targetAria: (url: string) => string;
+  /** Template: {0} = url */
+  targetAria: string;
   noLinkSet: string;
   propertiesShortcut: string;
-  editNumberedAria: (n: number) => string;
+  /** Template: {0} = n */
+  editNumberedAria: string;
   duplicateShortcut: string;
-  duplicateAria: (n: number) => string;
+  /** Template: {0} = n */
+  duplicateAria: string;
   deleteShortcut: string;
 
   // ---------- Alt text dialog ----------
@@ -236,46 +293,59 @@ declare interface IImageMapWebPartStrings {
   altLabel: string;
 
   // ---------- Color field ----------
-  openColorPicker: (label: string, value: string) => string;
+  /** Template: {0} = label, {1} = value */
+  openColorPicker: string;
 
   // ---------- Viewer ----------
   newTabSuffix: string;
   imageBlocked: string;
-  interactiveGraphic: (linkCount: number) => string;
-  linkFallback: (n: number) => string;
+  /** Template: {0} = linkCount */
+  interactiveGraphic: string;
+  /** Template: {0} = n */
+  linkFallback: string;
   linksAsList: string;
   graphicLinks: string;
 
   // ---------- Image picker ----------
-  imagesFound: (n: number) => string;
-  imagesLoadFailed: (message: string) => string;
+  /** Template: {0} = n */
+  imagesFound: string;
+  /** Template: {0} = message */
+  imagesLoadFailed: string;
   checkingAndUploading: string;
-  uploadedAndSelected: (name: string) => string;
-  uploadFailed: (message: string) => string;
+  /** Template: {0} = name */
+  uploadedAndSelected: string;
+  /** Template: {0} = message */
+  uploadFailed: string;
   closePicker: string;
   areasKept: string;
   closeMessage: string;
   imageSource: string;
   tabLibrary: string;
-  folderInfo: (path: string) => string;
+  /** Template: {0} = path */
+  folderInfo: string;
   refreshList: string;
   loadingImages: string;
   noImages: string;
   imagesInFolder: string;
   searchImages: string;
   folderPath: string;
-  openFolderAria: (name: string) => string;
+  /** Template: {0} = name */
+  openFolderAria: string;
   loadMore: string;
   moreAvailable: string;
-  noImagesFound: (query: string) => string;
+  /** Template: {0} = query */
+  noImagesFound: string;
   listTooLarge: string;
-  selectImageAria: (name: string, current: boolean) => string;
+  /** Template: {0} = name, {1} = current */
+  selectImageAria: string;
   tabUpload: string;
   uploadingSpinner: string;
   dropHere: string;
   chooseFile: string;
-  uploadRules: (allowed: string, maxMb: number) => string;
-  uploadTarget: (path: string) => string;
+  /** Template: {0} = allowed, {1} = maxMb */
+  uploadRules: string;
+  /** Template: {0} = path */
+  uploadTarget: string;
   tabAddress: string;
   imageUrlField: string;
   imageUrlPlaceholder: string;
@@ -283,9 +353,11 @@ declare interface IImageMapWebPartStrings {
 
   // ---------- History ----------
   nothingToUndo: string;
-  undone: (label: string) => string;
+  /** Template: {0} = label */
+  undone: string;
   nothingToRedo: string;
-  redone: (label: string) => string;
+  /** Template: {0} = label */
+  redone: string;
 
   // ---------- Services ----------
   httpBadRequest: string;
@@ -295,28 +367,34 @@ declare interface IImageMapWebPartStrings {
   httpTooLarge: string;
   httpLocked: string;
   httpBusy: string;
-  httpError: (status: number) => string;
+  /** Template: {0} = status */
+  httpError: string;
   fileReadFailed: string;
   pageSearchFailed: string;
 
   // ---------- File validation ----------
   noFileSelected: string;
   fileEmpty: string;
-  fileTooLarge: (sizeMb: string, maxMb: string) => string;
-  invalidImageContent: (allowed: string) => string;
+  /** Template: {0} = sizeMb, {1} = maxMb */
+  fileTooLarge: string;
+  /** Template: {0} = allowed */
+  invalidImageContent: string;
   defaultFileName: string;
 
   // ---------- Hover styles ----------
   visibilityWarning: string;
 
   // ---------- Validation ----------
-  linkTooLong: (length: number, max: number) => string;
+  /** Template: {0} = length, {1} = max */
+  linkTooLong: string;
   linkControlChars: string;
   linkInvisibleChars: string;
   linkBackslash: string;
-  linkMustBeEncoded: (hasSpaces: boolean, chars?: string) => string;
+  /** Template: {0} = hasSpaces, {1} = chars */
+  linkMustBeEncoded: string;
   invalidPercentEncoding: string;
-  pathTooLong: (length: number, max: number) => string;
+  /** Template: {0} = length, {1} = max */
+  pathTooLong: string;
   enterLink: string;
   emptyAnchor: string;
   protocolRelativeLink: string;
@@ -326,13 +404,16 @@ declare interface IImageMapWebPartStrings {
   emailTooLong: string;
   invalidEmailDomain: string;
   invalidPhone: string;
-  protocolNotAllowed: (protocol: string) => string;
+  /** Template: {0} = protocol */
+  protocolNotAllowed: string;
   invalidWebAddress: string;
   linkUserInfo: string;
-  domainTooLong: (max: number) => string;
+  /** Template: {0} = max */
+  domainTooLong: string;
   httpLinkNotAllowed: string;
   httpWarning: string;
-  domainNotAllowed: (host: string, allowed: string) => string;
+  /** Template: {0} = host, {1} = allowed */
+  domainNotAllowed: string;
   chooseImageError: string;
   protocolRelativeUrl: string;
   imageUrlNeedsHttps: string;
@@ -344,33 +425,24 @@ declare interface IImageMapWebPartStrings {
   folderRelative: string;
   folderTooLong: string;
   folderInvalid: string;
-  textTooLong: (length: number, max: number) => string;
+  /** Template: {0} = length, {1} = max */
+  textTooLong: string;
   textControlChars: string;
   textInvisibleChars: string;
-  textForbiddenChars: (chars: string) => string;
+  /** Template: {0} = chars */
+  textForbiddenChars: string;
   titleRequired: string;
   titleGeneric: string;
   altMissing: string;
-  issueArea: (n: number, error: string) => string;
-  issueTitle: (n: number, error: string) => string;
-  issueTooltip: (n: number, error: string) => string;
+  /** Template: {0} = n, {1} = error */
+  issueArea: string;
+  /** Template: {0} = n, {1} = error */
+  issueTitle: string;
+  /** Template: {0} = n, {1} = error */
+  issueTooltip: string;
 }
 
-/**
- * The language files as they are loaded: plain data. Texts with parameters are templates
- * there (see template.ts) and become functions in strings.ts. Do not import this module
- * directly, use "strings" from loc/strings.
- */
-declare type ImageMapStringResources = {
-  [K in keyof IImageMapWebPartStrings]: IImageMapWebPartStrings[K] extends (...args: never[]) => string
-    ? string
-    : IImageMapWebPartStrings[K];
-} & {
-  /** Plural rule: '1' = 0 and 1 are singular (French), '' = only 1 is singular */
-  zeroIsSingular: string;
-};
-
 declare module 'ImageMapWebPartStrings' {
-  const strings: ImageMapStringResources;
+  const strings: IImageMapWebPartStrings;
   export = strings;
 }

@@ -1,5 +1,5 @@
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
 import { logWarning } from '../utils/logging';
 import { IUntyped, odataItems } from '../utils/untyped';
 

@@ -4,7 +4,8 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import { mergeStyleSets } from '@fluentui/react/lib/Styling';
 import { ITheme, useTheme } from '@fluentui/react/lib/Theme';
 import { memoizeFunction } from '@fluentui/react/lib/Utilities';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
+import { formatText } from '../loc/template';
 import { IImageArea } from '../models/IImageMap';
 import { handleRovingKeyDown, initRovingTabIndex } from '../utils/rovingFocus';
 
@@ -62,20 +63,20 @@ export const QuickActions: React.FunctionComponent<IQuickActionsProps> = (props:
       className={css.bar}
       style={style}
       role="toolbar"
-      aria-label={strings.actionsFor(index + 1)}
+      aria-label={formatText(strings.actionsFor, index + 1)}
       data-ui="quick-actions"
       onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Escape' || e.key === 'Esc') { e.preventDefault(); e.stopPropagation(); onEscape(); return; }
         handleRovingKeyDown(e, 'horizontal');
       }}
     >
-      <span className={css.target} title={a.url || strings.noLink} aria-label={a.url ? strings.targetAria(a.url) : strings.noLinkSet} role="note">
+      <span className={css.target} title={a.url || strings.noLink} aria-label={a.url ? formatText(strings.targetAria, a.url) : strings.noLinkSet} role="note">
         <Icon iconName="Link" aria-hidden={true} />
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.url || strings.noLink}</span>
       </span>
-      <IconButton iconProps={{ iconName: 'Edit' }} title={strings.propertiesShortcut} ariaLabel={strings.editNumberedAria(index + 1)} onClick={onEdit} />
-      <IconButton iconProps={{ iconName: 'Copy' }} title={strings.duplicateShortcut} ariaLabel={strings.duplicateAria(index + 1)} onClick={onDuplicate} />
-      <IconButton iconProps={{ iconName: 'Delete' }} title={strings.deleteShortcut} ariaLabel={strings.deleteAreaAria(index + 1)} onClick={onDelete} />
+      <IconButton iconProps={{ iconName: 'Edit' }} title={strings.propertiesShortcut} ariaLabel={formatText(strings.editNumberedAria, index + 1)} onClick={onEdit} />
+      <IconButton iconProps={{ iconName: 'Copy' }} title={strings.duplicateShortcut} ariaLabel={formatText(strings.duplicateAria, index + 1)} onClick={onDuplicate} />
+      <IconButton iconProps={{ iconName: 'Delete' }} title={strings.deleteShortcut} ariaLabel={formatText(strings.deleteAreaAria, index + 1)} onClick={onDelete} />
     </div>
   );
 };

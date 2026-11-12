@@ -5,7 +5,8 @@ import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
 import { mergeStyleSets } from '@fluentui/react/lib/Styling';
 import { ITheme, useTheme } from '@fluentui/react/lib/Theme';
 import { getId, memoizeFunction } from '@fluentui/react/lib/Utilities';
-import { strings } from '../loc/strings';
+import * as strings from 'ImageMapWebPartStrings';
+import { formatText } from '../loc/template';
 import { IPageResult, PageService } from '../services/PageService';
 
 const getCss = memoizeFunction((theme: ITheme) => mergeStyleSets({
@@ -74,7 +75,7 @@ export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPa
   const status = loading ? strings.searching
     : error ? error
       : results.length === 0 ? strings.noPagesFound
-        : strings.pagesFound(results.length);
+        : formatText(strings.pagesFound, results.length);
 
   return (
     <div>

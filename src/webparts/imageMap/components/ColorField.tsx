@@ -5,8 +5,9 @@ import { IColor } from '@fluentui/react/lib/Color';
 import { ColorPicker } from '@fluentui/react/lib/ColorPicker';
 import { Label } from '@fluentui/react/lib/Label';
 import { getId } from '@fluentui/react/lib/Utilities';
+import * as strings from 'ImageMapWebPartStrings';
 import { useClassNames } from './styles';
-import { strings } from '../loc/strings';
+import { formatText } from '../loc/template';
 import { safeColor } from '../utils/sanitize';
 
 export interface IColorFieldProps {
@@ -32,7 +33,7 @@ export const ColorField: React.FunctionComponent<IColorFieldProps> = (props: ICo
         <DefaultButton
           className={classNames.swatchButton}
           onClick={() => setOpen(!open)}
-          ariaLabel={strings.openColorPicker(label, safeValue)}
+          ariaLabel={formatText(strings.openColorPicker, label, safeValue)}
           aria-haspopup="dialog"
           aria-expanded={open}
         >

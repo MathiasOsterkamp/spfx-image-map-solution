@@ -1,5 +1,6 @@
+import * as strings from 'ImageMapWebPartStrings';
 import { ISecurityPolicy } from '../config/securityConfig';
-import { strings } from '../loc/strings';
+import { formatText } from '../loc/template';
 import { IImageArea } from '../models/IImageMap';
 
 export type LinkKind = 'internal' | 'external' | 'mailto' | 'tel' | 'anchor';
@@ -45,7 +46,7 @@ function uniqueChars(value: string, pattern: RegExp): string[] {
 }
 
 function quoteChars(chars: string[]): string {
-  return chars.map((c: string) => strings.quote(c)).join(' ');
+  return chars.map((c: string) => formatText(strings.quote, c)).join(' ');
 }
 
 function percentEncodeChar(c: string): string {
@@ -61,7 +62,7 @@ function encodeForbidden(url: string): string {
 /** Checks that apply to every kind of URL. Returns an error text and, if applicable, a suggested fix. */
 function basicError(url: string, maxLength: number): { error: string; suggestion?: string } | undefined {
   if (url.length > maxLength) {
-    return { error: strings.linkTooLong(url.length, maxLength) };
+    return { error: formatText(strings.linkTooLong, url.length, maxLength) };
   }
   if (CONTROL_CHARS.test(url) || /[\t\r\n]/.test(url)) {
     return { error: strings.linkControlChars };
@@ -75,7 +76,7 @@ function basicError(url: string, maxLength: number): { error: string; suggestion
   const forbidden = uniqueChars(url, URL_FORBIDDEN);
   if (/\s/.test(url) || forbidden.length) {
     return {
-      error: strings.linkMustBeEncoded(/\s/.test(url), forbidden.length ? quoteChars(forbidden) : undefined),
+      error: formatText(strings.linkMustBeEncoded, /\s/.test(url), forbidden.length ? quoteChars(forbidden) : undefined),
       suggestion: /[^\S ]/.test(url) ? undefined : encodeForbidden(url)
     };
   }
@@ -98,7 +99,7 @@ function decodedPath(pathAndMore: string): string {
 function pathError(path: string, policy: ISecurityPolicy): string | undefined {
   const decoded = decodedPath(path);
   if (decoded.length > policy.maxSharePointPathLength) {
-    return strings.pathTooLong(decoded.length, policy.maxSharePointPathLength);
+    return formatText(strings.pathTooLong, decoded.length, policy.maxSharePointPathLength);
   }
   return undefined;
 }
@@ -169,13 +170,13 @@ export function checkLinkUrl(raw: string | undefined, policy: ISecurityPolicy): 
       : fail(url, strings.invalidPhone);
   }
   if (protocol !== 'http' && protocol !== 'https') {
-    return fail(url, strings.protocolNotAllowed(protocol));
+    return fail(url, formatText(strings.protocolNotAllowed, protocol));
   }
 
   const parsed = parseHttp(url);
   if (!parsed) { return fail(url, strings.invalidWebAddress); }
   if (parsed.hasUserInfo) { return fail(url, strings.linkUserInfo); }
-  if (parsed.hostname.length > MAX_HOST_LENGTH) { return fail(url, strings.domainTooLong(MAX_HOST_LENGTH)); }
+  if (parsed.hostname.length > MAX_HOST_LENGTH) { return fail(url, formatText(strings.domainTooLong, MAX_HOST_LENGTH)); }
 
   const internal = parsed.hostname === policy.currentHost;
   if (internal) {
@@ -191,7 +192,7 @@ export function checkLinkUrl(raw: string | undefined, policy: ISecurityPolicy): 
   }
   if (!internal && policy.allowedLinkDomains.length > 0 &&
     !policy.allowedLinkDomains.some((d: string) => hostMatches(parsed.hostname, d))) {
-    return fail(url, strings.domainNotAllowed(parsed.hostname, policy.allowedLinkDomains.join(', ')));
+    return fail(url, formatText(strings.domainNotAllowed, parsed.hostname, policy.allowedLinkDomains.join(', ')));
   }
   return { valid: true, url, kind: internal ? 'internal' : 'external', warning };
 }
@@ -217,7 +218,7 @@ export function checkImageUrl(raw: string | undefined, policy: ISecurityPolicy):
       : fail(url, strings.imageUrlOnlyHttps);
   }
   if (parsed.hasUserInfo) { return fail(url, strings.imageUrlUserInfo); }
-  if (parsed.hostname.length > MAX_HOST_LENGTH) { return fail(url, strings.domainTooLong(MAX_HOST_LENGTH)); }
+  if (parsed.hostname.length > MAX_HOST_LENGTH) { return fail(url, formatText(strings.domainTooLong, MAX_HOST_LENGTH)); }
   const internal = parsed.hostname === policy.currentHost;
   if (parsed.protocol === 'http' && !internal) {
     return fail(url, strings.imageNeedsHttps, 'https' + url.substr(4));
@@ -251,11 +252,11 @@ export function checkText(value: string | undefined, maxLength: number, required
   const raw = value || '';
   const t = raw.trim();
   if (!t) { return required ? { error: requiredMessage } : {}; }
-  if (raw.length > maxLength) { return { error: strings.textTooLong(raw.length, maxLength) }; }
+  if (raw.length > maxLength) { return { error: formatText(strings.textTooLong, raw.length, maxLength) }; }
   if (CONTROL_CHARS.test(raw) || /[\t\r\n]/.test(raw)) { return { error: strings.textControlChars }; }
   if (INVISIBLE_CHARS.test(raw)) { return { error: strings.textInvisibleChars }; }
   const forbidden = uniqueChars(raw, TEXT_FORBIDDEN);
-  if (forbidden.length) { return { error: strings.textForbiddenChars(quoteChars(forbidden)) }; }
+  if (forbidden.length) { return { error: formatText(strings.textForbiddenChars, quoteChars(forbidden)) }; }
   return {};
 }
 
@@ -301,15 +302,15 @@ export function collectIssues(areas: IImageArea[], imageAlt: string, policy: ISe
   areas.forEach((area: IImageArea, index: number) => {
     const link = checkLinkUrl(area.url, policy);
     if (!link.valid) {
-      issues.push({ areaId: area.id, areaIndex: index, field: 'url', message: strings.issueArea(index + 1, link.error || '') });
+      issues.push({ areaId: area.id, areaIndex: index, field: 'url', message: formatText(strings.issueArea, index + 1, link.error || '') });
     }
     const title = checkTitle(area.title, policy.maxTitleLength);
     if (title.error) {
-      issues.push({ areaId: area.id, areaIndex: index, field: 'title', message: strings.issueTitle(index + 1, title.error) });
+      issues.push({ areaId: area.id, areaIndex: index, field: 'title', message: formatText(strings.issueTitle, index + 1, title.error) });
     }
     const tooltip = checkTooltip(area.tooltip, policy.maxTooltipLength);
     if (tooltip.error) {
-      issues.push({ areaId: area.id, areaIndex: index, field: 'tooltip', message: strings.issueTooltip(index + 1, tooltip.error) });
+      issues.push({ areaId: area.id, areaIndex: index, field: 'tooltip', message: formatText(strings.issueTooltip, index + 1, tooltip.error) });
     }
   });
   return issues;

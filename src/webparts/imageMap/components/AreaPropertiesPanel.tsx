@@ -14,11 +14,12 @@ import { Text } from '@fluentui/react/lib/Text';
 import { TextField } from '@fluentui/react/lib/TextField';
 import { Toggle } from '@fluentui/react/lib/Toggle';
 import { getId, IRenderFunction } from '@fluentui/react/lib/Utilities';
+import * as strings from 'ImageMapWebPartStrings';
 import { ColorField } from './ColorField';
 import { PageSearch } from './PageSearch';
 import { useClassNames } from './styles';
 import { ISecurityPolicy } from '../config/securityConfig';
-import { strings } from '../loc/strings';
+import { formatText } from '../loc/template';
 import {
   AreaBorderStyle, AreaShape, DEFAULT_HOVER, HOVER_PRESETS, IHoverPreset, IHoverStyle, IImageArea, matchPreset
 } from '../models/IImageMap';
@@ -52,7 +53,7 @@ const SHAPES: AreaShape[] = ['rect', 'circle', 'ellipse'];
 const BORDER_STYLES: AreaBorderStyle[] = ['solid', 'dashed', 'dotted', 'double'];
 
 function counter(value: string | undefined, max: number): string {
-  return strings.charCounter((value || '').length, max);
+  return formatText(strings.charCounter, (value || '').length, max);
 }
 
 /** Color swatch of a preset (purely visual, hidden from screen readers). */
@@ -142,8 +143,8 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
       max={max}
       step={step}
       onChange={(ev: React.SyntheticEvent<HTMLElement>, v?: string) => onValue(v)}
-      incrementButtonAriaLabel={strings.increaseBy(label, `${step}${suffix || ''}`)}
-      decrementButtonAriaLabel={strings.decreaseBy(label, `${step}${suffix || ''}`)}
+      incrementButtonAriaLabel={formatText(strings.increaseBy, label, `${step}${suffix || ''}`)}
+      decrementButtonAriaLabel={formatText(strings.decreaseBy, label, `${step}${suffix || ''}`)}
     />
   );
 
@@ -152,7 +153,7 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
     if (!(area.title || '').trim()) { changes.title = page.title; }
     onChange(changes, strings.labelPageSelected);
     setSearchOpen(false);
-    onAnnounce(strings.announceTargetSet(page.title));
+    onAnnounce(formatText(strings.announceTargetSet, page.title));
     window.setTimeout(() => {
       const input = document.querySelector(`.${FIRST_FIELD_CLASS}`) as HTMLInputElement | null;
       if (input) { input.focus(); }
@@ -235,7 +236,7 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
             {link.suggestion && (
               <ActionButton
                 iconProps={{ iconName: 'AutoEnhanceOn' }}
-                text={strings.fixTo(link.suggestion)}
+                text={formatText(strings.fixTo, link.suggestion)}
                 onClick={() => onChange({ url: link.suggestion || '' }, strings.labelTargetFixed)}
               />
             )}
@@ -251,7 +252,7 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
               onChange({ title: v || '' }, strings.labelTitleChanged, `title-${area.id}`)}
             errorMessage={title.error}
             description={title.error ? undefined :
-              strings.titleDescription(counter(area.title, policy.maxTitleLength))}
+              formatText(strings.titleDescription, counter(area.title, policy.maxTitleLength))}
           />
           {title.warning && <MessageBar messageBarType={MessageBarType.warning}>{title.warning}</MessageBar>}
 
@@ -266,7 +267,7 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
               onChange({ tooltip: (v || '').replace(/[\r\n]+/g, ' ') }, strings.labelTooltipChanged, `tooltip-${area.id}`)}
             errorMessage={tooltip.error}
             description={tooltip.error ? undefined :
-              strings.tooltipDescription(counter(area.tooltip, policy.maxTooltipLength))}
+              formatText(strings.tooltipDescription, counter(area.tooltip, policy.maxTooltipLength))}
           />
 
           <Toggle
@@ -307,7 +308,7 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
               }
               setCustomize(false);
               const p = HOVER_PRESETS.filter((x: IHoverPreset) => x.key === o.key)[0];
-              if (p) { onChange({ hover: { ...p.hover } }, strings.labelPresetChosen(strings.presets[p.key].name)); }
+              if (p) { onChange({ hover: { ...p.hover } }, formatText(strings.labelPresetChosen, strings.presets[p.key].name)); }
             }}
           />
 
@@ -382,7 +383,7 @@ export const AreaPropertiesPanel: React.FunctionComponent<IAreaPropertiesPanelPr
       type={PanelType.custom}
       customWidth="360px"
       isBlocking={false}
-      headerText={strings.editAreaTitle(index + 1)}
+      headerText={formatText(strings.editAreaTitle, index + 1)}
       closeButtonAriaLabel={strings.closeProperties}
       onDismiss={onDismiss}
       onDismissed={onDismissed}
@@ -400,11 +401,11 @@ export const AreaPropertiesInline: React.FunctionComponent<IAreaPropertiesFormPr
   (props: IAreaPropertiesFormProps & { onDelete: () => void; onClose: () => void }) => {
     const { index, onDelete, onClose } = props;
     return (
-      <section aria-label={strings.propertiesOf(index + 1)} style={{ padding: '8px 16px' }}>
+      <section aria-label={formatText(strings.propertiesOf, index + 1)} style={{ padding: '8px 16px' }}>
         <Stack horizontal horizontalAlign="space-between" verticalAlign="center">
-          <Text variant="large" as="h2" style={{ margin: 0 }}>{strings.area(index + 1)}</Text>
+          <Text variant="large" as="h2" style={{ margin: 0 }}>{formatText(strings.area, index + 1)}</Text>
           <Stack horizontal>
-            <IconButton iconProps={{ iconName: 'Delete' }} title={strings.deleteArea} ariaLabel={strings.deleteAreaAria(index + 1)} onClick={onDelete} />
+            <IconButton iconProps={{ iconName: 'Delete' }} title={strings.deleteArea} ariaLabel={formatText(strings.deleteAreaAria, index + 1)} onClick={onDelete} />
             <IconButton iconProps={{ iconName: 'Cancel' }} title={strings.closeProperties} ariaLabel={strings.closeProperties} onClick={onClose} />
           </Stack>
         </Stack>

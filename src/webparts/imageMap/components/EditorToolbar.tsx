@@ -2,8 +2,9 @@ import * as React from 'react';
 import { CommandBar, ICommandBarData, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
 import { ContextualMenuItemType } from '@fluentui/react/lib/ContextualMenu';
 import { VerticalDivider } from '@fluentui/react/lib/Divider';
+import * as strings from 'ImageMapWebPartStrings';
 import { IssuesButton } from './IssuesButton';
-import { strings } from '../loc/strings';
+import { formatText } from '../loc/template';
 import { AreaShape } from '../models/IImageMap';
 import { IValidationIssue } from '../utils/validation';
 
@@ -121,8 +122,8 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
       key: `tool-${item}-${v}`,
       text: strings.toolNames[item],
       title: item === 'select'
-        ? strings.selectTitle(strings.toolKeys[item])
-        : strings.drawTitle(strings.toolNames[item], strings.toolKeys[item]),
+        ? formatText(strings.selectTitle, strings.toolKeys[item])
+        : formatText(strings.drawTitle, strings.toolNames[item], strings.toolKeys[item]),
       iconProps: { iconName: TOOL_ICONS[item] },
       disabled: !editing,
       canCheck: true,
@@ -155,8 +156,8 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
       key: `undo-${v}`,
       text: strings.undo,
       iconOnly: true,
-      ariaLabel: undoLabel ? strings.undoWith(undoLabel) : strings.undo,
-      title: strings.undoTitle(undoLabel),
+      ariaLabel: undoLabel ? formatText(strings.undoWith, undoLabel) : strings.undo,
+      title: formatText(strings.undoTitle, undoLabel),
       iconProps: { iconName: 'Undo' },
       disabled: !canUndo || testMode,
       onClick: () => onUndo(),
@@ -166,8 +167,8 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
       key: `redo-${v}`,
       text: strings.redo,
       iconOnly: true,
-      ariaLabel: redoLabel ? strings.redoWith(redoLabel) : strings.redo,
-      title: strings.redoTitle(redoLabel),
+      ariaLabel: redoLabel ? formatText(strings.redoWith, redoLabel) : strings.redo,
+      title: formatText(strings.redoTitle, redoLabel),
       iconProps: { iconName: 'Redo' },
       disabled: !canRedo || testMode,
       onClick: () => onRedo(),
@@ -184,7 +185,7 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
       subMenuProps: {
         items: (['rect', 'circle', 'ellipse'] as AreaShape[]).map((shape: AreaShape) => ({
           key: shape,
-          text: strings.insertCentered(strings.toolNames[shape]),
+          text: formatText(strings.insertCentered, strings.toolNames[shape]),
           onClick: () => onInsert(shape)
         }))
       }
