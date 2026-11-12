@@ -75,7 +75,7 @@ function PresetSwatch(props: { hover: IHoverStyle }): JSX.Element {
 function tabWithHint(hint: string | undefined) {
   return hint
     ? (link?: IPivotItemProps, defaultRender?: IRenderFunction<IPivotItemProps>) => (
-      <span>
+      <span title={link && link.headerText ? `${link.headerText}: ${hint}` : hint}>
         {defaultRender ? defaultRender(link) : null}
         <span className={classNames.srOnly}>, {hint}</span>
       </span>

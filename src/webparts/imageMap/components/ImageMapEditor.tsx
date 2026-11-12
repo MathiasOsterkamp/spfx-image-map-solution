@@ -629,7 +629,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
                 >
                   <span className={classNames.listIndex} aria-hidden={true}>{index + 1}</span>
                   <span className={classNames.listText}>
-                    {problems && <Icon iconName="Warning" className={classNames.issueIcon} aria-hidden={true} />}
+                    {problems && <Icon iconName="Warning" className={classNames.issueIcon} aria-hidden={true} title={problems.join(' ')} />}
                     <span className={classNames.srOnly}>{strings.area(index + 1)}, {strings.shapeNames[area.shape]}: </span>
                     {name} – {area.url || strings.noLinkLower}
                     {area.openInNewTab && <span aria-hidden={true}> ↗</span>}
