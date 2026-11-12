@@ -2,8 +2,9 @@ declare type ImageMapStringsShapeMap = { [K in import('../models/IImageMap').Are
 declare type ImageMapStringsToolMap = { [K in import('../models/IImageMap').AreaShape | 'select']: string };
 
 /**
- * All user-facing texts of the web part. Texts with parameters are functions so that
- * every language can handle word order and plural forms itself.
+ * All user-facing texts of the web part, as provided by "strings" from loc/strings.
+ * Texts with parameters are functions here. In the language files they are templates, so that
+ * every language can handle word order and plural forms itself (see template.ts).
  */
 declare interface IImageMapWebPartStrings {
   // ---------- General ----------
@@ -349,7 +350,21 @@ declare interface IImageMapWebPartStrings {
   issueTooltip: (n: number, error: string) => string;
 }
 
+/**
+ * The language files as they are loaded: plain data. Texts with parameters are templates
+ * there (see template.ts) and become functions in strings.ts. Do not import this module
+ * directly, use "strings" from loc/strings.
+ */
+declare type ImageMapStringResources = {
+  [K in keyof IImageMapWebPartStrings]: IImageMapWebPartStrings[K] extends (...args: never[]) => string
+    ? string
+    : IImageMapWebPartStrings[K];
+} & {
+  /** Plural rule: '1' = 0 and 1 are singular (French), '' = only 1 is singular */
+  zeroIsSingular: string;
+};
+
 declare module 'ImageMapWebPartStrings' {
-  const strings: IImageMapWebPartStrings;
+  const strings: ImageMapStringResources;
   export = strings;
 }

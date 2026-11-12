@@ -14,7 +14,7 @@ import { SearchBox } from '@fluentui/react/lib/SearchBox';
 import { IImageFile, IImageFolder, IImagePage, ImageService, isSameImageUrl } from '../services/ImageService';
 import { acceptAttribute, describeAllowedTypes, IValidatedImage, validateImageFile } from '../utils/fileValidation';
 import { checkImageUrl } from '../utils/validation';
-import * as strings from 'ImageMapWebPartStrings';
+import { strings } from '../loc/strings';
 import { useClassNames } from './styles';
 
 export interface IImagePickerPanelProps {

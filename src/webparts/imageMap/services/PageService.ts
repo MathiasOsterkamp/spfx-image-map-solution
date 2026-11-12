@@ -1,5 +1,5 @@
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
-import * as strings from 'ImageMapWebPartStrings';
+import { strings } from '../loc/strings';
 import { IUntyped, odataItems } from '../utils/untyped';
 
 export interface IPageResult {

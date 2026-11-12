@@ -1,5 +1,5 @@
 import { ImageType, ISecurityPolicy } from '../config/securityConfig';
-import * as strings from 'ImageMapWebPartStrings';
+import { strings } from '../loc/strings';
 import { formatNumber } from './format';
 
 const TYPE_LABEL: { [key: string]: string } = { png: 'PNG', jpeg: 'JPEG', gif: 'GIF', webp: 'WebP' };

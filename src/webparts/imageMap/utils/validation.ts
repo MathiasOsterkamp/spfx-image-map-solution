@@ -1,6 +1,6 @@
 import { ISecurityPolicy } from '../config/securityConfig';
 import { IImageArea } from '../models/IImageMap';
-import * as strings from 'ImageMapWebPartStrings';
+import { strings } from '../loc/strings';
 
 export type LinkKind = 'internal' | 'external' | 'mailto' | 'tel' | 'anchor';
 

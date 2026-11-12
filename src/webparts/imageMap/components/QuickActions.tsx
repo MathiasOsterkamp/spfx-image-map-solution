@@ -6,7 +6,7 @@ import { mergeStyleSets } from '@fluentui/react/lib/Styling';
 import { ITheme, useTheme } from '@fluentui/react/lib/Theme';
 import { memoizeFunction } from '@fluentui/react/lib/Utilities';
 import { IImageArea } from '../models/IImageMap';
-import * as strings from 'ImageMapWebPartStrings';
+import { strings } from '../loc/strings';
 
 const getCss = memoizeFunction((theme: ITheme) => mergeStyleSets({
   bar: {

@@ -1,4 +1,4 @@
-import * as strings from 'ImageMapWebPartStrings';
+import { strings } from '../loc/strings';
 
 /** Formats a number with the given decimal places and the decimal separator of the current language. */
 export function formatNumber(n: number, decimals: number = 1): string {

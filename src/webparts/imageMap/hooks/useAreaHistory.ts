@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IImageArea } from '../models/IImageMap';
-import * as strings from 'ImageMapWebPartStrings';
+import { strings } from '../loc/strings';
 
 interface IHistoryEntry {
   areas: IImageArea[];

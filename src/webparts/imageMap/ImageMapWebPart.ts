@@ -13,7 +13,7 @@ import { ITheme } from '@fluentui/react/lib/Theme';
 
 import { ImageMap, IImageMapProps } from './components/ImageMap';
 import { createSecurityPolicy, ISecurityPolicy } from './config/securityConfig';
-import * as strings from 'ImageMapWebPartStrings';
+import { strings } from './loc/strings';
 import { IHoverStyle, IImageArea } from './models/IImageMap';
 import { ImageService } from './services/ImageService';
 import { PageService } from './services/PageService';

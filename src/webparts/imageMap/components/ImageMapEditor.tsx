@@ -16,7 +16,7 @@ import { checkImageUrl, collectIssues, IValidationIssue } from '../utils/validat
 import { ImageService } from '../services/ImageService';
 import { PageService } from '../services/PageService';
 import { useAreaHistory } from '../hooks/useAreaHistory';
-import * as strings from 'ImageMapWebPartStrings';
+import { strings } from '../loc/strings';
 import { formatNumber } from '../utils/format';
 import { ImageMapViewer } from './ImageMapViewer';
 import { AreaPropertiesInline, AreaPropertiesPanel, FIRST_FIELD_CLASS, PropertiesTab } from './AreaPropertiesPanel';
