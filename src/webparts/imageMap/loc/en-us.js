@@ -38,6 +38,11 @@ define([], function () {
     linkListOn: 'Yes (recommended for accessibility)',
     linkListOff: 'No (only if loading fails)',
     groupUpload: 'Upload',
+    developerPageTitle: 'Developer',
+    groupDiagnostics: 'Diagnostics',
+    solutionInfo: 'Solution: {0} (version {1})',
+    logLevelLabel: 'Logging to the browser console',
+    logLevels: { verbose: 'Verbose', info: 'Information', warning: 'Warnings and errors', error: 'Errors only', off: 'Off' },
     uploadFolderLabel: 'Library folder',
     uploadFolderDescription: 'Relative to the current site, e.g. "SiteAssets" or "SiteAssets/Images". The folder must exist.',
     // ---------- Editor ----------

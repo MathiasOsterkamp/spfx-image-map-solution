@@ -7,6 +7,7 @@ import { formatTemplate } from './template';
  * the functions declared in IImageMapWebPartStrings.
  */
 const TEMPLATES: (keyof IImageMapWebPartStrings)[] = [
+  'solutionInfo',
   'quote', 'area', 'areaCount', 'charCounter', 'rectPosition', 'rectSize', 'circleDiameter', 'announceTool',
   'maxAreasReached', 'labelShapeAdded', 'announceShapeAdded', 'announceDuplicated', 'labelDeleted',
   'announceDeleted', 'announceReordered', 'announceMoved', 'announceResized', 'announceDiameter', 'announceSize',

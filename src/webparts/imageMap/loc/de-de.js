@@ -38,6 +38,11 @@ define([], function () {
     linkListOn: 'Ja (empfohlen für Barrierefreiheit)',
     linkListOff: 'Nein (nur bei Ladefehler)',
     groupUpload: 'Upload',
+    developerPageTitle: 'Entwickler',
+    groupDiagnostics: 'Diagnose',
+    solutionInfo: 'Solution: {0} (Version {1})',
+    logLevelLabel: 'Protokollierung in der Browser-Konsole',
+    logLevels: { verbose: 'Ausführlich', info: 'Informationen', warning: 'Warnungen und Fehler', error: 'Nur Fehler', off: 'Aus' },
     uploadFolderLabel: 'Bibliotheksordner',
     uploadFolderDescription: 'Relativ zur aktuellen Website, z. B. „SiteAssets“ oder „SiteAssets/Bilder“. Der Ordner muss existieren.',
     // ---------- Editor ----------

@@ -1,5 +1,6 @@
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 import { strings } from '../loc/strings';
+import { logError, logInfo, logVerbose } from '../utils/logging';
 import { asRecord, IUntyped, odataEntity, odataItems } from '../utils/untyped';
 
 export interface IImageFile {
@@ -138,7 +139,11 @@ export class ImageService {
       `?@f=${odataLiteral(folderPath)}&@n=${odataLiteral(name)}`;
     return this.httpClient.post(url, SPHttpClient.configurations.v1, { body: buffer })
       .then(readJson)
-      .then((json: unknown) => mapFile(odataEntity(json)));
+      .then((json: unknown) => {
+        const file = mapFile(odataEntity(json));
+        logInfo('Image uploaded', { url: file.serverRelativeUrl });
+        return file;
+      });
   }
 
   /** One page of list rows of a folder via RenderListDataAsStream (server-side paging and filtering). */
@@ -154,6 +159,7 @@ export class ImageService {
       `<RowLimit Paged="TRUE">${PAGE_SIZE}</RowLimit></View>`;
     const parameters: IUntyped = { RenderOptions: 2, ViewXml: viewXml, FolderServerRelativeUrl: folderPath };
     if (paging) { parameters.Paging = paging; }
+    logVerbose('Loading images', { folder: folderPath, query: q, paging: paging || '' });
 
     return this.httpClient.post(url, SPHttpClient.configurations.v1, {
       headers: { 'Content-Type': 'application/json;charset=utf-8' },
@@ -232,9 +238,8 @@ function readJson(response: SPHttpClientResponse): Promise<unknown> {
     return response.json();
   }
   return response.text().then((text: string) => {
-    // Technical details only in the console, not in the UI
-    // tslint:disable-next-line:no-console
-    console.error('[ImageMap] SharePoint error', response.status, text);
+    // Technical details only in the log, not in the UI
+    logError('SharePoint request failed with status ' + response.status, { url: response.url, response: text });
     // List view threshold exceeded (SPQueryThrottledException)
     const throttled = /SPQueryThrottledException|-2147024860/.test(text);
     const error: IServiceError = new Error(throttled ? strings.listTooLarge : friendlyMessage(response.status));

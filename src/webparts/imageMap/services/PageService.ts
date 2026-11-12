@@ -1,5 +1,6 @@
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 import { strings } from '../loc/strings';
+import { logWarning } from '../utils/logging';
 import { IUntyped, odataItems } from '../utils/untyped';
 
 export interface IPageResult {
@@ -26,7 +27,10 @@ export class PageService {
       const url = `${this.api()}/web/lists(guid'${id}')/items?$select=Title,FileRef,FileLeafRef&$orderby=Modified desc&$top=15${filter}`;
       return this.httpClient.get(url, SPHttpClient.configurations.v1)
         .then((r: SPHttpClientResponse) => {
-          if (!r.ok) { throw new Error(strings.pageSearchFailed); }
+          if (!r.ok) {
+            logWarning('Page search failed with status ' + r.status);
+            throw new Error(strings.pageSearchFailed);
+          }
           return r.json();
         })
         .then((json: unknown) => {

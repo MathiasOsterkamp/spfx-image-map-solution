@@ -4,6 +4,9 @@ import { DisplayMode } from '@microsoft/sp-core-library';
 import {
   BaseClientSideWebPart,
   IPropertyPaneConfiguration,
+  IPropertyPaneDropdownOption,
+  PropertyPaneDropdown,
+  PropertyPaneLabel,
   PropertyPaneTextField,
   PropertyPaneToggle
 } from '@microsoft/sp-webpart-base';
@@ -17,8 +20,10 @@ import { strings } from './loc/strings';
 import { IHoverStyle, IImageArea } from './models/IImageMap';
 import { ImageService } from './services/ImageService';
 import { PageService } from './services/PageService';
+import { configureLogging, LOG_LEVEL_NAMES, logInfo, LogLevelName, sanitizeLogLevel } from './utils/logging';
 import { sanitizeAreas, sanitizeHover } from './utils/sanitize';
 import { createSharePointTheme } from './utils/theme';
+import { asRecord } from './utils/untyped';
 import { checkAlt, checkImageUrl, validateFolderPath } from './utils/validation';
 
 export interface IImageMapWebPartProps {
@@ -30,7 +35,14 @@ export interface IImageMapWebPartProps {
   showLinkList: boolean;
   uploadFolder: string;
   defaultHover: IHoverStyle;
+  /** From which level on the log is written to the browser console */
+  logLevel: LogLevelName;
 }
+
+/** Name and version of the solution package, shown on the developer page of the property pane. */
+const SOLUTION = asRecord(asRecord(require('../../../config/package-solution.json')).solution);
+const SOLUTION_NAME = String(SOLUTION.name || '');
+const SOLUTION_VERSION = String(SOLUTION.version || '');
 
 let iconsInitialized = false;
 
@@ -51,6 +63,8 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
       initializeIcons();
       iconsInitialized = true;
     }
+    configureLogging(sanitizeLogLevel(this.properties.logLevel));
+    logInfo('Web part initialized', { solution: SOLUTION_NAME, version: SOLUTION_VERSION, instanceId: this.context.instanceId });
     this.theme = createSharePointTheme();
     this.policy = createSecurityPolicy(this.context.pageContext.web.absoluteUrl);
     this.service = new ImageService(
@@ -65,6 +79,8 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
   public render(): void {
     const p = this.properties;
     const folder = validateFolderPath(p.uploadFolder) ? 'SiteAssets' : p.uploadFolder;
+    // The property pane is reactive: a changed log level applies immediately.
+    configureLogging(sanitizeLogLevel(p.logLevel));
 
     const props: IImageMapProps = {
       theme: this.theme,
@@ -174,6 +190,27 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
                   description: strings.uploadFolderDescription,
                   onGetErrorMessage: this.validateFolder.bind(this),
                   deferredValidationTime: 600
+                })
+              ]
+            }
+          ]
+        },
+        {
+          header: { description: strings.developerPageTitle },
+          groups: [
+            {
+              groupName: strings.groupDiagnostics,
+              groupFields: [
+                PropertyPaneLabel('', {
+                  text: strings.solutionInfo(SOLUTION_NAME, SOLUTION_VERSION)
+                }),
+                PropertyPaneDropdown('logLevel', {
+                  label: strings.logLevelLabel,
+                  options: LOG_LEVEL_NAMES.map((level: LogLevelName): IPropertyPaneDropdownOption => ({
+                    key: level,
+                    text: strings.logLevels[level]
+                  })),
+                  selectedKey: sanitizeLogLevel(this.properties.logLevel)
                 })
               ]
             }

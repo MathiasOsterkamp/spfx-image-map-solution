@@ -26,6 +26,7 @@
       "hintAreas": false,
       "showLinkList": false,
       "uploadFolder": "SiteAssets",
+      "logLevel": "warning",
       "defaultHover": {
         "borderColor": "#0078d4",
         "borderWidth": 3,

@@ -47,6 +47,12 @@ declare interface IImageMapWebPartStrings {
   linkListOn: string;
   linkListOff: string;
   groupUpload: string;
+  /** Title of the second page of the property pane */
+  developerPageTitle: string;
+  groupDiagnostics: string;
+  solutionInfo: (name: string, version: string) => string;
+  logLevelLabel: string;
+  logLevels: { [K in import('../utils/logging').LogLevelName]: string };
   uploadFolderLabel: string;
   uploadFolderDescription: string;
 

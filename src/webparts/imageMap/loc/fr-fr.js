@@ -38,6 +38,11 @@ define([], function () {
     linkListOn: 'Oui (recommandé pour l\'accessibilité)',
     linkListOff: 'Non (uniquement en cas d\'erreur de chargement)',
     groupUpload: 'Chargement',
+    developerPageTitle: 'Développeur',
+    groupDiagnostics: 'Diagnostic',
+    solutionInfo: 'Solution : {0} (version {1})',
+    logLevelLabel: 'Journalisation dans la console du navigateur',
+    logLevels: { verbose: 'Détaillé', info: 'Informations', warning: 'Avertissements et erreurs', error: 'Erreurs uniquement', off: 'Désactivé' },
     uploadFolderLabel: 'Dossier de bibliothèque',
     uploadFolderDescription: 'Relatif au site actuel, p. ex. « SiteAssets » ou « SiteAssets/Images ». Le dossier doit exister.',
     // ---------- Editor ----------
