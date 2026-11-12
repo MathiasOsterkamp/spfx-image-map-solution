@@ -108,8 +108,10 @@ function isTextInput(el: EventTarget | null): boolean {
 }
 
 export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (props: IImageMapEditorProps) => {
-  const areas = props.areas;
-  const policy = props.policy;
+  const {
+    areas, policy, onAreasChange, imageUrl, imageAlt, defaultHover, service, uploadFolder, onImageChange,
+    onImageAltChange, pageService, onDefaultHoverChange, stretch, hintAreas, showLinkList
+  } = props;
 
   // ---------- Refs (always current state – the CommandBar caches handlers) ----------
   const areasRef = React.useRef<IImageArea[]>(areas);
@@ -150,9 +152,9 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     setAnnouncement((prev: string) => (prev === message ? message + ' ' : message));
   };
 
-  const history = useAreaHistory(latest, props.onAreasChange, announce);
+  const history = useAreaHistory(latest, onAreasChange, announce);
 
-  React.useEffect(() => { setImageFailed(false); }, [props.imageUrl]);
+  React.useEffect(() => { setImageFailed(false); }, [imageUrl]);
 
   // Set focus deliberately (new area, delete, panel closed, full screen exited …)
   React.useEffect(() => {
@@ -182,7 +184,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   React.useEffect(() => {
     const current = latest();
     if (current.some((a: IImageArea) => a.shape === 'circle' && Math.abs(a.height - a.width * imageRatio) > 0.05)) {
-      props.onAreasChange(current.map((a: IImageArea) =>
+      onAreasChange(current.map((a: IImageArea) =>
         a.shape === 'circle' ? { ...a, ...circleFromWidth(a.x, a.y, a.width, imageRatio) } : a));
     }
   }, [imageRatio]);
@@ -201,7 +203,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   const selectedIndex = indexOf(selectedId);
   const selected = selectedIndex >= 0 ? areas[selectedIndex] : undefined;
 
-  const issues = collectIssues(areas, props.imageAlt, policy);
+  const issues = collectIssues(areas, imageAlt, policy);
   const areaIssues: { [id: string]: string[] } = {};
   issues.forEach((issue: IValidationIssue) => {
     if (issue.areaId) { (areaIssues[issue.areaId] = areaIssues[issue.areaId] || []).push(issue.message); }
@@ -225,7 +227,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       announce(strings.maxAreasReached(policy.maxAreas));
       return;
     }
-    const area = createArea(rect, props.defaultHover, shape, getRatio());
+    const area = createArea(rect, defaultHover, shape, getRatio());
     history.commit(current.concat([area]), strings.labelShapeAdded(strings.shapeNames[shape], drawn));
     setSelectedId(area.id);
     setPropsTab('link');
@@ -472,27 +474,27 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   const picker = (
     <ImagePickerPanel
       isOpen={pickerOpen}
-      service={props.service}
+      service={service}
       policy={policy}
-      folder={props.uploadFolder}
-      currentUrl={props.imageUrl}
+      folder={uploadFolder}
+      currentUrl={imageUrl}
       hasAreas={areas.length > 0}
-      onSelect={(url: string) => { props.onImageChange(url); setPickerOpen(false); announce(strings.announceImageApplied); }}
+      onSelect={(url: string) => { onImageChange(url); setPickerOpen(false); announce(strings.announceImageApplied); }}
       onDismiss={() => setPickerOpen(false)}
     />
   );
   const altDialog = (
     <AltTextDialog
       isOpen={altOpen}
-      value={props.imageAlt}
+      value={imageAlt}
       maxLength={policy.maxAltLength}
-      onSave={(alt: string) => { props.onImageAltChange(alt); setAltOpen(false); announce(strings.announceAltSaved); }}
+      onSave={(alt: string) => { onImageAltChange(alt); setAltOpen(false); announce(strings.announceAltSaved); }}
       onDismiss={() => setAltOpen(false)}
     />
   );
   const liveRegion = <div className={classNames.srOnly} role="status" aria-live="polite" aria-atomic="true">{announcement}</div>;
 
-  if (!props.imageUrl) {
+  if (!imageUrl) {
     return (
       <div className={classNames.placeholder}>
         <Icon iconName="Photo2" className={classNames.placeholderIcon} aria-hidden={true} />
@@ -505,13 +507,13 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     );
   }
 
-  const imageCheck = checkImageUrl(props.imageUrl, policy);
+  const imageCheck = checkImageUrl(imageUrl, policy);
 
   const formProps = selected ? {
     area: selected,
     index: selectedIndex,
     policy,
-    pageService: props.pageService,
+    pageService: pageService,
     imageRatio,
     tab: propsTab,
     onTabChange: setPropsTab,
@@ -521,7 +523,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       announce(strings.announceStyleAppliedToAll);
     },
     onSaveAsDefaultHover: (hover: IHoverStyle) => {
-      props.onDefaultHoverChange({ ...hover });
+      onDefaultHoverChange({ ...hover });
       announce(strings.announceSavedAsDefault);
     },
     onAnnounce: announce
@@ -531,10 +533,10 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     <div className={classNames.canvasCol}>
       <Text block={true} variant="small" className={classNames.hint} id={ids.current.help}>{strings.editorHelp}</Text>
       {imageFailed && <MessageBar messageBarType={MessageBarType.error}>{strings.imageLoadFailed}</MessageBar>}
-      <div className={css(classNames.outer, props.stretch && classNames.outerStretch)}>
+      <div className={css(classNames.outer, stretch && classNames.outerStretch)}>
         <div
           ref={surfaceRef}
-          className={css(classNames.frame, props.stretch && classNames.frameStretch, classNames.surface)}
+          className={css(classNames.frame, stretch && classNames.frameStretch, classNames.surface)}
           style={{ cursor: tool === 'select' ? 'default' : 'crosshair' }}
           tabIndex={0}
           role="application"
@@ -553,7 +555,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
               src={imageCheck.url}
               alt=""
               aria-hidden={true}
-              className={css(classNames.image, props.stretch && classNames.imageStretch)}
+              className={css(classNames.image, stretch && classNames.imageStretch)}
               draggable={false}
               onError={() => setImageFailed(true)}
               onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -658,7 +660,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       {liveRegion}
       <EditorToolbar
         tool={tool}
-        hasImage={!!props.imageUrl}
+        hasImage={!!imageUrl}
         testMode={testMode}
         fullscreen={fullscreen}
         canUndo={history.canUndo}
@@ -705,12 +707,12 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
           </div>
           <div style={{ marginTop: 8 }}>
             <ImageMapViewer
-              imageUrl={props.imageUrl}
-              imageAlt={props.imageAlt}
+              imageUrl={imageUrl}
+              imageAlt={imageAlt}
               areas={areas}
-              stretch={props.stretch}
-              hintAreas={props.hintAreas}
-              showLinkList={props.showLinkList}
+              stretch={stretch}
+              hintAreas={hintAreas}
+              showLinkList={showLinkList}
               policy={policy}
               onPreviewClick={(a: IImageArea) => setTestMessage(
                 strings.previewClick(a.title || strings.untitled, a.url, a.openInNewTab))}

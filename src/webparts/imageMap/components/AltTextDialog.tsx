@@ -14,14 +14,15 @@ export interface IAltTextDialogProps {
 }
 
 export const AltTextDialog: React.FunctionComponent<IAltTextDialogProps> = (props: IAltTextDialogProps) => {
-  const [draft, setDraft] = React.useState<string>(props.value);
-  React.useEffect(() => { if (props.isOpen) { setDraft(props.value); } }, [props.isOpen]);
-  const error = checkAlt(draft, props.maxLength);
+  const { value, isOpen, maxLength, onDismiss, onSave } = props;
+  const [draft, setDraft] = React.useState<string>(value);
+  React.useEffect(() => { if (isOpen) { setDraft(value); } }, [isOpen]);
+  const error = checkAlt(draft, maxLength);
 
   return (
     <Dialog
-      hidden={!props.isOpen}
-      onDismiss={props.onDismiss}
+      hidden={!isOpen}
+      onDismiss={onDismiss}
       dialogContentProps={{
         type: DialogType.normal,
         title: strings.altDialogTitle,
@@ -36,15 +37,15 @@ export const AltTextDialog: React.FunctionComponent<IAltTextDialogProps> = (prop
         multiline={true}
         autoAdjustHeight={true}
         rows={3}
-        maxLength={props.maxLength}
+        maxLength={maxLength}
         value={draft}
         onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) => setDraft((v || '').replace(/[\r\n]+/g, ' '))}
         errorMessage={error}
-        description={error ? undefined : strings.charCounter(draft.length, props.maxLength)}
+        description={error ? undefined : strings.charCounter(draft.length, maxLength)}
       />
       <DialogFooter>
-        <PrimaryButton text={strings.save} disabled={!!error} onClick={() => props.onSave(draft.trim())} />
-        <DefaultButton text={strings.cancel} onClick={props.onDismiss} />
+        <PrimaryButton text={strings.save} disabled={!!error} onClick={() => onSave(draft.trim())} />
+        <DefaultButton text={strings.cancel} onClick={onDismiss} />
       </DialogFooter>
     </Dialog>
   );

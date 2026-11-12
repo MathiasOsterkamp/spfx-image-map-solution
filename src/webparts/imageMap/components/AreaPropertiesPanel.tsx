@@ -56,8 +56,8 @@ function counter(value: string | undefined, max: number): string {
 }
 
 /** Color swatch of a preset (purely visual, hidden from screen readers). */
-function PresetSwatch(props: { hover: IHoverStyle }): JSX.Element {
-  const s = getHoverRawStyle(props.hover, 'rect');
+function PresetSwatch({ hover }: { hover: IHoverStyle }): JSX.Element {
+  const s = getHoverRawStyle(hover, 'rect');
   return (
     <span
       aria-hidden={true}
@@ -85,7 +85,10 @@ function tabWithHint(hint: string | undefined) {
 
 /** Form with three tabs. Used in the panel and in full screen (inline). */
 export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProps> = (props: IAreaPropertiesFormProps) => {
-  const area = props.area;
+  const {
+    area, policy, onChange, imageRatio, onAnnounce, tab, onTabChange, pageService, onApplyHoverToAll,
+    onSaveAsDefaultHover
+  } = props;
   const hover: IHoverStyle = area.hover || DEFAULT_HOVER;
   const [searchOpen, setSearchOpen] = React.useState<boolean>(false);
   const searchButtonRef = React.useRef<HTMLButtonElement>(null);
@@ -94,33 +97,33 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
   const [customize, setCustomize] = React.useState<boolean>(false);
   React.useEffect(() => { setSearchOpen(false); setCustomize(false); }, [area.id]);
 
-  const link = checkLinkUrl(area.url, props.policy);
-  const title = checkTitle(area.title, props.policy.maxTitleLength);
-  const tooltip = checkTooltip(area.tooltip, props.policy.maxTooltipLength);
+  const link = checkLinkUrl(area.url, policy);
+  const title = checkTitle(area.title, policy.maxTitleLength);
+  const tooltip = checkTooltip(area.tooltip, policy.maxTooltipLength);
   const visibility = getVisibilityWarning(hover);
   const linkTabHasError = !link.valid || !!title.error || !!tooltip.error;
   const matched = matchPreset(hover);
   const preset = customize ? undefined : matched;
 
   const setHover = (changes: Partial<IHoverStyle>, label: string) =>
-    props.onChange({ hover: { ...hover, ...changes } }, label, `hover-${area.id}-${Object.keys(changes).join()}`);
+    onChange({ hover: { ...hover, ...changes } }, label, `hover-${area.id}-${Object.keys(changes).join()}`);
 
   const setRect = (key: keyof IRect, raw: string | undefined) => {
     const value = parseFloat((raw || '').replace(',', '.'));
     if (isNaN(value)) { return; }
     const rect: IRect = { x: area.x, y: area.y, width: area.width, height: area.height };
     rect[key] = value;
-    props.onChange(area.shape === 'circle'
-      ? circleFromWidth(rect.x, rect.y, rect.width, props.imageRatio)
+    onChange(area.shape === 'circle'
+      ? circleFromWidth(rect.x, rect.y, rect.width, imageRatio)
       : normalizeRect(rect), strings.labelPositionChanged, `rect-${area.id}-${key}`);
   };
 
   const setShape = (shape: AreaShape) => {
     if (shape === 'circle') {
-      const diameter = Math.min(area.width, area.height / props.imageRatio);
-      props.onChange({ shape, ...circleFromWidth(area.x, area.y, diameter, props.imageRatio) }, strings.labelShapeChanged);
+      const diameter = Math.min(area.width, area.height / imageRatio);
+      onChange({ shape, ...circleFromWidth(area.x, area.y, diameter, imageRatio) }, strings.labelShapeChanged);
     } else {
-      props.onChange({ shape }, strings.labelShapeChanged);
+      onChange({ shape }, strings.labelShapeChanged);
     }
   };
 
@@ -146,9 +149,9 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
   const selectPage = (page: IPageResult) => {
     const changes: Partial<IImageArea> = { url: page.url };
     if (!(area.title || '').trim()) { changes.title = page.title; }
-    props.onChange(changes, strings.labelPageSelected);
+    onChange(changes, strings.labelPageSelected);
     setSearchOpen(false);
-    props.onAnnounce(strings.announceTargetSet(page.title));
+    onAnnounce(strings.announceTargetSet(page.title));
     window.setTimeout(() => {
       const input = document.querySelector(`.${FIRST_FIELD_CLASS}`) as HTMLInputElement | null;
       if (input) { input.focus(); }
@@ -175,8 +178,8 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
 
   return (
     <Pivot
-      selectedKey={props.tab}
-      onLinkClick={(item?: PivotItem) => item && props.onTabChange(item.props.itemKey as PropertiesTab)}
+      selectedKey={tab}
+      onLinkClick={(item?: PivotItem) => item && onTabChange(item.props.itemKey as PropertiesTab)}
       aria-label={strings.propertiesAria}
       overflowBehavior="none"
     >
@@ -196,11 +199,11 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
                   inputClassName={FIRST_FIELD_CLASS}
                   placeholder={strings.linkPlaceholder}
                   value={area.url}
-                  maxLength={props.policy.maxUrlLength}
+                  maxLength={policy.maxUrlLength}
                   autoComplete="off"
                   spellCheck={false}
                   onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) =>
-                    props.onChange({ url: v || '' }, strings.labelTargetChanged, `url-${area.id}`)}
+                    onChange({ url: v || '' }, strings.labelTargetChanged, `url-${area.id}`)}
                   errorMessage={link.error}
                   description={link.valid && link.kind ? strings.linkKinds[link.kind] : undefined}
                 />
@@ -219,7 +222,7 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
             {searchOpen && (
               <div style={{ marginTop: 8 }}>
                 <PageSearch
-                  service={props.pageService}
+                  service={pageService}
                   onSelect={selectPage}
                   onClose={() => {
                     setSearchOpen(false);
@@ -232,7 +235,7 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
               <ActionButton
                 iconProps={{ iconName: 'AutoEnhanceOn' }}
                 text={strings.fixTo(link.suggestion)}
-                onClick={() => props.onChange({ url: link.suggestion || '' }, strings.labelTargetFixed)}
+                onClick={() => onChange({ url: link.suggestion || '' }, strings.labelTargetFixed)}
               />
             )}
             {link.warning && <MessageBar messageBarType={MessageBarType.warning}>{link.warning}</MessageBar>}
@@ -241,13 +244,13 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
           <TextField
             label={strings.titleLabel}
             required={true}
-            maxLength={props.policy.maxTitleLength}
+            maxLength={policy.maxTitleLength}
             value={area.title}
             onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) =>
-              props.onChange({ title: v || '' }, strings.labelTitleChanged, `title-${area.id}`)}
+              onChange({ title: v || '' }, strings.labelTitleChanged, `title-${area.id}`)}
             errorMessage={title.error}
             description={title.error ? undefined :
-              strings.titleDescription(counter(area.title, props.policy.maxTitleLength))}
+              strings.titleDescription(counter(area.title, policy.maxTitleLength))}
           />
           {title.warning && <MessageBar messageBarType={MessageBarType.warning}>{title.warning}</MessageBar>}
 
@@ -256,13 +259,13 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
             multiline={true}
             autoAdjustHeight={true}
             rows={2}
-            maxLength={props.policy.maxTooltipLength}
+            maxLength={policy.maxTooltipLength}
             value={area.tooltip || ''}
             onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) =>
-              props.onChange({ tooltip: (v || '').replace(/[\r\n]+/g, ' ') }, strings.labelTooltipChanged, `tooltip-${area.id}`)}
+              onChange({ tooltip: (v || '').replace(/[\r\n]+/g, ' ') }, strings.labelTooltipChanged, `tooltip-${area.id}`)}
             errorMessage={tooltip.error}
             description={tooltip.error ? undefined :
-              strings.tooltipDescription(counter(area.tooltip, props.policy.maxTooltipLength))}
+              strings.tooltipDescription(counter(area.tooltip, policy.maxTooltipLength))}
           />
 
           <Toggle
@@ -271,7 +274,7 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
             onText={strings.yes}
             offText={strings.no}
             onChange={(e: React.MouseEvent<HTMLElement>, checked?: boolean) =>
-              props.onChange({ openInNewTab: !!checked }, checked ? strings.labelNewTabOn : strings.labelNewTabOff)}
+              onChange({ openInNewTab: !!checked }, checked ? strings.labelNewTabOn : strings.labelNewTabOff)}
           />
         </Stack>
       </PivotItem>
@@ -298,12 +301,12 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
               if (!o) { return; }
               if (o.key === 'custom') {
                 setCustomize(true);
-                props.onAnnounce(strings.announceCustomStyle);
+                onAnnounce(strings.announceCustomStyle);
                 return;
               }
               setCustomize(false);
               const p = HOVER_PRESETS.filter((x: IHoverPreset) => x.key === o.key)[0];
-              if (p) { props.onChange({ hover: { ...p.hover } }, strings.labelPresetChosen(strings.presets[p.key].name)); }
+              if (p) { onChange({ hover: { ...p.hover } }, strings.labelPresetChosen(strings.presets[p.key].name)); }
             }}
           />
 
@@ -334,8 +337,8 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
           </div>
 
           <Stack horizontal wrap tokens={{ childrenGap: 4 }}>
-            <ActionButton iconProps={{ iconName: 'Copy' }} text={strings.applyToAll} onClick={() => props.onApplyHoverToAll(hover)} />
-            <ActionButton iconProps={{ iconName: 'Save' }} text={strings.saveAsDefault} onClick={() => props.onSaveAsDefaultHover(hover)} />
+            <ActionButton iconProps={{ iconName: 'Copy' }} text={strings.applyToAll} onClick={() => onApplyHoverToAll(hover)} />
+            <ActionButton iconProps={{ iconName: 'Save' }} text={strings.saveAsDefault} onClick={() => onSaveAsDefaultHover(hover)} />
           </Stack>
         </Stack>
       </PivotItem>
@@ -365,22 +368,23 @@ export interface IAreaPropertiesPanelProps extends IAreaPropertiesFormProps {
 }
 
 export const AreaPropertiesPanel: React.FunctionComponent<IAreaPropertiesPanelProps> = (props: IAreaPropertiesPanelProps) => {
+  const { onDismiss, onDelete, isOpen, index, onDismissed } = props;
   const footer = () => (
     <Stack horizontal tokens={{ childrenGap: 8 }}>
-      <PrimaryButton text={strings.done} onClick={props.onDismiss} />
-      <DefaultButton text={strings.deleteArea} iconProps={{ iconName: 'Delete' }} onClick={props.onDelete} />
+      <PrimaryButton text={strings.done} onClick={onDismiss} />
+      <DefaultButton text={strings.deleteArea} iconProps={{ iconName: 'Delete' }} onClick={onDelete} />
     </Stack>
   );
   return (
     <Panel
-      isOpen={props.isOpen}
+      isOpen={isOpen}
       type={PanelType.custom}
       customWidth="360px"
       isBlocking={false}
-      headerText={strings.editAreaTitle(props.index + 1)}
+      headerText={strings.editAreaTitle(index + 1)}
       closeButtonAriaLabel={strings.closeProperties}
-      onDismiss={props.onDismiss}
-      onDismissed={props.onDismissed}
+      onDismiss={onDismiss}
+      onDismissed={onDismissed}
       onRenderFooterContent={footer}
       isFooterAtBottom={true}
       focusTrapZoneProps={{ firstFocusableSelector: FIRST_FIELD_CLASS }}
@@ -392,16 +396,19 @@ export const AreaPropertiesPanel: React.FunctionComponent<IAreaPropertiesPanelPr
 
 /** Full-screen variant: as a column next to the canvas. */
 export const AreaPropertiesInline: React.FunctionComponent<IAreaPropertiesFormProps & { onDelete: () => void; onClose: () => void }> =
-  (props: IAreaPropertiesFormProps & { onDelete: () => void; onClose: () => void }) => (
-    <section aria-label={strings.propertiesOf(props.index + 1)} style={{ padding: '8px 16px' }}>
-      <Stack horizontal horizontalAlign="space-between" verticalAlign="center">
-        <Text variant="large" as="h2" style={{ margin: 0 }}>{strings.area(props.index + 1)}</Text>
-        <Stack horizontal>
-          <IconButton iconProps={{ iconName: 'Delete' }} title={strings.deleteArea} ariaLabel={strings.deleteAreaAria(props.index + 1)} onClick={props.onDelete} />
-          <IconButton iconProps={{ iconName: 'Cancel' }} title={strings.closeProperties} ariaLabel={strings.closeProperties} onClick={props.onClose} />
+  (props: IAreaPropertiesFormProps & { onDelete: () => void; onClose: () => void }) => {
+    const { index, onDelete, onClose } = props;
+    return (
+      <section aria-label={strings.propertiesOf(index + 1)} style={{ padding: '8px 16px' }}>
+        <Stack horizontal horizontalAlign="space-between" verticalAlign="center">
+          <Text variant="large" as="h2" style={{ margin: 0 }}>{strings.area(index + 1)}</Text>
+          <Stack horizontal>
+            <IconButton iconProps={{ iconName: 'Delete' }} title={strings.deleteArea} ariaLabel={strings.deleteAreaAria(index + 1)} onClick={onDelete} />
+            <IconButton iconProps={{ iconName: 'Cancel' }} title={strings.closeProperties} ariaLabel={strings.closeProperties} onClick={onClose} />
+          </Stack>
         </Stack>
-      </Stack>
-      <Separator />
-      <AreaPropertiesForm {...props} />
-    </section>
-  );
+        <Separator />
+        <AreaPropertiesForm {...props} />
+      </section>
+    );
+  };

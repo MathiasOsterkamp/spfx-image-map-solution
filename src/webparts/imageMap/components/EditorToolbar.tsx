@@ -106,25 +106,30 @@ function onGrowData(data: ICommandBarData): ICommandBarData | undefined {
  * radio group (menuitemradio + aria-checked).
  */
 export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (props: IEditorToolbarProps) => {
+  const {
+    tool, canUndo, canRedo, testMode, fullscreen, hasImage, issues, onToolChange, onChooseImage, onEditAlt,
+    undoLabel, onUndo, redoLabel, onRedo, limitReached, onInsert, canSort, onSort, onIssueSelect, onToggleTest,
+    onToggleFullscreen
+  } = props;
   // The state is included in the keys so the CommandBar does not render stale items from its cache.
-  const v = [props.tool, props.canUndo, props.canRedo, props.testMode, props.fullscreen, props.hasImage, props.issues.length].join('-');
-  const editing = props.hasImage && !props.testMode;
+  const v = [tool, canUndo, canRedo, testMode, fullscreen, hasImage, issues.length].join('-');
+  const editing = hasImage && !testMode;
 
-  const toolItem = (tool: EditorTool): ICommandBarItemProps => {
-    const checked = props.tool === tool;
+  const toolItem = (item: EditorTool): ICommandBarItemProps => {
+    const checked = tool === item;
     return {
-      key: `tool-${tool}-${v}`,
-      text: strings.toolNames[tool],
-      title: tool === 'select'
-        ? strings.selectTitle(strings.toolKeys[tool])
-        : strings.drawTitle(strings.toolNames[tool], strings.toolKeys[tool]),
-      iconProps: { iconName: TOOL_ICONS[tool] },
+      key: `tool-${item}-${v}`,
+      text: strings.toolNames[item],
+      title: item === 'select'
+        ? strings.selectTitle(strings.toolKeys[item])
+        : strings.drawTitle(strings.toolNames[item], strings.toolKeys[item]),
+      iconProps: { iconName: TOOL_ICONS[item] },
       disabled: !editing,
       canCheck: true,
       checked,
       role: 'menuitemradio',
       'aria-checked': checked,
-      onClick: () => props.onToolChange(tool)
+      onClick: () => onToolChange(item)
     };
   };
 
@@ -135,8 +140,8 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
       iconProps: { iconName: 'Photo2' },
       subMenuProps: {
         items: [
-          { key: 'choose', text: props.hasImage ? strings.changeImageMenu : strings.chooseImageMenu, iconProps: { iconName: 'Photo2' }, onClick: () => props.onChooseImage() },
-          { key: 'alt', text: strings.editAltMenu, iconProps: { iconName: 'TextField' }, disabled: !props.hasImage, onClick: () => props.onEditAlt() }
+          { key: 'choose', text: hasImage ? strings.changeImageMenu : strings.chooseImageMenu, iconProps: { iconName: 'Photo2' }, onClick: () => onChooseImage() },
+          { key: 'alt', text: strings.editAltMenu, iconProps: { iconName: 'TextField' }, disabled: !hasImage, onClick: () => onEditAlt() }
         ]
       }
     },
@@ -150,22 +155,22 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
       key: `undo-${v}`,
       text: strings.undo,
       iconOnly: true,
-      ariaLabel: props.undoLabel ? strings.undoWith(props.undoLabel) : strings.undo,
-      title: strings.undoTitle(props.undoLabel),
+      ariaLabel: undoLabel ? strings.undoWith(undoLabel) : strings.undo,
+      title: strings.undoTitle(undoLabel),
       iconProps: { iconName: 'Undo' },
-      disabled: !props.canUndo || props.testMode,
-      onClick: () => props.onUndo(),
+      disabled: !canUndo || testMode,
+      onClick: () => onUndo(),
       data: { collapsible: true } as ICollapsible
     },
     {
       key: `redo-${v}`,
       text: strings.redo,
       iconOnly: true,
-      ariaLabel: props.redoLabel ? strings.redoWith(props.redoLabel) : strings.redo,
-      title: strings.redoTitle(props.redoLabel),
+      ariaLabel: redoLabel ? strings.redoWith(redoLabel) : strings.redo,
+      title: strings.redoTitle(redoLabel),
       iconProps: { iconName: 'Redo' },
-      disabled: !props.canRedo || props.testMode,
-      onClick: () => props.onRedo(),
+      disabled: !canRedo || testMode,
+      onClick: () => onRedo(),
       data: { collapsible: true } as ICollapsible
     }
   ];
@@ -175,12 +180,12 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
       key: `insert-${v}`,
       text: strings.insertArea,
       iconProps: { iconName: 'Add' },
-      disabled: !editing || props.limitReached,
+      disabled: !editing || limitReached,
       subMenuProps: {
         items: (['rect', 'circle', 'ellipse'] as AreaShape[]).map((shape: AreaShape) => ({
           key: shape,
           text: strings.insertCentered(strings.toolNames[shape]),
-          onClick: () => props.onInsert(shape)
+          onClick: () => onInsert(shape)
         }))
       }
     },
@@ -189,36 +194,36 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
       text: strings.sortOrder,
       title: strings.sortOrderTitle,
       iconProps: { iconName: 'SortLines' },
-      disabled: !editing || !props.canSort,
-      onClick: () => props.onSort()
+      disabled: !editing || !canSort,
+      onClick: () => onSort()
     }
   ];
 
   const farItems: ICommandBarItemProps[] = [
     {
       key: `issues-${v}`,
-      onRender: () => <IssuesButton issues={props.issues} onSelect={props.onIssueSelect} />
+      onRender: () => <IssuesButton issues={issues} onSelect={onIssueSelect} />
     },
     {
       key: `test-${v}`,
-      text: props.testMode ? strings.edit : strings.preview,
-      title: props.testMode ? strings.backToEditTitle : strings.previewTitle,
-      iconProps: { iconName: props.testMode ? 'Edit' : 'Play' },
-      disabled: !props.hasImage,
+      text: testMode ? strings.edit : strings.preview,
+      title: testMode ? strings.backToEditTitle : strings.previewTitle,
+      iconProps: { iconName: testMode ? 'Edit' : 'Play' },
+      disabled: !hasImage,
       canCheck: true,
-      checked: props.testMode,
+      checked: testMode,
       role: 'menuitemcheckbox',
-      'aria-checked': props.testMode,
-      onClick: () => props.onToggleTest()
+      'aria-checked': testMode,
+      onClick: () => onToggleTest()
     },
     {
       key: `full-${v}`,
-      text: props.fullscreen ? strings.exitFullscreen : strings.fullscreen,
+      text: fullscreen ? strings.exitFullscreen : strings.fullscreen,
       iconOnly: true,
-      title: props.fullscreen ? strings.exitFullscreenTooltip : strings.fullscreenTooltip,
-      iconProps: { iconName: props.fullscreen ? 'BackToWindow' : 'FullScreen' },
-      disabled: !props.hasImage,
-      onClick: () => props.onToggleFullscreen()
+      title: fullscreen ? strings.exitFullscreenTooltip : strings.fullscreenTooltip,
+      iconProps: { iconName: fullscreen ? 'BackToWindow' : 'FullScreen' },
+      disabled: !hasImage,
+      onClick: () => onToggleFullscreen()
     }
   ];
 

@@ -45,7 +45,8 @@ export interface IQuickActionsProps {
  * the buttons, Esc jumps back to the area.
  */
 export const QuickActions: React.FunctionComponent<IQuickActionsProps> = (props: IQuickActionsProps) => {
-  const a = props.area;
+  const { area, index, onEscape, onEdit, onDuplicate, onDelete } = props;
+  const a = area;
   const barRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => { initRovingTabIndex(barRef.current); }, [a.id]);
   const below = a.y + a.height < 82;
@@ -59,10 +60,10 @@ export const QuickActions: React.FunctionComponent<IQuickActionsProps> = (props:
       className={css.bar}
       style={style}
       role="toolbar"
-      aria-label={strings.actionsFor(props.index + 1)}
+      aria-label={strings.actionsFor(index + 1)}
       data-ui="quick-actions"
       onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === 'Escape' || e.key === 'Esc') { e.preventDefault(); e.stopPropagation(); props.onEscape(); return; }
+        if (e.key === 'Escape' || e.key === 'Esc') { e.preventDefault(); e.stopPropagation(); onEscape(); return; }
         handleRovingKeyDown(e, 'horizontal');
       }}
     >
@@ -70,9 +71,9 @@ export const QuickActions: React.FunctionComponent<IQuickActionsProps> = (props:
         <Icon iconName="Link" aria-hidden={true} />
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.url || strings.noLink}</span>
       </span>
-      <IconButton iconProps={{ iconName: 'Edit' }} title={strings.propertiesShortcut} ariaLabel={strings.editNumberedAria(props.index + 1)} onClick={props.onEdit} />
-      <IconButton iconProps={{ iconName: 'Copy' }} title={strings.duplicateShortcut} ariaLabel={strings.duplicateAria(props.index + 1)} onClick={props.onDuplicate} />
-      <IconButton iconProps={{ iconName: 'Delete' }} title={strings.deleteShortcut} ariaLabel={strings.deleteAreaAria(props.index + 1)} onClick={props.onDelete} />
+      <IconButton iconProps={{ iconName: 'Edit' }} title={strings.propertiesShortcut} ariaLabel={strings.editNumberedAria(index + 1)} onClick={onEdit} />
+      <IconButton iconProps={{ iconName: 'Copy' }} title={strings.duplicateShortcut} ariaLabel={strings.duplicateAria(index + 1)} onClick={onDuplicate} />
+      <IconButton iconProps={{ iconName: 'Delete' }} title={strings.deleteShortcut} ariaLabel={strings.deleteAreaAria(index + 1)} onClick={onDelete} />
     </div>
   );
 };

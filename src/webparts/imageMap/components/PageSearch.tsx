@@ -34,6 +34,7 @@ export interface IPageSearchProps {
  * up/down arrow switches, Enter selects, Esc closes. The number of results is announced.
  */
 export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPageSearchProps) => {
+  const { service, onClose, onSelect } = props;
   const [query, setQuery] = React.useState<string>('');
   const [results, setResults] = React.useState<IPageResult[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -46,7 +47,7 @@ export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPa
     const id = ++request.current;
     setLoading(true);
     const timer = window.setTimeout(() => {
-      props.service.search(query)
+      service.search(query)
         .then((r: IPageResult[]) => { if (id === request.current) { setResults(r); setError(undefined); } })
         .catch((e: Error) => { if (id === request.current) { setResults([]); setError(e.message); } })
         .then(() => { if (id === request.current) { setLoading(false); } });
@@ -66,7 +67,7 @@ export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPa
     const index = buttons.indexOf(document.activeElement);
     if (e.key === 'ArrowDown' || e.key === 'Down') { e.preventDefault(); focusResult(index + 1); }
     if (e.key === 'ArrowUp' || e.key === 'Up') { e.preventDefault(); focusResult(index - 1); }
-    if (e.key === 'Escape' || e.key === 'Esc') { e.preventDefault(); e.stopPropagation(); props.onClose(); }
+    if (e.key === 'Escape' || e.key === 'Esc') { e.preventDefault(); e.stopPropagation(); onClose(); }
   };
 
   const status = loading ? strings.searching
@@ -87,7 +88,7 @@ export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPa
         onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
           if (e.key === 'ArrowDown' || e.key === 'Down') { e.preventDefault(); focusResult(0); }
         }}
-        onEscape={() => props.onClose()}
+        onEscape={() => onClose()}
         onSearch={() => focusResult(0)}
       />
       <div id={ids.current.status} className={css.status} role="status" aria-live="polite">
@@ -97,7 +98,7 @@ export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPa
         <ul id={ids.current.list} ref={listRef} className={css.list} aria-label={strings.foundPages} onKeyDown={onListKeyDown}>
           {results.map((page: IPageResult) => (
             <li key={page.url}>
-              <button type="button" className={css.item} onClick={() => props.onSelect(page)}>
+              <button type="button" className={css.item} onClick={() => onSelect(page)}>
                 <Icon iconName="Page" aria-hidden={true} />
                 <span className={css.title}>{page.title}</span>
                 <span className={css.file} aria-hidden={true}>{page.fileName}</span>

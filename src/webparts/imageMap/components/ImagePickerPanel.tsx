@@ -29,6 +29,7 @@ export interface IImagePickerPanelProps {
 }
 
 export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> = (props: IImagePickerPanelProps) => {
+  const { currentUrl, service, folder, isOpen, policy, onSelect, onDismiss, hasAreas } = props;
   const [tab, setTab] = React.useState<string>('library');
   const [images, setImages] = React.useState<IImageFile[]>([]);
   const [folders, setFolders] = React.useState<IImageFolder[]>([]);
@@ -46,7 +47,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
   const [uploading, setUploading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const [status, setStatus] = React.useState<string>('');
-  const [urlInput, setUrlInput] = React.useState<string>(props.currentUrl || '');
+  const [urlInput, setUrlInput] = React.useState<string>(currentUrl || '');
   const [dragOver, setDragOver] = React.useState<boolean>(false);
   const fileInput = React.useRef<HTMLInputElement>(null);
   const alive = React.useRef<boolean>(true);
@@ -69,8 +70,8 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
     setImages([]);
     setNext(undefined);
     Promise.all([
-      props.service.getFolders(props.folder, path),
-      props.service.getImagePage(props.folder, path, search)
+      service.getFolders(folder, path),
+      service.getImagePage(folder, path, search)
     ])
       .then((result: [IImageFolder[], IImagePage]) => {
         if (!isCurrent()) { return; }
@@ -89,7 +90,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
     const isCurrent = () => alive.current && id === requestId.current;
     setLoadingMore(true);
     setError(undefined);
-    props.service.getImagePage(props.folder, subFolders, query, next)
+    service.getImagePage(folder, subFolders, query, next)
       .then((page: IImagePage) => {
         if (!isCurrent()) { return; }
         const all = images.concat(page.images);
@@ -128,13 +129,13 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
   React.useEffect(() => clearSearchTimer, []);
 
   React.useEffect(() => {
-    if (props.isOpen) {
-      setUrlInput(props.currentUrl || '');
+    if (isOpen) {
+      setUrlInput(currentUrl || '');
       openFolder([]);
     }
-  }, [props.isOpen, props.folder]);
+  }, [isOpen, folder]);
 
-  const rootName = (props.folder || '').replace(/^\/+|\/+$/g, '') || 'SiteAssets';
+  const rootName = (folder || '').replace(/^\/+|\/+$/g, '') || 'SiteAssets';
   const breadcrumb: IBreadcrumbItem[] = [rootName].concat(subFolders).map((name: string, index: number) => ({
     key: String(index),
     text: name,
@@ -155,13 +156,13 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
     setError(undefined);
     setUploading(true);
     setStatus(strings.checkingAndUploading);
-    validateImageFile(file, props.policy)
-      .then((valid: IValidatedImage) => props.service.upload(props.folder, file, valid.fileName))
+    validateImageFile(file, policy)
+      .then((valid: IValidatedImage) => service.upload(folder, file, valid.fileName))
       .then((uploaded: IImageFile) => {
         if (!alive.current) { return; }
         setUploading(false);
         setStatus(strings.uploadedAndSelected(uploaded.name));
-        props.onSelect(uploaded.serverRelativeUrl);
+        onSelect(uploaded.serverRelativeUrl);
       })
       .catch((e: Error) => {
         if (!alive.current) { return; }
@@ -171,21 +172,21 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
       });
   };
 
-  const urlCheck = checkImageUrl(urlInput, props.policy);
-  const allowed = describeAllowedTypes(props.policy);
-  const maxMb = Math.round(props.policy.maxUploadBytes / 1024 / 1024);
+  const urlCheck = checkImageUrl(urlInput, policy);
+  const allowed = describeAllowedTypes(policy);
+  const maxMb = Math.round(policy.maxUploadBytes / 1024 / 1024);
 
   return (
     <Panel
-      isOpen={props.isOpen}
+      isOpen={isOpen}
       type={PanelType.medium}
       headerText={strings.chooseImage}
       closeButtonAriaLabel={strings.closePicker}
-      onDismiss={props.onDismiss}
+      onDismiss={onDismiss}
       isLightDismiss={true}
     >
       <div className={classNames.srOnly} role="status" aria-live="polite">{status}</div>
-      {props.hasAreas && (
+      {hasAreas && (
         <MessageBar messageBarType={MessageBarType.info}>{strings.areasKept}</MessageBar>
       )}
       {error && (
@@ -249,13 +250,13 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
                 </li>
               ))}
               {images.map((img: IImageFile) => {
-                const current = isSameImageUrl(img.serverRelativeUrl, props.currentUrl);
+                const current = isSameImageUrl(img.serverRelativeUrl, currentUrl);
                 return (
                   <li key={img.serverRelativeUrl} className={css(classNames.tile, current && classNames.tileSelected)} style={{ padding: 0 }}>
                     <button
                       type="button"
                       style={tileButtonStyle}
-                      onClick={() => props.onSelect(img.serverRelativeUrl)}
+                      onClick={() => onSelect(img.serverRelativeUrl)}
                       aria-pressed={current}
                       aria-label={strings.selectImageAria(img.name, current)}
                     >
@@ -303,14 +304,14 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
                   aria-describedby="imagemap-upload-rules"
                 />
                 <Text block={true} variant="small" style={{ marginTop: 12 }} id="imagemap-upload-rules">
-                  {strings.uploadRules(allowed, maxMb)} {strings.uploadTarget(props.service.resolveFolder(props.folder))}
+                  {strings.uploadRules(allowed, maxMb)} {strings.uploadTarget(service.resolveFolder(folder))}
                 </Text>
               </div>
             )}
             <input
               ref={fileInput}
               type="file"
-              accept={acceptAttribute(props.policy)}
+              accept={acceptAttribute(policy)}
               style={{ display: 'none' }}
               tabIndex={-1}
               aria-hidden={true}
@@ -328,20 +329,20 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
             required={true}
             placeholder={strings.imageUrlPlaceholder}
             value={urlInput}
-            maxLength={props.policy.maxUrlLength}
+            maxLength={policy.maxUrlLength}
             autoComplete="off"
             spellCheck={false}
             onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) => setUrlInput(v || '')}
             errorMessage={urlInput ? urlCheck.error : undefined}
-            description={props.policy.imagesSameHostOnly ? strings.sameHostOnly : undefined}
+            description={policy.imagesSameHostOnly ? strings.sameHostOnly : undefined}
           />
           {urlInput && urlCheck.suggestion && (
             <ActionButton iconProps={{ iconName: 'AutoEnhanceOn' }} text={strings.fixTo(urlCheck.suggestion)}
               onClick={() => setUrlInput(urlCheck.suggestion || '')} />
           )}
           <div style={{ marginTop: 12 }}>
-            <PrimaryButton text={strings.apply} disabled={!urlCheck.valid} onClick={() => props.onSelect(urlCheck.url)} />
-            <DefaultButton text={strings.cancel} style={{ marginLeft: 8 }} onClick={props.onDismiss} />
+            <PrimaryButton text={strings.apply} disabled={!urlCheck.valid} onClick={() => onSelect(urlCheck.url)} />
+            <DefaultButton text={strings.cancel} style={{ marginLeft: 8 }} onClick={onDismiss} />
           </div>
         </PivotItem>
       </Pivot>

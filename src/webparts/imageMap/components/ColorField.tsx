@@ -18,26 +18,27 @@ export interface IColorFieldProps {
 }
 
 export const ColorField: React.FunctionComponent<IColorFieldProps> = (props: IColorFieldProps) => {
+  const { value, fallback, label, allowAlpha, onChange } = props;
   const [open, setOpen] = React.useState<boolean>(false);
   const targetRef = React.useRef<HTMLDivElement>(null);
   const labelId = React.useRef<string>(getId('imagemap-color'));
-  const value = safeColor(props.value, props.fallback);
+  const safeValue = safeColor(value, fallback);
 
   return (
     <div>
-      <Label id={labelId.current}>{props.label}</Label>
+      <Label id={labelId.current}>{label}</Label>
       <div ref={targetRef} style={{ display: 'inline-block' }}>
         <DefaultButton
           className={classNames.swatchButton}
           onClick={() => setOpen(!open)}
-          ariaLabel={strings.openColorPicker(props.label, value)}
+          ariaLabel={strings.openColorPicker(label, safeValue)}
           aria-haspopup="dialog"
           aria-expanded={open}
         >
           <span className={classNames.swatchOuter} aria-hidden={true}>
-            <span className={classNames.swatchInner} style={{ backgroundColor: value }} />
+            <span className={classNames.swatchInner} style={{ backgroundColor: safeValue }} />
           </span>
-          <span>{value}</span>
+          <span>{safeValue}</span>
         </DefaultButton>
       </div>
       {open && (
@@ -51,10 +52,10 @@ export const ColorField: React.FunctionComponent<IColorFieldProps> = (props: ICo
           ariaLabelledBy={labelId.current}
         >
           <ColorPicker
-            color={value}
-            alphaType={props.allowAlpha ? 'alpha' : 'none'}
+            color={safeValue}
+            alphaType={allowAlpha ? 'alpha' : 'none'}
             showPreview={true}
-            onChange={(ev: React.SyntheticEvent<HTMLElement>, color: IColor) => props.onChange(color.str)}
+            onChange={(ev: React.SyntheticEvent<HTMLElement>, color: IColor) => onChange(color.str)}
           />
         </Callout>
       )}

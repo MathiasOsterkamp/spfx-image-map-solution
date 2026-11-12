@@ -26,18 +26,19 @@ export interface IImageMapProps {
 }
 
 export const ImageMap: React.FunctionComponent<IImageMapProps> = (props: IImageMapProps) => {
-  if (props.isEditMode) {
+  const { isEditMode, imageUrl, imageAlt, areas, stretch, hintAreas, showLinkList, policy } = props;
+  if (isEditMode) {
     return <ImageMapEditor {...props} />;
   }
   return (
     <ImageMapViewer
-      imageUrl={props.imageUrl}
-      imageAlt={props.imageAlt}
-      areas={props.areas}
-      stretch={props.stretch}
-      hintAreas={props.hintAreas}
-      showLinkList={props.showLinkList}
-      policy={props.policy}
+      imageUrl={imageUrl}
+      imageAlt={imageAlt}
+      areas={areas}
+      stretch={stretch}
+      hintAreas={hintAreas}
+      showLinkList={showLinkList}
+      policy={policy}
     />
   );
 };

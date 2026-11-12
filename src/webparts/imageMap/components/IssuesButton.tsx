@@ -15,10 +15,11 @@ export interface IIssuesButtonProps {
 
 /** "n issues" counter in the toolbar. Opens a list with jump links to the affected locations. */
 export const IssuesButton: React.FunctionComponent<IIssuesButtonProps> = (props: IIssuesButtonProps) => {
+  const { issues, onSelect } = props;
   const [open, setOpen] = React.useState<boolean>(false);
   const buttonRef = React.useRef<HTMLDivElement>(null);
   const titleId = React.useRef<string>(getId('imagemap-issues'));
-  const count = props.issues.length;
+  const count = issues.length;
   const label = strings.issuesLabel(count);
 
   return (
@@ -53,9 +54,9 @@ export const IssuesButton: React.FunctionComponent<IIssuesButtonProps> = (props:
           </Text>
           <div onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => handleRovingKeyDown(e, 'vertical')}>
             <ul style={{ margin: 0, paddingLeft: 18 }}>
-              {props.issues.map((issue: IValidationIssue, i: number) => (
+              {issues.map((issue: IValidationIssue, i: number) => (
                 <li key={i} style={{ marginBottom: 6 }}>
-                  <Link onClick={() => { setOpen(false); props.onSelect(issue); }}>{issue.message}</Link>
+                  <Link onClick={() => { setOpen(false); onSelect(issue); }}>{issue.message}</Link>
                 </li>
               ))}
             </ul>

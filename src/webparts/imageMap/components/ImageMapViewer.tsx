@@ -62,37 +62,38 @@ function linkAttributes(link: IRenderableLink): React.AnchorHTMLAttributes<HTMLA
  * Every URL is validated again on render. Invalid or disallowed links are not rendered.
  */
 export const ImageMapViewer: React.FunctionComponent<IImageMapViewerProps> = (props: IImageMapViewerProps) => {
+  const { imageUrl, policy, areas, onPreviewClick, showLinkList, stretch, imageAlt, hintAreas } = props;
   const [failed, setFailed] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     setFailed(false);
-  }, [props.imageUrl]);
+  }, [imageUrl]);
 
-  if (!props.imageUrl) {
+  if (!imageUrl) {
     return null;
   }
 
-  const imageCheck = checkImageUrl(props.imageUrl, props.policy);
+  const imageCheck = checkImageUrl(imageUrl, policy);
   const links: IRenderableLink[] = [];
-  props.areas.forEach((area: IImageArea, index: number) => {
-    const check = checkLinkUrl(area.url, props.policy);
+  areas.forEach((area: IImageArea, index: number) => {
+    const check = checkLinkUrl(area.url, policy);
     if (check.valid) {
       // Accessible name: title, otherwise a neutral fallback. The URL is never used as link text.
-      const label = cleanText(area.title, props.policy.maxTitleLength) || strings.linkFallback(index + 1);
-      const tooltip = cleanText(area.tooltip, props.policy.maxTooltipLength) || label;
+      const label = cleanText(area.title, policy.maxTitleLength) || strings.linkFallback(index + 1);
+      const tooltip = cleanText(area.tooltip, policy.maxTooltipLength) || label;
       links.push({ area, check, label, tooltip });
     }
   });
 
-  const onClick = (area: IImageArea) => props.onPreviewClick
-    ? (e: React.MouseEvent<HTMLAnchorElement>) => { e.preventDefault(); props.onPreviewClick!(area); }
+  const onClick = (area: IImageArea) => onPreviewClick
+    ? (e: React.MouseEvent<HTMLAnchorElement>) => { e.preventDefault(); onPreviewClick!(area); }
     : undefined;
 
   const imageUsable = imageCheck.valid && !failed;
-  const showTextLinks = links.length > 0 && (props.showLinkList || !imageUsable);
+  const showTextLinks = links.length > 0 && (showLinkList || !imageUsable);
 
   return (
-    <div className={css(classNames.outer, props.stretch && classNames.outerStretch)}>
+    <div className={css(classNames.outer, stretch && classNames.outerStretch)}>
       {!imageCheck.valid && (
         <MessageBar messageBarType={MessageBarType.blocked}>{strings.imageBlocked}</MessageBar>
       )}
@@ -102,14 +103,14 @@ export const ImageMapViewer: React.FunctionComponent<IImageMapViewerProps> = (pr
 
       {imageUsable && (
         <div
-          className={css(classNames.frame, props.stretch && classNames.frameStretch)}
+          className={css(classNames.frame, stretch && classNames.frameStretch)}
           role="group"
           aria-label={links.length > 0 ? strings.interactiveGraphic(links.length) : undefined}
         >
           <img
             src={imageCheck.url}
-            alt={props.imageAlt || ''}
-            className={css(classNames.image, props.stretch && classNames.imageStretch)}
+            alt={imageAlt || ''}
+            className={css(classNames.image, stretch && classNames.imageStretch)}
             onError={() => setFailed(true)}
             draggable={false}
           />
@@ -123,7 +124,7 @@ export const ImageMapViewer: React.FunctionComponent<IImageMapViewerProps> = (pr
                       {...linkAttributes(link)}
                       aria-label={link.label + suffix}
                       title={link.tooltip + suffix}
-                      className={getViewAreaClass(link.area, props.hintAreas)}
+                      className={getViewAreaClass(link.area, hintAreas)}
                       onClick={onClick(link.area)}
                     />
                   </li>
