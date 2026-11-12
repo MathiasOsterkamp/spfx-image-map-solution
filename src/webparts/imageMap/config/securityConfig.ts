@@ -50,7 +50,7 @@ export interface ISecurityPolicy {
 }
 
 export function createSecurityPolicy(webAbsoluteUrl: string): ISecurityPolicy {
-  const match = /^https?:\/\/([^\/:?#]+)/i.exec(webAbsoluteUrl || '');
+  const match = /^https?:\/\/([^/:?#]+)/i.exec(webAbsoluteUrl || '');
   const normalize = (list: string[]) => list.map((d: string) => d.trim().toLowerCase()).filter((d: string) => !!d);
   return {
     currentHost: match ? match[1].toLowerCase() : '',

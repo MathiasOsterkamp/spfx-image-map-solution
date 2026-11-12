@@ -37,7 +37,7 @@ export function sanitizeFileName(name: string, extension: string): string {
   const dot = (name || '').lastIndexOf('.');
   let base = dot > 0 ? name.substr(0, dot) : (name || '');
   base = base
-    .replace(/[\u0000-\u001f~"#%&*:<>?\/\\{|}]/g, '_')
+    .replace(/[\u0000-\u001f~"#%&*:<>?/\\{|}]/g, '_')
     .replace(/\s+/g, ' ')
     .replace(/^[.\s_]+|[.\s]+$/g, '')
     .substr(0, 100);

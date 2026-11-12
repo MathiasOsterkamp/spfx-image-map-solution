@@ -5,7 +5,7 @@ import { asRecord } from './untyped';
 
 const COLOR_PATTERN = /^(#[0-9a-f]{3,8}|rgba?\(\s*[\d.\s,%]+\)|hsla?\(\s*[\d.\s,%deg]+\)|[a-z]{3,30})$/i;
 const BORDER_STYLES: AreaBorderStyle[] = ['solid', 'dashed', 'dotted', 'double'];
-const ID_PATTERN = /^[a-z0-9_\-]{1,64}$/i;
+const ID_PATTERN = /^[a-z0-9_-]{1,64}$/i;
 
 /** Allows only valid CSS color values (prevents CSS injection via color values). */
 export function safeColor(value: unknown, fallback: string): string {

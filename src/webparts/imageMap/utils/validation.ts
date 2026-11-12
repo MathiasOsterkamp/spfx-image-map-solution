@@ -14,16 +14,16 @@ export interface IUrlCheck {
   suggestion?: string;
 }
 
-const SCHEME = /^([a-z][a-z0-9+.\-]*):/i;
+const SCHEME = /^([a-z][a-z0-9+.-]*):/i;
 const LABEL = '[a-z0-9\\u00c0-\\u024f](?:[a-z0-9\\u00c0-\\u024f\\-]{0,61}[a-z0-9\\u00c0-\\u024f])?';
 const HOSTNAME = new RegExp(`^${LABEL}(?:\\.${LABEL})*$`, 'i');
-const LOOKS_LIKE_DOMAIN = /^(www\.)?[a-z0-9À-ɏ\-]+(\.[a-z0-9À-ɏ\-]+)*\.[a-z]{2,}([\/?#:]|$)/i;
+const LOOKS_LIKE_DOMAIN = /^(www\.)?[a-z0-9À-ɏ-]+(\.[a-z0-9À-ɏ-]+)*\.[a-z]{2,}([/?#:]|$)/i;
 /** Invisible characters and text direction overrides (spoofing, "Trojan Source"). */
 const INVISIBLE_CHARS = /[\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]/;
 /** Characters not allowed in links (must be percent-encoded). */
-const URL_FORBIDDEN = /[<>"`{}|\^\[\]]/g;
+const URL_FORBIDDEN = /[<>"`{}|^[\]]/g;
 /** Characters not allowed in title, tooltip and alt text. */
-const TEXT_FORBIDDEN = /[<>{}\[\]\\`|^~]/g;
+const TEXT_FORBIDDEN = /[<>{}[\]\\`|^~]/g;
 const CONTROL_CHARS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/;
 const MAX_HOST_LENGTH = 253;
 const GENERIC_LINK_TEXTS = [
@@ -112,7 +112,7 @@ export function hostMatches(host: string, domain: string): boolean {
 interface IParsedHttp { protocol: string; hostname: string; hasUserInfo: boolean; }
 
 function parseHttp(url: string): IParsedHttp | undefined {
-  const m = /^(https?):\/\/([^\/?#]*)/i.exec(url);
+  const m = /^(https?):\/\/([^/?#]*)/i.exec(url);
   if (!m) { return undefined; }
   const authority = m[2];
   const hostPort = authority.substr(authority.lastIndexOf('@') + 1);
@@ -155,7 +155,7 @@ export function checkLinkUrl(raw: string | undefined, policy: ISecurityPolicy): 
 
   const protocol = scheme[1].toLowerCase();
   if (protocol === 'mailto') {
-    const m = /^mailto:([^@\/?#]+)@([^@\/?#]+\.[^@\/?#]+)(\?.*)?$/i.exec(url);
+    const m = /^mailto:([^@/?#]+)@([^@/?#]+\.[^@/?#]+)(\?.*)?$/i.exec(url);
     if (!m) { return fail(url, strings.invalidEmail); }
     if (m[1].length > 64 || m[1].length + 1 + m[2].length > 254) {
       return fail(url, strings.emailTooLong);
@@ -164,7 +164,7 @@ export function checkLinkUrl(raw: string | undefined, policy: ISecurityPolicy): 
     return { valid: true, url, kind: 'mailto' };
   }
   if (protocol === 'tel') {
-    return /^tel:\+?[0-9()\-.\/]{3,30}$/i.test(url)
+    return /^tel:\+?[0-9()\-./]{3,30}$/i.test(url)
       ? { valid: true, url, kind: 'tel' }
       : fail(url, strings.invalidPhone);
   }
