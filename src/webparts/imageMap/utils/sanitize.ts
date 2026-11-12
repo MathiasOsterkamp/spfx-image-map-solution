@@ -1,30 +1,31 @@
 import { AreaBorderStyle, DEFAULT_HOVER, IHoverStyle, IImageArea } from '../models/IImageMap';
 import { ISecurityPolicy } from '../config/securityConfig';
 import { normalizeRect } from './geometry';
+import { asRecord } from './untyped';
 
 const COLOR_PATTERN = /^(#[0-9a-f]{3,8}|rgba?\(\s*[\d.\s,%]+\)|hsla?\(\s*[\d.\s,%deg]+\)|[a-z]{3,30})$/i;
 const BORDER_STYLES: AreaBorderStyle[] = ['solid', 'dashed', 'dotted', 'double'];
 const ID_PATTERN = /^[a-z0-9_\-]{1,64}$/i;
 
 /** Allows only valid CSS color values (prevents CSS injection via color values). */
-export function safeColor(value: string | undefined, fallback: string): string {
+export function safeColor(value: unknown, fallback: string): string {
   const v = typeof value === 'string' ? value.trim() : '';
   return COLOR_PATTERN.test(v) ? v : fallback;
 }
 
-export function safeNumber(value: any, min: number, max: number, fallback: number): number {
-  const n = typeof value === 'number' ? value : parseFloat(value);
-  if (typeof n !== 'number' || isNaN(n) || !isFinite(n)) {
+export function safeNumber(value: unknown, min: number, max: number, fallback: number): number {
+  const n = typeof value === 'number' ? value : (typeof value === 'string' ? parseFloat(value) : NaN);
+  if (isNaN(n) || !isFinite(n)) {
     return fallback;
   }
   return Math.min(max, Math.max(min, n));
 }
 
-export function safeBorderStyle(value: string | undefined): AreaBorderStyle {
+export function safeBorderStyle(value: unknown): AreaBorderStyle {
   return BORDER_STYLES.indexOf(value as AreaBorderStyle) >= 0 ? value as AreaBorderStyle : 'solid';
 }
 
-function safeString(value: any, maxLength: number): string {
+function safeString(value: unknown, maxLength: number): string {
   return typeof value === 'string' ? value.substr(0, maxLength) : '';
 }
 
@@ -43,8 +44,8 @@ export function colorAlpha(color: string): number {
   return 1;
 }
 
-export function sanitizeHover(raw: any): IHoverStyle {
-  const h = raw && typeof raw === 'object' ? raw : {};
+export function sanitizeHover(raw: unknown): IHoverStyle {
+  const h = asRecord(raw);
   return {
     borderColor: safeColor(h.borderColor, DEFAULT_HOVER.borderColor),
     borderWidth: safeNumber(h.borderWidth, 0, 20, DEFAULT_HOVER.borderWidth),
@@ -58,15 +59,17 @@ export function sanitizeHover(raw: any): IHoverStyle {
  * Web part properties are untrusted (they can be tampered with e.g. via REST or by
  * editing the page JSON). Therefore everything is typed, limited and sanitized on load.
  */
-export function sanitizeAreas(raw: any, policy: ISecurityPolicy): IImageArea[] {
+export function sanitizeAreas(raw: unknown, policy: ISecurityPolicy): IImageArea[] {
   if (!Array.isArray(raw)) {
     return [];
   }
+  const items: unknown[] = raw;
   const seen: { [id: string]: boolean } = {};
-  return raw
-    .filter((a: any) => !!a && typeof a === 'object')
+  return items
+    .filter((item: unknown) => !!item && typeof item === 'object')
     .slice(0, policy.maxAreas)
-    .map((a: any, index: number) => {
+    .map((item: unknown, index: number): IImageArea => {
+      const a = asRecord(item);
       let id = typeof a.id === 'string' && ID_PATTERN.test(a.id) ? a.id : `area-${index}`;
       if (seen[id]) { id = `area-${index}-dup`; }
       seen[id] = true;
@@ -88,6 +91,6 @@ export function sanitizeAreas(raw: any, policy: ISecurityPolicy): IImageArea[] {
         title: safeString(a.title, policy.maxTitleLength),
         tooltip: safeString(a.tooltip, policy.maxTooltipLength),
         hover: sanitizeHover(a.hover)
-      } as IImageArea;
+      };
     });
 }

@@ -1,5 +1,6 @@
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 import * as strings from 'ImageMapWebPartStrings';
+import { IUntyped, odataItems } from '../utils/untyped';
 
 export interface IPageResult {
   title: string;
@@ -28,11 +29,10 @@ export class PageService {
           if (!r.ok) { throw new Error(strings.pageSearchFailed); }
           return r.json();
         })
-        .then((json: any) => {
-          const items: any[] = json.value || (json.d && json.d.results) || [];
-          return items
-            .filter((i: any) => typeof i.FileRef === 'string')
-            .map((i: any) => ({
+        .then((json: unknown) => {
+          return odataItems(json)
+            .filter((i: IUntyped) => typeof i.FileRef === 'string')
+            .map((i: IUntyped) => ({
               title: String(i.Title || i.FileLeafRef || '').substr(0, 255),
               fileName: String(i.FileLeafRef || ''),
               url: encodeURI(String(i.FileRef))
@@ -46,8 +46,8 @@ export class PageService {
       const url = `${this.api()}/web/lists?$filter=BaseTemplate eq ${SITE_PAGES_TEMPLATE}&$select=Id&$top=1`;
       this.listId = this.httpClient.get(url, SPHttpClient.configurations.v1)
         .then((r: SPHttpClientResponse) => (r.ok ? r.json() : { value: [] }))
-        .then((json: any) => {
-          const lists: any[] = json.value || (json.d && json.d.results) || [];
+        .then((json: unknown) => {
+          const lists = odataItems(json);
           const id = lists.length ? String(lists[0].Id) : undefined;
           return id && /^[0-9a-f-]{36}$/i.test(id) ? id : undefined;
         })

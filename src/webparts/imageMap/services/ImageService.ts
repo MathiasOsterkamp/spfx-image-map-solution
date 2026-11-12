@@ -1,5 +1,6 @@
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 import * as strings from 'ImageMapWebPartStrings';
+import { IUntyped, odataEntity, odataItems } from '../utils/untyped';
 
 export interface IImageFile {
   name: string;
@@ -39,10 +40,7 @@ export class ImageService {
     return this.httpClient.get(url, SPHttpClient.configurations.v1)
       .then((response: SPHttpClientResponse) => {
         if (!response.ok) { return false; }
-        return response.json().then((json: any) => {
-          const data = json.d || json;
-          return data.Exists !== false;
-        });
+        return response.json().then((json: unknown) => odataEntity(json).Exists !== false);
       })
       .catch(() => false);
   }
@@ -53,10 +51,9 @@ export class ImageService {
 
     return this.httpClient.get(url, SPHttpClient.configurations.v1)
       .then(readJson)
-      .then((json: any) => {
-        const items: any[] = json.value || (json.d && json.d.results) || [];
-        return items
-          .filter((i: any) => typeof i.Name === 'string' && IMAGE_EXTENSIONS.test(i.Name) && typeof i.ServerRelativeUrl === 'string')
+      .then((json: unknown) => {
+        return odataItems(json)
+          .filter((i: IUntyped) => typeof i.Name === 'string' && IMAGE_EXTENSIONS.test(i.Name) && typeof i.ServerRelativeUrl === 'string')
           .map(mapFile)
           .sort((a: IImageFile, b: IImageFile) => (a.modified < b.modified ? 1 : -1));
       });
@@ -83,7 +80,7 @@ export class ImageService {
       `?@f=${odataLiteral(folderPath)}&@n=${odataLiteral(name)}`;
     return this.httpClient.post(url, SPHttpClient.configurations.v1, { body: buffer })
       .then(readJson)
-      .then((json: any) => mapFile(json.d || json));
+      .then((json: unknown) => mapFile(odataEntity(json)));
   }
 
   private api(): string {
@@ -115,7 +112,7 @@ export function isSameImageUrl(a: string, b: string): boolean {
   return decode(a) === decode(b);
 }
 
-function mapFile(item: any): IImageFile {
+function mapFile(item: IUntyped): IImageFile {
   return {
     name: String(item.Name || ''),
     serverRelativeUrl: encodeServerRelativeUrl(String(item.ServerRelativeUrl || '')),
@@ -138,7 +135,7 @@ function friendlyMessage(status: number): string {
   }
 }
 
-function readJson(response: SPHttpClientResponse): Promise<any> {
+function readJson(response: SPHttpClientResponse): Promise<unknown> {
   if (response.ok) {
     return response.json();
   }
