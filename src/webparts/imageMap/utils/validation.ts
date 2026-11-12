@@ -198,7 +198,9 @@ export function checkLinkUrl(raw: string | undefined, policy: ISecurityPolicy): 
 
 /** Validates an image URL: server-relative or https, by default only from the own host. */
 export function checkImageUrl(raw: string | undefined, policy: ISecurityPolicy): IUrlCheck {
-  const url = (raw || '').trim();
+  // Spaces in file names are common ("my image.png") and harmless: encode them instead of rejecting.
+  // The returned url is the encoded one and is what gets rendered.
+  const url = (raw || '').trim().replace(/ /g, '%20');
   if (!url) { return fail(url, strings.chooseImageError); }
   const basic = basicError(url, policy.maxUrlLength);
   if (basic) { return fail(url, basic.error, basic.suggestion); }

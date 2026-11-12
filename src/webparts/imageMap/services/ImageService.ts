@@ -3,6 +3,7 @@ import * as strings from 'ImageMapWebPartStrings';
 
 export interface IImageFile {
   name: string;
+  /** Percent-encoded, can be used directly as a URL */
   serverRelativeUrl: string;
   modified: string;
 }
@@ -94,10 +95,30 @@ function odataLiteral(value: string): string {
   return `'${encodeURIComponent(value.replace(/'/g, "''"))}'`;
 }
 
+/**
+ * SharePoint returns ServerRelativeUrl decoded ("/sites/x/SiteAssets/my image.png").
+ * Encodes each path segment so that spaces, #, % etc. yield a valid URL.
+ */
+export function encodeServerRelativeUrl(path: string): string {
+  return path.split('/').map(encodeURIComponent).join('/');
+}
+
+/** Compares two image URLs regardless of their percent encoding. */
+export function isSameImageUrl(a: string, b: string): boolean {
+  const decode = (value: string) => {
+    try {
+      return decodeURIComponent(value || '');
+    } catch (e) {
+      return value || '';
+    }
+  };
+  return decode(a) === decode(b);
+}
+
 function mapFile(item: any): IImageFile {
   return {
     name: String(item.Name || ''),
-    serverRelativeUrl: String(item.ServerRelativeUrl || ''),
+    serverRelativeUrl: encodeServerRelativeUrl(String(item.ServerRelativeUrl || '')),
     modified: String(item.TimeLastModified || '')
   };
 }

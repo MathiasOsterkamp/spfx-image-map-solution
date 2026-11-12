@@ -9,7 +9,7 @@ import { Text } from '@fluentui/react/lib/Text';
 import { Icon } from '@fluentui/react/lib/Icon';
 import { css } from '@fluentui/react/lib/Utilities';
 import { ISecurityPolicy } from '../config/securityConfig';
-import { IImageFile, ImageService } from '../services/ImageService';
+import { IImageFile, ImageService, isSameImageUrl } from '../services/ImageService';
 import { acceptAttribute, describeAllowedTypes, IValidatedImage, validateImageFile } from '../utils/fileValidation';
 import { checkImageUrl } from '../utils/validation';
 import * as strings from 'ImageMapWebPartStrings';
@@ -122,7 +122,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
           {!loading && images.length > 0 && (
             <ul className={classNames.grid} style={{ listStyle: 'none', padding: 0 }} aria-label={strings.imagesInFolder}>
               {images.map((img: IImageFile) => {
-                const current = img.serverRelativeUrl === props.currentUrl;
+                const current = isSameImageUrl(img.serverRelativeUrl, props.currentUrl);
                 return (
                   <li key={img.serverRelativeUrl} className={css(classNames.tile, current && classNames.tileSelected)} style={{ padding: 0 }}>
                     <button
@@ -135,7 +135,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
                       <div
                         className={classNames.tileImage}
                         aria-hidden={true}
-                        style={{ backgroundImage: `url("${encodeURI(img.serverRelativeUrl).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/'/g, '%27')}")` }}
+                        style={{ backgroundImage: `url("${img.serverRelativeUrl.replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/'/g, '%27')}")` }}
                       />
                       <span className={classNames.tileName} aria-hidden={true}>{img.name}</span>
                     </button>
