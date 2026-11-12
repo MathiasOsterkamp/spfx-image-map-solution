@@ -2,14 +2,16 @@ import * as React from 'react';
 import { Panel, PanelType } from '@fluentui/react/lib/Panel';
 import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
 import { TextField } from '@fluentui/react/lib/TextField';
-import { PrimaryButton, DefaultButton, ActionButton } from '@fluentui/react/lib/Button';
+import { PrimaryButton, DefaultButton, ActionButton, IconButton } from '@fluentui/react/lib/Button';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
 import { Text } from '@fluentui/react/lib/Text';
 import { Icon } from '@fluentui/react/lib/Icon';
 import { css } from '@fluentui/react/lib/Utilities';
 import { ISecurityPolicy } from '../config/securityConfig';
-import { IImageFile, ImageService, isSameImageUrl } from '../services/ImageService';
+import { Breadcrumb, IBreadcrumbItem } from '@fluentui/react/lib/Breadcrumb';
+import { SearchBox } from '@fluentui/react/lib/SearchBox';
+import { IImageFile, IImageFolder, IImagePage, ImageService, isSameImageUrl } from '../services/ImageService';
 import { acceptAttribute, describeAllowedTypes, IValidatedImage, validateImageFile } from '../utils/fileValidation';
 import { checkImageUrl } from '../utils/validation';
 import * as strings from 'ImageMapWebPartStrings';
@@ -29,6 +31,17 @@ export interface IImagePickerPanelProps {
 export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> = (props: IImagePickerPanelProps) => {
   const [tab, setTab] = React.useState<string>('library');
   const [images, setImages] = React.useState<IImageFile[]>([]);
+  const [folders, setFolders] = React.useState<IImageFolder[]>([]);
+  /** Subfolders below the configured folder the user navigated into */
+  const [subFolders, setSubFolders] = React.useState<string[]>([]);
+  /** Paging token for the next page (undefined = everything loaded) */
+  const [next, setNext] = React.useState<string | undefined>(undefined);
+  const [searchInput, setSearchInput] = React.useState<string>('');
+  /** Search text the displayed list was loaded with */
+  const [query, setQuery] = React.useState<string>('');
+  const [loadingMore, setLoadingMore] = React.useState<boolean>(false);
+  const requestId = React.useRef<number>(0);
+  const searchTimer = React.useRef<number | undefined>(undefined);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [uploading, setUploading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | undefined>(undefined);
@@ -40,25 +53,101 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
 
   React.useEffect(() => () => { alive.current = false; }, []);
 
-  const load = () => {
+  const announceCount = (count: number, more: boolean) =>
+    setStatus(strings.imagesFound(count) + (more ? ' ' + strings.moreAvailable : ''));
+
+  /** Loads the first page of a folder. Responses of outdated requests are discarded. */
+  const load = (path: string[], search: string) => {
+    const id = ++requestId.current;
+    const isCurrent = () => alive.current && id === requestId.current;
+    setSubFolders(path);
+    setQuery(search);
     setLoading(true);
+    setLoadingMore(false);
     setError(undefined);
-    props.service.getImages(props.folder)
-      .then((result: IImageFile[]) => {
-        if (!alive.current) { return; }
-        setImages(result);
-        setStatus(strings.imagesFound(result.length));
+    setFolders([]);
+    setImages([]);
+    setNext(undefined);
+    Promise.all([
+      props.service.getFolders(props.folder, path),
+      props.service.getImagePage(props.folder, path, search)
+    ])
+      .then((result: [IImageFolder[], IImagePage]) => {
+        if (!isCurrent()) { return; }
+        setFolders(result[0]);
+        setImages(result[1].images);
+        setNext(result[1].next);
+        announceCount(result[1].images.length, !!result[1].next);
       })
-      .catch((e: Error) => { if (alive.current) { setError(strings.imagesLoadFailed(e.message)); } })
-      .then(() => { if (alive.current) { setLoading(false); } });
+      .catch((e: Error) => { if (isCurrent()) { setError(strings.imagesLoadFailed(e.message)); } })
+      .then(() => { if (isCurrent()) { setLoading(false); } });
   };
+
+  const loadMore = () => {
+    if (!next || loadingMore) { return; }
+    const id = requestId.current;
+    const isCurrent = () => alive.current && id === requestId.current;
+    setLoadingMore(true);
+    setError(undefined);
+    props.service.getImagePage(props.folder, subFolders, query, next)
+      .then((page: IImagePage) => {
+        if (!isCurrent()) { return; }
+        const all = images.concat(page.images);
+        setImages(all);
+        setNext(page.next);
+        announceCount(all.length, !!page.next);
+      })
+      .catch((e: Error) => { if (isCurrent()) { setError(strings.imagesLoadFailed(e.message)); } })
+      .then(() => { if (isCurrent()) { setLoadingMore(false); } });
+  };
+
+  const clearSearchTimer = () => {
+    if (searchTimer.current !== undefined) {
+      window.clearTimeout(searchTimer.current);
+      searchTimer.current = undefined;
+    }
+  };
+
+  const openFolder = (path: string[]) => {
+    clearSearchTimer();
+    setSearchInput('');
+    load(path, '');
+  };
+
+  /** Searches after a short typing pause, or immediately (Enter / clear). */
+  const search = (value: string, immediately: boolean) => {
+    clearSearchTimer();
+    setSearchInput(value);
+    const run = () => {
+      searchTimer.current = undefined;
+      if (value.trim() !== query) { load(subFolders, value.trim()); }
+    };
+    if (immediately) { run(); } else { searchTimer.current = window.setTimeout(run, 400); }
+  };
+
+  React.useEffect(() => clearSearchTimer, []);
 
   React.useEffect(() => {
     if (props.isOpen) {
       setUrlInput(props.currentUrl || '');
-      load();
+      openFolder([]);
     }
   }, [props.isOpen, props.folder]);
+
+  const rootName = (props.folder || '').replace(/^\/+|\/+$/g, '') || 'SiteAssets';
+  const breadcrumb: IBreadcrumbItem[] = [rootName].concat(subFolders).map((name: string, index: number) => ({
+    key: String(index),
+    text: name,
+    isCurrentItem: index === subFolders.length,
+    onClick: index === subFolders.length ? undefined : () => openFolder(subFolders.slice(0, index))
+  }));
+  const needle = query.toLowerCase();
+  const visibleFolders = needle
+    ? folders.filter((f: IImageFolder) => f.name.toLowerCase().indexOf(needle) >= 0)
+    : folders;
+  const tileButtonStyle: React.CSSProperties = {
+    width: '100%', border: 'none', background: 'transparent', padding: 4, cursor: 'pointer', textAlign: 'left'
+  };
 
   const handleFiles = (files: FileList | null) => {
     const file = files && files[0];
@@ -111,23 +200,61 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
         aria-label={strings.imageSource}
       >
         <PivotItem headerText={strings.tabLibrary} itemKey="library" itemIcon="Library">
-          <Text block={true} variant="small" style={{ marginTop: 8 }}>
-            {strings.folderInfo(props.service.resolveFolder(props.folder))}
-          </Text>
-          <ActionButton iconProps={{ iconName: 'Refresh' }} text={strings.refreshList} onClick={load} disabled={loading} />
-          {loading && <Spinner size={SpinnerSize.large} label={strings.loadingImages} ariaLive="polite" />}
-          {!loading && images.length === 0 && !error && (
-            <Text block={true} style={{ marginTop: 8 }}>{strings.noImages}</Text>
+          <Breadcrumb
+            items={breadcrumb}
+            ariaLabel={strings.folderPath}
+            maxDisplayedItems={3}
+            styles={{ root: { margin: '4px 0 0' }, itemLink: { fontSize: 14 }, item: { fontSize: 14 } }}
+          />
+          <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
+            <SearchBox
+              placeholder={strings.searchImages}
+              ariaLabel={strings.searchImages}
+              value={searchInput}
+              onChange={(e?: React.ChangeEvent<HTMLInputElement>, v?: string) => search(v || '', !v)}
+              onSearch={(v: string) => search(v || '', true)}
+              styles={{ root: { flexGrow: 1 } }}
+            />
+            <IconButton
+              iconProps={{ iconName: 'Refresh' }}
+              title={strings.refreshList}
+              ariaLabel={strings.refreshList}
+              disabled={loading}
+              onClick={() => load(subFolders, query)}
+            />
+          </div>
+          {loading && <Spinner size={SpinnerSize.large} label={strings.loadingImages} ariaLive="polite" style={{ marginTop: 16 }} />}
+          {!loading && images.length === 0 && visibleFolders.length === 0 && !next && !error && (
+            <Text block={true} style={{ marginTop: 8 }}>{query ? strings.noImagesFound(query) : strings.noImages}</Text>
           )}
-          {!loading && images.length > 0 && (
+          {!loading && (images.length > 0 || visibleFolders.length > 0) && (
             <ul className={classNames.grid} style={{ listStyle: 'none', padding: 0 }} aria-label={strings.imagesInFolder}>
+              {visibleFolders.map((f: IImageFolder) => (
+                <li key={`folder:${f.name}`} className={classNames.tile} style={{ padding: 0 }}>
+                  <button
+                    type="button"
+                    style={tileButtonStyle}
+                    onClick={() => openFolder(subFolders.concat([f.name]))}
+                    aria-label={strings.openFolderAria(f.name)}
+                  >
+                    <div
+                      className={classNames.tileImage}
+                      aria-hidden={true}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <Icon iconName="FabricFolder" style={{ fontSize: 40 }} />
+                    </div>
+                    <span className={classNames.tileName} aria-hidden={true}>{f.name}</span>
+                  </button>
+                </li>
+              ))}
               {images.map((img: IImageFile) => {
                 const current = isSameImageUrl(img.serverRelativeUrl, props.currentUrl);
                 return (
                   <li key={img.serverRelativeUrl} className={css(classNames.tile, current && classNames.tileSelected)} style={{ padding: 0 }}>
                     <button
                       type="button"
-                      style={{ width: '100%', border: 'none', background: 'transparent', padding: 4, cursor: 'pointer', textAlign: 'left' }}
+                      style={tileButtonStyle}
                       onClick={() => props.onSelect(img.serverRelativeUrl)}
                       aria-pressed={current}
                       aria-label={strings.selectImageAria(img.name, current)}
@@ -143,6 +270,13 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
                 );
               })}
             </ul>
+          )}
+          {!loading && next && (
+            <div style={{ marginTop: 12, textAlign: 'center' }}>
+              {loadingMore
+                ? <Spinner size={SpinnerSize.medium} label={strings.loadingImages} ariaLive="polite" />
+                : <DefaultButton iconProps={{ iconName: 'ChevronDown' }} text={strings.loadMore} onClick={loadMore} />}
+            </div>
           )}
         </PivotItem>
 

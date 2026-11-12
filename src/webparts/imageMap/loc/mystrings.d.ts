@@ -255,6 +255,13 @@ declare interface IImageMapWebPartStrings {
   loadingImages: string;
   noImages: string;
   imagesInFolder: string;
+  searchImages: string;
+  folderPath: string;
+  openFolderAria: (name: string) => string;
+  loadMore: string;
+  moreAvailable: string;
+  noImagesFound: (query: string) => string;
+  listTooLarge: string;
   selectImageAria: (name: string, current: boolean) => string;
   tabUpload: string;
   uploadingSpinner: string;
