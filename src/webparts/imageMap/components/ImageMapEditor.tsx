@@ -328,7 +328,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       const r: IRect = { x: p.x, y: p.y, width: 0, height: 0 };
       next = { mode: 'draw', shape: current, pointerId: e.pointerId, startPoint: p, startRect: r, rect: r, moved: false };
     }
-    try { surface.setPointerCapture(e.pointerId); } catch (err) { /* not supported */ }
+    try { surface.setPointerCapture(e.pointerId); } catch { /* not supported */ }
     e.preventDefault();
     setDrag(next);
   };
@@ -357,7 +357,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     const d = dragRef.current;
     const surface = surfaceRef.current;
     if (!d || d.pointerId !== e.pointerId) { return; }
-    try { if (surface) { surface.releasePointerCapture(e.pointerId); } } catch (err) { /* ignore */ }
+    try { if (surface) { surface.releasePointerCapture(e.pointerId); } } catch { /* ignore */ }
     setDrag(null);
     if (e.type === 'pointercancel' || !d.moved) { return; }
     if (d.mode === 'draw') {

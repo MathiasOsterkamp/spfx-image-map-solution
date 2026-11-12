@@ -198,7 +198,7 @@ export function isSameImageUrl(a: string, b: string): boolean {
   const decode = (value: string) => {
     try {
       return decodeURIComponent(value || '');
-    } catch (e) {
+    } catch {
       return value || '';
     }
   };

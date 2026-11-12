@@ -90,7 +90,7 @@ function decodedPath(pathAndMore: string): string {
   const path = pathAndMore.split(/[?#]/)[0];
   try {
     return decodeURIComponent(path);
-  } catch (e) {
+  } catch {
     return path;
   }
 }
