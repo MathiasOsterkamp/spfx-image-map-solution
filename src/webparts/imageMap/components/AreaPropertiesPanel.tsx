@@ -343,18 +343,13 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
       <PivotItem headerText={strings.tabPosition} itemKey="position">
         <Stack tokens={{ childrenGap: 12 }} styles={{ root: { paddingTop: 12 } }}>
           <Text variant="small">{strings.positionHint}</Text>
-          <Stack horizontal tokens={{ childrenGap: 8 }}>
-            <Stack.Item grow={1}>{numberField(strings.leftLabel, area.x, 0, 100, 0.5, (v?: string) => setRect('x', v), ' %')}</Stack.Item>
-            <Stack.Item grow={1}>{numberField(strings.topLabel, area.y, 0, 100, 0.5, (v?: string) => setRect('y', v), ' %')}</Stack.Item>
-          </Stack>
-          {area.shape === 'circle' ? (
-            numberField(strings.diameterLabel, area.width, 1, 100, 0.5, (v?: string) => setRect('width', v), ' %')
-          ) : (
-            <Stack horizontal tokens={{ childrenGap: 8 }}>
-              <Stack.Item grow={1}>{numberField(strings.widthLabel, area.width, 1, 100, 0.5, (v?: string) => setRect('width', v), ' %')}</Stack.Item>
-              <Stack.Item grow={1}>{numberField(strings.heightLabel, area.height, 1, 100, 0.5, (v?: string) => setRect('height', v), ' %')}</Stack.Item>
-            </Stack>
-          )}
+          {numberField(strings.leftLabel, area.x, 0, 100, 0.5, (v?: string) => setRect('x', v), ' %')}
+          {numberField(strings.topLabel, area.y, 0, 100, 0.5, (v?: string) => setRect('y', v), ' %')}
+          {area.shape === 'circle'
+            ? numberField(strings.diameterLabel, area.width, 1, 100, 0.5, (v?: string) => setRect('width', v), ' %')
+            : numberField(strings.widthLabel, area.width, 1, 100, 0.5, (v?: string) => setRect('width', v), ' %')}
+          {area.shape !== 'circle' &&
+            numberField(strings.heightLabel, area.height, 1, 100, 0.5, (v?: string) => setRect('height', v), ' %')}
         </Stack>
       </PivotItem>
     </Pivot>
