@@ -17,7 +17,7 @@ export interface IUrlCheck {
 const SCHEME = /^([a-z][a-z0-9+.-]*):/i;
 const LABEL = '[a-z0-9\\u00c0-\\u024f](?:[a-z0-9\\u00c0-\\u024f\\-]{0,61}[a-z0-9\\u00c0-\\u024f])?';
 const HOSTNAME = new RegExp(`^${LABEL}(?:\\.${LABEL})*$`, 'i');
-const LOOKS_LIKE_DOMAIN = /^(www\.)?[a-z0-9À-ɏ-]+(\.[a-z0-9À-ɏ-]+)*\.[a-z]{2,}([/?#:]|$)/i;
+const LOOKS_LIKE_DOMAIN = /^(www\.)?[a-z0-9\u00c0-\u024f-]+(\.[a-z0-9\u00c0-\u024f-]+)*\.[a-z]{2,}([/?#:]|$)/i;
 /** Invisible characters and text direction overrides (spoofing, "Trojan Source"). */
 const INVISIBLE_CHARS = /[\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]/;
 /** Characters not allowed in links (must be percent-encoded). */
