@@ -1,8 +1,9 @@
-import { getTheme, hiddenContentStyle, HighContrastSelector, mergeStyleSets } from '@fluentui/react/lib/Styling';
+import { hiddenContentStyle, HighContrastSelector, mergeStyleSets } from '@fluentui/react/lib/Styling';
+import { ITheme, useTheme } from '@fluentui/react/lib/Theme';
+import { memoizeFunction } from '@fluentui/react/lib/Utilities';
 
-const theme = getTheme();
-
-export const classNames = mergeStyleSets({
+/** Styles depend on the theme, therefore they are created per theme (and cached). */
+const getClassNames = memoizeFunction((theme: ITheme) => mergeStyleSets({
   /** Visible to screen readers only */
   srOnly: hiddenContentStyle,
 
@@ -249,4 +250,9 @@ export const classNames = mergeStyleSets({
     border: `2px dashed ${theme.palette.neutralTertiaryAlt}`
   },
   dropZoneActive: { borderColor: theme.palette.themePrimary, background: theme.palette.themeLighterAlt }
-});
+}));
+
+/** Class names in the colors of the surrounding ThemeProvider. */
+export function useClassNames(): ReturnType<typeof getClassNames> {
+  return getClassNames(useTheme());
+}

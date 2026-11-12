@@ -6,7 +6,7 @@ import { ColorPicker } from '@fluentui/react/lib/ColorPicker';
 import { IColor } from '@fluentui/react/lib/Color';
 import { getId } from '@fluentui/react/lib/Utilities';
 import { safeColor } from '../utils/sanitize';
-import { classNames } from './styles';
+import { useClassNames } from './styles';
 import * as strings from 'ImageMapWebPartStrings';
 
 export interface IColorFieldProps {
@@ -18,6 +18,7 @@ export interface IColorFieldProps {
 }
 
 export const ColorField: React.FunctionComponent<IColorFieldProps> = (props: IColorFieldProps) => {
+  const classNames = useClassNames();
   const { value, fallback, label, allowAlpha, onChange } = props;
   const [open, setOpen] = React.useState<boolean>(false);
   const targetRef = React.useRef<HTMLDivElement>(null);

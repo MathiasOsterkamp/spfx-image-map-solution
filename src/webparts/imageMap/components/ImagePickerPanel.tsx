@@ -15,7 +15,7 @@ import { IImageFile, IImageFolder, IImagePage, ImageService, isSameImageUrl } fr
 import { acceptAttribute, describeAllowedTypes, IValidatedImage, validateImageFile } from '../utils/fileValidation';
 import { checkImageUrl } from '../utils/validation';
 import * as strings from 'ImageMapWebPartStrings';
-import { classNames } from './styles';
+import { useClassNames } from './styles';
 
 export interface IImagePickerPanelProps {
   isOpen: boolean;
@@ -29,6 +29,7 @@ export interface IImagePickerPanelProps {
 }
 
 export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> = (props: IImagePickerPanelProps) => {
+  const classNames = useClassNames();
   const { currentUrl, service, folder, isOpen, policy, onSelect, onDismiss, hasAreas } = props;
   const [tab, setTab] = React.useState<string>('library');
   const [images, setImages] = React.useState<IImageFile[]>([]);

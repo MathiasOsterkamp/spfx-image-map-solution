@@ -2,12 +2,13 @@ import * as React from 'react';
 import { IconButton } from '@fluentui/react/lib/Button';
 import { Icon } from '@fluentui/react/lib/Icon';
 import { handleRovingKeyDown, initRovingTabIndex } from '../utils/rovingFocus';
-import { getTheme, mergeStyleSets } from '@fluentui/react/lib/Styling';
+import { mergeStyleSets } from '@fluentui/react/lib/Styling';
+import { ITheme, useTheme } from '@fluentui/react/lib/Theme';
+import { memoizeFunction } from '@fluentui/react/lib/Utilities';
 import { IImageArea } from '../models/IImageMap';
 import * as strings from 'ImageMapWebPartStrings';
 
-const theme = getTheme();
-const css = mergeStyleSets({
+const getCss = memoizeFunction((theme: ITheme) => mergeStyleSets({
   bar: {
     position: 'absolute',
     zIndex: 5,
@@ -27,7 +28,7 @@ const css = mergeStyleSets({
     display: 'inline-flex', alignItems: 'center', gap: 4, maxWidth: 220, padding: '0 6px',
     fontSize: 12, color: theme.palette.neutralSecondary, overflow: 'hidden', textOverflow: 'ellipsis'
   }
-});
+}));
 
 export interface IQuickActionsProps {
   area: IImageArea;
@@ -45,6 +46,7 @@ export interface IQuickActionsProps {
  * the buttons, Esc jumps back to the area.
  */
 export const QuickActions: React.FunctionComponent<IQuickActionsProps> = (props: IQuickActionsProps) => {
+  const css = getCss(useTheme());
   const { area, index, onEscape, onEdit, onDuplicate, onDelete } = props;
   const a = area;
   const barRef = React.useRef<HTMLDivElement>(null);

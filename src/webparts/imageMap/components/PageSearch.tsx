@@ -2,13 +2,13 @@ import * as React from 'react';
 import { SearchBox } from '@fluentui/react/lib/SearchBox';
 import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
 import { Icon } from '@fluentui/react/lib/Icon';
-import { getId } from '@fluentui/react/lib/Utilities';
-import { getTheme, mergeStyleSets } from '@fluentui/react/lib/Styling';
+import { getId, memoizeFunction } from '@fluentui/react/lib/Utilities';
+import { mergeStyleSets } from '@fluentui/react/lib/Styling';
+import { ITheme, useTheme } from '@fluentui/react/lib/Theme';
 import { IPageResult, PageService } from '../services/PageService';
 import * as strings from 'ImageMapWebPartStrings';
 
-const theme = getTheme();
-const css = mergeStyleSets({
+const getCss = memoizeFunction((theme: ITheme) => mergeStyleSets({
   list: { listStyle: 'none', margin: '4px 0 0', padding: 0, border: `1px solid ${theme.palette.neutralLight}`, borderRadius: 2, maxHeight: 220, overflowY: 'auto' },
   item: {
     display: 'flex', alignItems: 'center', gap: 8, width: '100%', minHeight: 32, padding: '4px 8px',
@@ -21,7 +21,7 @@ const css = mergeStyleSets({
   title: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   file: { color: theme.palette.neutralSecondary, fontSize: 12 },
   status: { fontSize: 12, color: theme.palette.neutralSecondary, marginTop: 4 }
-});
+}));
 
 export interface IPageSearchProps {
   service: PageService;
@@ -34,6 +34,7 @@ export interface IPageSearchProps {
  * up/down arrow switches, Enter selects, Esc closes. The number of results is announced.
  */
 export const PageSearch: React.FunctionComponent<IPageSearchProps> = (props: IPageSearchProps) => {
+  const css = getCss(useTheme());
   const { service, onClose, onSelect } = props;
   const [query, setQuery] = React.useState<string>('');
   const [results, setResults] = React.useState<IPageResult[]>([]);

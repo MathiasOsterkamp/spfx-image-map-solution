@@ -24,7 +24,7 @@ import { ImagePickerPanel } from './ImagePickerPanel';
 import { AltTextDialog } from './AltTextDialog';
 import { EditorTool, EditorToolbar } from './EditorToolbar';
 import { QuickActions } from './QuickActions';
-import { classNames } from './styles';
+import { useClassNames } from './styles';
 
 export interface IImageMapEditorProps {
   imageUrl: string;
@@ -108,6 +108,7 @@ function isTextInput(el: EventTarget | null): boolean {
 }
 
 export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (props: IImageMapEditorProps) => {
+  const classNames = useClassNames();
   const {
     areas, policy, onAreasChange, imageUrl, imageAlt, defaultHover, service, uploadFolder, onImageChange,
     onImageAltChange, pageService, onDefaultHoverChange, stretch, hintAreas, showLinkList

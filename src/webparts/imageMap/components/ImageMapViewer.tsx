@@ -7,7 +7,7 @@ import { IImageArea } from '../models/IImageMap';
 import { getViewAreaClass } from '../utils/hoverStyles';
 import { checkImageUrl, checkLinkUrl, cleanText, IUrlCheck } from '../utils/validation';
 import * as strings from 'ImageMapWebPartStrings';
-import { classNames } from './styles';
+import { useClassNames } from './styles';
 
 export interface IImageMapViewerProps {
   imageUrl: string;
@@ -62,6 +62,7 @@ function linkAttributes(link: IRenderableLink): React.AnchorHTMLAttributes<HTMLA
  * Every URL is validated again on render. Invalid or disallowed links are not rendered.
  */
 export const ImageMapViewer: React.FunctionComponent<IImageMapViewerProps> = (props: IImageMapViewerProps) => {
+  const classNames = useClassNames();
   const { imageUrl, policy, areas, onPreviewClick, showLinkList, stretch, imageAlt, hintAreas } = props;
   const [failed, setFailed] = React.useState<boolean>(false);
 

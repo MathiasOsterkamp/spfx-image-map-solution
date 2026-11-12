@@ -9,6 +9,7 @@ import {
 } from '@microsoft/sp-webpart-base';
 import { initializeIcons } from '@fluentui/react/lib/Icons';
 import { setIconOptions } from '@fluentui/react/lib/Styling';
+import { ITheme } from '@fluentui/react/lib/Theme';
 
 import { ImageMap, IImageMapProps } from './components/ImageMap';
 import { createSecurityPolicy, ISecurityPolicy } from './config/securityConfig';
@@ -17,6 +18,7 @@ import { IHoverStyle, IImageArea } from './models/IImageMap';
 import { ImageService } from './services/ImageService';
 import { PageService } from './services/PageService';
 import { sanitizeAreas, sanitizeHover } from './utils/sanitize';
+import { createSharePointTheme } from './utils/theme';
 import { checkAlt, checkImageUrl, validateFolderPath } from './utils/validation';
 
 export interface IImageMapWebPartProps {
@@ -36,6 +38,7 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
   private service!: ImageService;
   private pageService!: PageService;
   private policy!: ISecurityPolicy;
+  private theme!: ITheme;
 
   // Note: No override of `dataVersion` – the SPFx 1.4.1 typings declare it as a property,
   // newer TypeScript versions reject a getter override (TS2611). Default is 1.0.
@@ -48,6 +51,7 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
       initializeIcons();
       iconsInitialized = true;
     }
+    this.theme = createSharePointTheme();
     this.policy = createSecurityPolicy(this.context.pageContext.web.absoluteUrl);
     this.service = new ImageService(
       this.context.spHttpClient,
@@ -63,6 +67,7 @@ export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebP
     const folder = validateFolderPath(p.uploadFolder) ? 'SiteAssets' : p.uploadFolder;
 
     const props: IImageMapProps = {
+      theme: this.theme,
       isEditMode: this.displayMode === DisplayMode.Edit,
       // All stored values are considered untrusted and are sanitized.
       imageUrl: typeof p.imageUrl === 'string' ? p.imageUrl.substr(0, this.policy.maxUrlLength) : '',

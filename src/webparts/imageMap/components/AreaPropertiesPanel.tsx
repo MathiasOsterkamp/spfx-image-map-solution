@@ -25,7 +25,7 @@ import { IPageResult, PageService } from '../services/PageService';
 import * as strings from 'ImageMapWebPartStrings';
 import { ColorField } from './ColorField';
 import { PageSearch } from './PageSearch';
-import { classNames } from './styles';
+import { useClassNames } from './styles';
 
 /** CSS class on the link input so the panel focuses it when opened. */
 export const FIRST_FIELD_CLASS = 'imagemap-first-field';
@@ -72,12 +72,12 @@ function PresetSwatch({ hover }: { hover: IHoverStyle }): JSX.Element {
 }
 
 /** Tab label with invisible addition for screen readers (Fluent does not apply aria-label to the tab). */
-function tabWithHint(hint: string | undefined) {
+function tabWithHint(hint: string | undefined, hintClassName: string) {
   return hint
     ? (link?: IPivotItemProps, defaultRender?: IRenderFunction<IPivotItemProps>) => (
       <span title={link && link.headerText ? `${link.headerText}: ${hint}` : hint}>
         {defaultRender ? defaultRender(link) : null}
-        <span className={classNames.srOnly}>, {hint}</span>
+        <span className={hintClassName}>, {hint}</span>
       </span>
     )
     : undefined;
@@ -85,6 +85,7 @@ function tabWithHint(hint: string | undefined) {
 
 /** Form with three tabs. Used in the panel and in full screen (inline). */
 export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProps> = (props: IAreaPropertiesFormProps) => {
+  const classNames = useClassNames();
   const {
     area, policy, onChange, imageRatio, onAnnounce, tab, onTabChange, pageService, onApplyHoverToAll,
     onSaveAsDefaultHover
@@ -187,7 +188,7 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
         headerText={strings.tabLink}
         itemKey="link"
         itemIcon={linkTabHasError ? 'Warning' : undefined}
-        onRenderItemLink={tabWithHint(linkTabHasError ? strings.tabHasErrors : undefined)}
+        onRenderItemLink={tabWithHint(linkTabHasError ? strings.tabHasErrors : undefined, classNames.srOnly)}
       >
         <Stack tokens={{ childrenGap: 12 }} styles={{ root: { paddingTop: 12 } }}>
           <div>
@@ -283,7 +284,7 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
         headerText={strings.tabStyle}
         itemKey="style"
         itemIcon={visibility ? 'Warning' : undefined}
-        onRenderItemLink={tabWithHint(visibility ? strings.tabPoorlyVisible : undefined)}
+        onRenderItemLink={tabWithHint(visibility ? strings.tabPoorlyVisible : undefined, classNames.srOnly)}
       >
         <Stack tokens={{ childrenGap: 12 }} styles={{ root: { paddingTop: 12 } }}>
           <ChoiceGroup
