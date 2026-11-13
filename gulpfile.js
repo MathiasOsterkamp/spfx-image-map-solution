@@ -23,6 +23,10 @@ build.TypeScriptConfiguration.setTypescriptCompiler(require('typescript'));
 // ("Invalid source file …"). Linting is done by ESLint (npm run lint).
 build.tslint.enabled = false;
 
+// package.json overrides @microsoft/gulp-core-build-sass with a version based
+// on Dart Sass, because the node-sass 4 of SPFx 1.4.1 has no binary for current Node.
+build.sass.enabled = true;
+
 // ---------------------------------------------------------------------------
 // Webpack
 // ---------------------------------------------------------------------------

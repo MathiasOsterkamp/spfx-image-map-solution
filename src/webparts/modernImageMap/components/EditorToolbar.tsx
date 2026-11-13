@@ -45,7 +45,7 @@ function divider(key: string): ICommandBarItemProps {
   return {
     key,
     itemType: ContextualMenuItemType.Divider,
-    onRender: () => <VerticalDivider styles={{ wrapper: { height: 40, padding: '8px 4px' }, divider: { height: '100%' } }} />,
+    onRender: () => <VerticalDivider styles={{ wrapper: { height: 35, padding: '2px 4px' }, divider: { height: '100%' } }} />,
     data: { collapsible: true } as ICollapsible
   };
 }
