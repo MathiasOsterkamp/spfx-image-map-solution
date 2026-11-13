@@ -8,7 +8,7 @@ export function asRecord(value: unknown): IUntyped {
   return value && typeof value === 'object' ? value as IUntyped : {};
 }
 
-/** Single entity of a SharePoint REST response (verbose: { d: {…} }, otherwise the object itself). */
+/** Single entity of a SharePoint REST response (verbose: { d: {...} }, otherwise the object itself). */
 export function odataEntity(json: unknown): IUntyped {
   const root = asRecord(json);
   return root.d && typeof root.d === 'object' ? asRecord(root.d) : root;

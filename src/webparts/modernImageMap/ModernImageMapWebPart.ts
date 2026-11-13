@@ -53,14 +53,14 @@ export default class ModernImageMapWebPart extends BaseClientSideWebPart<IModern
   private policy!: ISecurityPolicy;
   private theme!: ITheme;
 
-  // Note: No override of `dataVersion` – the SPFx 1.4.1 typings declare it as a property,
+  // Note: No override of `dataVersion` - the SPFx 1.4.1 typings declare it as a property,
   // newer TypeScript versions reject a getter override (TS2611). Default is 1.0.
 
   protected onInit(): Promise<void> {
     if (!iconsInitialized) {
-      // SharePoint sometimes already registers icons with the same name → suppress warnings.
+      // SharePoint sometimes already registers icons with the same name -> suppress warnings.
       setIconOptions({ disableWarnings: true });
-      // On-premises without internet: host the font files yourself and call initializeIcons('https://…/fonts/').
+      // On-premises without internet: host the font files yourself and call initializeIcons('https://.../fonts/').
       initializeIcons();
       iconsInitialized = true;
     }

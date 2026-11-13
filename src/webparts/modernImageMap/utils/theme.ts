@@ -8,7 +8,7 @@ import { asRecord, IUntyped } from './untyped';
  *
  * SPFx 1.4.1 has no theme service yet, and the web part bundles its own Fluent UI 8, which
  * does not know the site colors. SharePoint publishes the active theme as color slots
- * (themePrimary, neutralPrimary, bodyText …) in window.__themeState__.theme. Slots known to
+ * (themePrimary, neutralPrimary, bodyText ...) in window.__themeState__.theme. Slots known to
  * Fluent UI are taken from there, everything else is derived by createTheme from the palette.
  * Without a SharePoint theme (e.g. local workbench) the Fluent UI default theme is returned.
  */

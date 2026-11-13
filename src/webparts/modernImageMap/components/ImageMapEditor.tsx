@@ -115,7 +115,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     onImageAltChange, pageService, onDefaultHoverChange, stretch, hintAreas, showLinkList
   } = props;
 
-  // ---------- Refs (always current state – the CommandBar caches handlers) ----------
+  // Refs (always current state - the CommandBar caches handlers)
   const areasRef = React.useRef<IImageArea[]>(areas);
   areasRef.current = areas;
   const latest = (): IImageArea[] => areasRef.current;
@@ -128,7 +128,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     modalTitle: getId('imagemap-fullscreen')
   });
 
-  // ---------- State ----------
+  // State
   const [selectedId, setSelectedId] = React.useState<string | undefined>(undefined);
   const [panelOpen, setPanelOpen] = React.useState<boolean>(false);
   const [propsTab, setPropsTab] = React.useState<PropertiesTab>('link');
@@ -158,7 +158,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
 
   React.useEffect(() => { setImageFailed(false); }, [imageUrl]);
 
-  // Set focus deliberately (new area, delete, panel closed, full screen exited …)
+  // Set focus deliberately (new area, delete, panel closed, full screen exited ...)
   React.useEffect(() => {
     if (!focusTarget) { return; }
     if (focusTarget === '#surface') {
@@ -182,7 +182,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     return imageRatio;
   };
 
-  // Adapt circles to a new aspect ratio (e.g. after changing the image) – without an undo step
+  // Adapt circles to a new aspect ratio (e.g. after changing the image) - without an undo step
   React.useEffect(() => {
     const current = latest();
     if (current.some((a: IImageArea) => a.shape === 'circle' && Math.abs(a.height - a.width * imageRatio) > 0.05)) {
@@ -212,13 +212,13 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
   });
   const limitReached = areas.length >= policy.maxAreas;
 
-  // ---------------- Tools ----------------
+  // Tools
   const setTool = (next: EditorTool) => {
     setToolState(next);
     announce(next === 'select' ? strings.announceToolSelect : formatText(strings.announceTool, strings.toolNames[next]));
   };
 
-  // ---------------- Data changes (all via history → undo possible) ----------------
+  // Data changes (all via history -> undo possible)
   const updateArea = (id: string, changes: Partial<IImageArea>, label: string, coalesceKey?: string) => {
     history.commit(latest().map((a: IImageArea) => (a.id === id ? { ...a, ...changes } : a)), label, coalesceKey);
   };
@@ -299,7 +299,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     announce(next ? strings.announceFullscreenOn : strings.announceFullscreenOff);
   };
 
-  // ---------------- Pointer (mouse, pen, touch) ----------------
+  // Pointer (mouse, pen, touch)
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const surface = surfaceRef.current;
     if (testMode || e.button !== 0 || !surface) { return; }
@@ -380,8 +380,8 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     if (areaId) { openProperties(areaId); }
   };
 
-  // ---------------- Keyboard ----------------
-  /** Editor-wide: undo/redo (not in text fields – native undo applies there). */
+  // Keyboard
+  /** Editor-wide: undo/redo (not in text fields - native undo applies there). */
   const onEditorKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (stateRef.current.testMode || isTextInput(e.target)) { return; }
     const key = (e.key || '').toLowerCase();
@@ -472,7 +472,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
     }
   };
 
-  // ---------------- Parts ----------------
+  // Parts
   const picker = (
     <ImagePickerPanel
       isOpen={pickerOpen}

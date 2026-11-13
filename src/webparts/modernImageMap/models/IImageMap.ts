@@ -1,6 +1,6 @@
 /**
  * Data model of the web part.
- * All positions/sizes are stored in PERCENT relative to the image (0–100).
+ * All positions/sizes are stored in PERCENT relative to the image (0-100).
  * This way the areas scale automatically with the image (responsive).
  */
 

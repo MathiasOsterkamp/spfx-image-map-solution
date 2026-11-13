@@ -77,7 +77,7 @@ export function resizeRect(r: IRect, handle: ResizeHandle, p: IPoint): IRect {
   return { x: left, y: top, width: right - left, height: bottom - top };
 }
 
-// ---------------- Circles ----------------
+// Circles
 // Percentages refer horizontally to the image width and vertically to the image height.
 // For a circle to stay round: height% = width% × ratio  (ratio = image width / image height).
 

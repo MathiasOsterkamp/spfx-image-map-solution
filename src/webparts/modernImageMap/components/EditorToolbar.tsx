@@ -36,7 +36,7 @@ export interface IEditorToolbarProps {
   onIssueSelect: (issue: IValidationIssue) => void;
 }
 
-/** Marks items that may move into the "…" menu when space is limited (from last to first). */
+/** Marks items that may move into the "..." menu when space is limited (from last to first). */
 interface ICollapsible { collapsible?: boolean; }
 
 function divider(key: string): ICommandBarItemProps {
@@ -59,7 +59,7 @@ function cacheKeyOf(data: ICommandBarData, iconOnly: boolean): string {
 /**
  * Responsive behavior when space is limited:
  *  1. Hide labels (icons only, name remains as aria-label/tooltip)
- *  2. Move items from the end into the "…" menu (tools stay visible the longest)
+ *  2. Move items from the end into the "..." menu (tools stay visible the longest)
  */
 function onReduceData(data: ICommandBarData): ICommandBarData | undefined {
   if (data.primaryItems.some((i: ICommandBarItemProps) => !!i.text && !i.iconOnly)) {

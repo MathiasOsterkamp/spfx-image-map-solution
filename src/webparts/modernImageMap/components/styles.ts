@@ -7,7 +7,7 @@ const getClassNames = memoizeFunction((theme: ITheme) => mergeStyleSets({
   /** Visible to screen readers only */
   srOnly: hiddenContentStyle,
 
-  // ---------- Display mode: links over the image ----------
+  // Display mode: links over the image
   areaList: {
     position: 'absolute',
     left: 0,
@@ -43,7 +43,7 @@ const getClassNames = memoizeFunction((theme: ITheme) => mergeStyleSets({
     }
   },
   newTabIcon: { fontSize: 12, marginLeft: 4, verticalAlign: 'middle' },
-  // ---------- shared image surface (display + editor) ----------
+  // shared image surface (display + editor)
   outer: { width: '100%', textAlign: 'center' },
   outerStretch: { textAlign: 'left' },
   frame: {
@@ -64,7 +64,7 @@ const getClassNames = memoizeFunction((theme: ITheme) => mergeStyleSets({
   },
   imageStretch: { width: '100%' },
 
-  // ---------- Editor ----------
+  // Editor
   editor: { border: `1px solid ${theme.palette.neutralLight}`, padding: 8, background: theme.palette.white },
   hint: { color: theme.palette.neutralSecondary, margin: '4px 0 8px' },
   surface: {
@@ -192,7 +192,7 @@ const getClassNames = memoizeFunction((theme: ITheme) => mergeStyleSets({
   },
   placeholderIcon: { fontSize: 40, color: theme.palette.neutralSecondary },
 
-  // ---------- Panels ----------
+  // Panels
   swatchButton: { minWidth: 0, padding: '0 8px' },
   swatchOuter: {
     display: 'inline-block',

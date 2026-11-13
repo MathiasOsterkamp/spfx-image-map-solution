@@ -34,9 +34,9 @@ export interface IServiceError extends Error {
 const IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|svg|bmp)$/i;
 /** Rows requested from SharePoint per request (folders and non-image files are filtered out afterwards). */
 const PAGE_SIZE = 60;
-/** A page is filled up with further requests until it has at least this many images … */
+/** A page is filled up with further requests until it has at least this many images ... */
 const MIN_IMAGES_PER_PAGE = 24;
-/** … but with at most this many requests per page. */
+/** ... but with at most this many requests per page. */
 const MAX_REQUESTS_PER_PAGE = 5;
 /** Technical subfolders that are not shown. */
 const HIDDEN_FOLDERS = /^(_.*|Forms)$/i;
@@ -53,7 +53,7 @@ export class ImageService {
     private readonly webServerRelativeUrl: string
   ) { }
 
-  /** "SiteAssets/Bilder" → "/sites/xyz/SiteAssets/Bilder". Only paths within the current site. */
+  /** "SiteAssets/Bilder" -> "/sites/xyz/SiteAssets/Bilder". Only paths within the current site. */
   public resolveFolder(folder: string): string {
     const base = this.webServerRelativeUrl === '/' ? '' : this.webServerRelativeUrl.replace(/\/+$/, '');
     return `${base}/${cleanFolder(folder)}`;
@@ -122,7 +122,7 @@ export class ImageService {
    * @param next Paging token of the previous page (IImagePage.next)
    */
   public getImagePage(folder: string, subFolders: string[], query: string, next?: string): Promise<IImagePage> {
-    // The library is the first segment of the configured folder ("SiteAssets/Bilder" → "SiteAssets").
+    // The library is the first segment of the configured folder ("SiteAssets/Bilder" -> "SiteAssets").
     const library = this.resolveFolder(cleanFolder(folder).split('/')[0]);
     const path = this.resolvePath(folder, subFolders);
     const images: IImageFile[] = [];

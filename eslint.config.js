@@ -1,6 +1,6 @@
 'use strict';
 
-// ESLint 9 (flat config). Needs Node >= 18.18 – the SPFx build itself runs on Node 8.
+// ESLint 9 (flat config). Needs Node >= 18.18 - the SPFx build itself runs on Node 8.
 const js = require('@eslint/js');
 const { defineConfig, globalIgnores } = require('eslint/config');
 const importPlugin = require('eslint-plugin-import');
@@ -75,7 +75,7 @@ module.exports = defineConfig([
       'react/no-unused-state': 'error',
 
       'import/no-named-as-default': 'off',
-      // SPFx resolves the localized strings module at runtime (config.json → localizedResources).
+      // SPFx resolves the localized strings module at runtime (config.json -> localizedResources).
       'import/no-unresolved': ['error', { ignore: ['Strings$'] }],
       'import/order': ['error', {
         groups: [

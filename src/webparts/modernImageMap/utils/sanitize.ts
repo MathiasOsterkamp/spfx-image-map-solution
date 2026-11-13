@@ -29,7 +29,7 @@ function safeString(value: unknown, maxLength: number): string {
   return typeof value === 'string' ? value.substr(0, maxLength) : '';
 }
 
-/** Opacity of a CSS color (0–1), for the visibility warning. */
+/** Opacity of a CSS color (0-1), for the visibility warning. */
 export function colorAlpha(color: string): number {
   const c = (color || '').trim().toLowerCase();
   if (c === 'transparent') { return 0; }

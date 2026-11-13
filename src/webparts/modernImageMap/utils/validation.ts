@@ -127,10 +127,10 @@ function parseHttp(url: string): IParsedHttp | undefined {
 
 /**
  * Validates an area link. Only the following are allowed:
- *  - server-relative links (/sites/…), links relative to the page (Page.aspx, ../Docs/x.pdf, ?id=1), anchors (#…)
+ *  - server-relative links (/sites/...), links relative to the page (Page.aspx, ../Docs/x.pdf, ?id=1), anchors (#...)
  *  - https:// (http:// only on the own host or if httpsOnly = false)
  *  - mailto: and tel:
- * Everything else (javascript:, data:, file:, //host, user:password@ …) is rejected.
+ * Everything else (javascript:, data:, file:, //host, user:password@ ...) is rejected.
  */
 export function checkLinkUrl(raw: string | undefined, policy: ISecurityPolicy): IUrlCheck {
   const url = (raw || '').trim();
