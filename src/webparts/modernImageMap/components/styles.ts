@@ -218,7 +218,10 @@ const getClassNames = memoizeFunction((theme: ITheme) => mergeStyleSets({
   previewBox: { position: 'absolute', left: '20%', top: 15, width: '60%', height: 60, boxSizing: 'border-box' },
   grid: { display: 'flex', flexWrap: 'wrap', margin: '8px -4px 0' },
   tile: {
-    width: 'calc(50% - 8px)',
+    // Four tiles per row; border-box so that border and margin still fit into the row.
+    boxSizing: 'border-box',
+    width: 'calc(25% - 8px)',
+    minWidth: 96,
     margin: 4,
     padding: 4,
     border: `2px solid ${theme.palette.neutralLight}`,
@@ -229,7 +232,7 @@ const getClassNames = memoizeFunction((theme: ITheme) => mergeStyleSets({
   },
   tileSelected: { borderColor: theme.palette.themePrimary },
   tileImage: {
-    height: 90,
+    height: 64,
     backgroundColor: theme.palette.neutralLighter,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
@@ -238,7 +241,7 @@ const getClassNames = memoizeFunction((theme: ITheme) => mergeStyleSets({
   tileName: {
     display: 'block',
     marginTop: 4,
-    fontSize: 12,
+    fontSize: 11,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap'

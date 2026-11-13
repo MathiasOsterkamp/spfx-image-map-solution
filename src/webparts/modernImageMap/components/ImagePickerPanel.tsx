@@ -245,7 +245,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
                       aria-hidden={true}
                       style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                      <Icon iconName="FabricFolder" style={{ fontSize: 40 }} />
+                      <Icon iconName="FabricFolder" style={{ fontSize: 32 }} />
                     </div>
                     <span className={classNames.tileName} aria-hidden={true}>{f.name}</span>
                   </button>

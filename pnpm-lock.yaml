@@ -8,6 +8,7 @@ overrides:
   graceful-fs: ^4.2.11
   typescript: 4.9.5
   '@microsoft/gulp-core-build-sass': 4.17.3
+  send: 0.19.1
 
 importers:
 
@@ -2311,9 +2312,6 @@ packages:
   des.js@1.1.0:
     resolution: {integrity: sha512-r17GxjhUCjSRy8aiJpr8/UadFIzMzJGexI3Nmz4ADi9LYSFx4gTBp80+NaX/YsXWWLhpZ7v/v/ubEc/bCNfKwg==}
 
-  destroy@1.0.4:
-    resolution: {integrity: sha512-3NdhDuEXnfun/z7x9GOElY49LoqVHoGScmOKwmxhsS8N5Y+Z8KyPPDnaSzqWgYt/ji4mqwfTS34Htrk0zPIXVg==}
-
   destroy@1.2.0:
     resolution: {integrity: sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==}
     engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
@@ -2410,6 +2408,10 @@ packages:
 
   encodeurl@1.0.4:
     resolution: {integrity: sha512-ImAQpWtQZKdkUxvj9CMNzB8M4IGg0DkRTZzmOHqgVFrf71JDmUacbt+iKljfIpD2yHcxI+HR76d8bwvdvtSvGA==}
+    engines: {node: '>= 0.8'}
+
+  encodeurl@2.0.3:
+    resolution: {integrity: sha512-mIteYONiEfc4xWf2F1WXovh1c8npzS00vNeiUPdwFF+QlVJni+gNvpQltLMQhob8rew/bWWc/bGTuUr0EUGt0w==}
     engines: {node: '>= 0.8'}
 
   encoding@0.1.14:
@@ -2696,6 +2698,10 @@ packages:
 
   etag@1.7.0:
     resolution: {integrity: sha512-Mbv5pNpLNPrm1b4rzZlZlfTRpdDr31oiD43N362sIyvSWVNu5Du33EcJGzvEV4YdYLuENB1HzND907cQkFmXNw==}
+    engines: {node: '>= 0.6'}
+
+  etag@1.8.1:
+    resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
 
   event-emitter@0.3.7:
@@ -3040,6 +3046,10 @@ packages:
 
   fresh@0.3.0:
     resolution: {integrity: sha512-akx5WBKAwMSg36qoHTuMMVncHWctlaDGslJASDYAhoLrzDUDCjZlOngNa/iC6lPm9aA0qk8pN5KnpmbJHSIIQQ==}
+    engines: {node: '>= 0.6'}
+
+  fresh@0.5.2:
+    resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}
     engines: {node: '>= 0.6'}
 
   from@0.1.7:
@@ -3530,9 +3540,9 @@ packages:
     resolution: {integrity: sha512-gMygNskMurDCWfoCdyh1gOeDfSbkAHXqz94QoPj5IHIUjC/BG8/xv7FSEUr7waR5RcAya4j58bft9Wu/wHNeXA==}
     engines: {node: '>= 0.6'}
 
-  http-errors@1.5.1:
-    resolution: {integrity: sha512-ftkc2U5ADKHv8Ny1QJaDn8xnE18G+fP5QYupx9c3Xk6L5Vgo3qK8Bgbpb4a+jRtaF/YQKjIuXA5J0tde4Tojng==}
-    engines: {node: '>= 0.6'}
+  http-errors@2.0.0:
+    resolution: {integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==}
+    engines: {node: '>= 0.8'}
 
   http-errors@2.0.1:
     resolution: {integrity: sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ==}
@@ -4914,10 +4924,6 @@ packages:
     resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
     engines: {node: '>= 0.6'}
 
-  mime@1.3.4:
-    resolution: {integrity: sha512-sAaYXszED5ALBt665F0wMQCUXpGuZsGdopoqcHPdL39ZYdi7uHoZlhrfZfhv8WzivhBzr/oXwaj+yiK5wY8MXQ==}
-    hasBin: true
-
   mime@1.6.0:
     resolution: {integrity: sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==}
     engines: {node: '>=4'}
@@ -5263,6 +5269,10 @@ packages:
 
   on-finished@2.3.0:
     resolution: {integrity: sha512-ikqdkGAAyf/X/gPhXGvfgAytDZtDbr+bkNUJ0N9h5MI/dmdgCs3l6hoHrcUv41sRKew3jIwrp4qQDXiK99Utww==}
+    engines: {node: '>= 0.8'}
+
+  on-finished@2.4.1:
+    resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
     engines: {node: '>= 0.8'}
 
   on-finished@2.4.2:
@@ -5890,10 +5900,6 @@ packages:
   randomfill@1.0.4:
     resolution: {integrity: sha512-87lcbR8+MhcWcUiQ+9e+Rwx8MyR2P7qnt15ynUlbm3TU/fjbgz4GsvfSUDTemtCCtVCqb4ZcEFlyPNTh9bBTLw==}
 
-  range-parser@1.0.3:
-    resolution: {integrity: sha512-nDsRrtIxVUO5opg/A8T2S3ebULVIfuh8ECbh4w3N4mWxIiT3QILDJDUQayPqm2e8Q8NUa0RSUkGCfe33AfjR3Q==}
-    engines: {node: '>= 0.6'}
-
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
@@ -6340,12 +6346,8 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  send@0.13.2:
-    resolution: {integrity: sha512-cQ0rmXHrdO2Iof08igV2bG/yXWD106ANwBg6DkGQNT2Vsznbgq6T0oAIQboy1GoFsIuy51jCim26aA9tj3Z3Zg==}
-    engines: {node: '>= 0.8.0'}
-
-  send@0.14.2:
-    resolution: {integrity: sha512-36O39SV4A6lj4TBALc0tAMmiTwClC2Npp6wiRvzxqyrH3yTiYwAmWVyB2a0a/D3ISCQVHY/l+VO/9JVo6ZubfA==}
+  send@0.19.1:
+    resolution: {integrity: sha512-p4rRk4f23ynFEfcD9LA0xRYngj+IyGiEYyqqOak8kaN0TvNmuxC2dcVeBn62GpCeR2CpWqyHCNScTP91QbAVFg==}
     engines: {node: '>= 0.8.0'}
 
   sequencify@0.0.7:
@@ -6389,9 +6391,6 @@ packages:
 
   setimmediate@1.0.5:
     resolution: {integrity: sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==}
-
-  setprototypeof@1.0.2:
-    resolution: {integrity: sha512-mNRSo7UFE4c4tjxlZ3KxO5r+3oQUD1M/KXbp/XTwTwybL4VR9T8Ltmv5DvZX8iRz6C3hQmQftXEV0EmTKRV6mg==}
 
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
@@ -6582,9 +6581,6 @@ packages:
     resolution: {integrity: sha512-72E9+uLc27Mt718pMHt9VMNiAL4LMsmDbBva8mxWUCkT07fSzEGMYUCk0XWY6lp0j6RBAG4cJ3mWuZv2OE3s0g==}
     engines: {node: '>=0.10.0'}
 
-  statuses@1.2.1:
-    resolution: {integrity: sha512-pVEuxHdSGrt8QmQ3LOZXLhSA6MP/iPqKzZeO6Squ7PNGkA/9MBsSfV0/L+bIxkoDmjF4tZcLpcVq/fkqoHvuKg==}
-
   statuses@1.3.1:
     resolution: {integrity: sha512-wuTCPGlJONk/a1kqZ4fQM2+908lC7fa7nPYpTC1EhnvqLX/IICbeP1OZGDtA374trpSq68YubKUMo8oRhN46yg==}
     engines: {node: '>= 0.6'}
@@ -6592,6 +6588,10 @@ packages:
   statuses@1.5.0:
     resolution: {integrity: sha512-OpZ3zP+jT1PI7I8nemJX4AKmAX070ZkYPVWV/AaKTJl+tXCTGyVdC1a4SL8RUQYEwk/f34ZX8UTykN68FwrqAA==}
     engines: {node: '>= 0.6'}
+
+  statuses@2.0.1:
+    resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
+    engines: {node: '>= 0.8'}
 
   statuses@2.0.2:
     resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
@@ -8153,7 +8153,10 @@ snapshots:
       jest-runner: 25.5.4
       jest-runtime: 25.5.4
     transitivePeerDependencies:
+      - bufferutil
+      - canvas
       - supports-color
+      - utf-8-validate
 
   '@jest/transform@25.5.1':
     dependencies:
@@ -10941,8 +10944,6 @@ snapshots:
       inherits: 2.0.4
       minimalistic-assert: 1.0.1
 
-  destroy@1.0.4: {}
-
   destroy@1.2.0: {}
 
   detect-file@1.0.0: {}
@@ -11041,6 +11042,8 @@ snapshots:
   emojis-list@3.0.0: {}
 
   encodeurl@1.0.4: {}
+
+  encodeurl@2.0.3: {}
 
   encoding@0.1.14:
     dependencies:
@@ -11524,6 +11527,8 @@ snapshots:
 
   etag@1.7.0: {}
 
+  etag@1.8.1: {}
+
   event-emitter@0.3.7:
     dependencies:
       d: 1.0.2
@@ -11683,7 +11688,7 @@ snapshots:
       proxy-addr: 1.1.5
       qs: 6.2.0
       range-parser: 1.2.1
-      send: 0.14.2
+      send: 0.19.1
       serve-static: 1.11.2
       type-is: 1.6.18
       utils-merge: 1.0.0
@@ -12009,6 +12014,8 @@ snapshots:
       map-cache: 0.2.2
 
   fresh@0.3.0: {}
+
+  fresh@0.5.2: {}
 
   from@0.1.7: {}
 
@@ -12677,13 +12684,15 @@ snapshots:
   http-errors@1.3.1:
     dependencies:
       inherits: 2.0.4
-      statuses: 1.2.1
+      statuses: 1.5.0
 
-  http-errors@1.5.1:
+  http-errors@2.0.0:
     dependencies:
-      inherits: 2.0.3
-      setprototypeof: 1.0.2
-      statuses: 1.3.1
+      depd: 2.0.0
+      inherits: 2.0.4
+      setprototypeof: 1.2.0
+      statuses: 2.0.1
+      toidentifier: 1.0.1
 
   http-errors@2.0.1:
     dependencies:
@@ -13504,10 +13513,7 @@ snapshots:
       pretty-format: 25.5.0
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - utf-8-validate
 
   jest-leak-detector@25.5.0:
     dependencies:
@@ -14536,8 +14542,6 @@ snapshots:
     dependencies:
       mime-db: 1.52.0
 
-  mime@1.3.4: {}
-
   mime@1.6.0: {}
 
   mime@4.1.2: {}
@@ -14939,6 +14943,10 @@ snapshots:
   office-ui-fabric@2.6.1: {}
 
   on-finished@2.3.0:
+    dependencies:
+      ee-first: 1.1.1
+
+  on-finished@2.4.1:
     dependencies:
       ee-first: 1.1.1
 
@@ -15621,8 +15629,6 @@ snapshots:
       randombytes: 2.1.0
       safe-buffer: 5.2.1
 
-  range-parser@1.0.3: {}
-
   range-parser@1.2.1: {}
 
   range-parser@1.3.0: {}
@@ -16159,38 +16165,21 @@ snapshots:
 
   semver@7.8.6: {}
 
-  send@0.13.2:
+  send@0.19.1:
     dependencies:
-      debug: 2.2.0
-      depd: 1.1.2
-      destroy: 1.0.4
+      debug: 2.6.9(supports-color@4.5.0)
+      depd: 2.0.0
+      destroy: 1.2.0
+      encodeurl: 2.0.3
       escape-html: 1.0.3
-      etag: 1.7.0
-      fresh: 0.3.0
-      http-errors: 1.3.1
-      mime: 1.3.4
-      ms: 0.7.1
-      on-finished: 2.3.0
-      range-parser: 1.0.3
-      statuses: 1.2.1
-    transitivePeerDependencies:
-      - supports-color
-
-  send@0.14.2:
-    dependencies:
-      debug: 2.2.0
-      depd: 1.1.2
-      destroy: 1.0.4
-      encodeurl: 1.0.4
-      escape-html: 1.0.3
-      etag: 1.7.0
-      fresh: 0.3.0
-      http-errors: 1.5.1
-      mime: 1.3.4
-      ms: 0.7.2
-      on-finished: 2.3.0
+      etag: 1.8.1
+      fresh: 0.5.2
+      http-errors: 2.0.0
+      mime: 1.6.0
+      ms: 2.1.3
+      on-finished: 2.4.1
       range-parser: 1.2.1
-      statuses: 1.3.1
+      statuses: 2.0.1
     transitivePeerDependencies:
       - supports-color
 
@@ -16219,7 +16208,7 @@ snapshots:
     dependencies:
       escape-html: 1.0.3
       parseurl: 1.3.3
-      send: 0.13.2
+      send: 0.19.1
     transitivePeerDependencies:
       - supports-color
 
@@ -16228,7 +16217,7 @@ snapshots:
       encodeurl: 1.0.4
       escape-html: 1.0.3
       parseurl: 1.3.3
-      send: 0.14.2
+      send: 0.19.1
     transitivePeerDependencies:
       - supports-color
 
@@ -16264,8 +16253,6 @@ snapshots:
       split-string: 3.1.0
 
   setimmediate@1.0.5: {}
-
-  setprototypeof@1.0.2: {}
 
   setprototypeof@1.2.0: {}
 
@@ -16513,11 +16500,11 @@ snapshots:
       define-property: 0.2.5
       object-copy: 0.1.0
 
-  statuses@1.2.1: {}
-
   statuses@1.3.1: {}
 
   statuses@1.5.0: {}
+
+  statuses@2.0.1: {}
 
   statuses@2.0.2: {}
 

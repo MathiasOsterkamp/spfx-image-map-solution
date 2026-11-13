@@ -46,12 +46,14 @@
     "overrides": {
       "graceful-fs": "^4.2.11",
       "typescript": "4.9.5",
-      "@microsoft/gulp-core-build-sass": "4.17.3"
+      "@microsoft/gulp-core-build-sass": "4.17.3",
+      "send": "0.19.1"
     }
   },
   "resolutions": {
     "graceful-fs": "^4.2.11",
     "typescript": "4.9.5",
-    "@microsoft/gulp-core-build-sass": "4.17.3"
+    "@microsoft/gulp-core-build-sass": "4.17.3",
+    "send": "0.19.1"
   }
 }

@@ -19,3 +19,6 @@ coverage
 
 # Persönliche VS-Code-Einstellungen (enthält die eigene SharePoint-URL)
 .vscode/settings.json
+
+# Lokale Beispielbilder zum Testen
+beispielbilder/
