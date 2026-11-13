@@ -662,7 +662,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
 
   const body = (
     // role="presentation": the container only catches keyboard shortcuts bubbling up from its content.
-    <div className={classNames.editor} role="presentation" onKeyDown={onEditorKeyDown} style={fullscreen ? { border: 'none', height: '100%', display: 'flex', flexDirection: 'column' } : undefined}>
+    <div className={classNames.editor} role="presentation" onKeyDown={onEditorKeyDown} style={fullscreen ? { border: 'none', boxSizing: 'border-box', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' } : undefined}>
       {liveRegion}
       <EditorToolbar
         tool={tool}
@@ -703,7 +703,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
       )}
 
       {testMode ? (
-        <div style={{ padding: 8, overflow: 'auto' }}>
+        <div style={{ padding: 8, overflow: 'auto', ...(fullscreen ? { flex: 1, minHeight: 0 } : undefined) }}>
           <div role="status" aria-live="polite">
             <MessageBar messageBarType={MessageBarType.info}>
               {testMessage || strings.previewInfo}
@@ -760,8 +760,9 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
         isBlocking={false}
         titleAriaId={ids.current.modalTitle}
         styles={{
-          main: { width: 'calc(100vw - 32px)', height: 'calc(100vh - 32px)', maxWidth: 'none', maxHeight: 'none' },
-          scrollableContent: { height: '100%', display: 'flex', flexDirection: 'column' }
+          // Only the canvas scrolls: the modal and its content must not add scrollbars of their own.
+          main: { width: 'calc(100vw - 32px)', height: 'calc(100vh - 32px)', maxWidth: 'none', maxHeight: 'none', overflow: 'hidden', display: 'flex' },
+          scrollableContent: { flex: 1, minWidth: 0, maxHeight: 'none', overflow: 'hidden', display: 'flex', flexDirection: 'column' }
         }}
       >
         <h2 id={ids.current.modalTitle} className={classNames.srOnly}>{strings.fullscreenTitle}</h2>
