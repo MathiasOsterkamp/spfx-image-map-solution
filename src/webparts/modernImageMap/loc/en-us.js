@@ -1,8 +1,6 @@
 define([], function () {
   return {
-    /** '1' = 0 and 1 are singular (French), '' = only 1 is singular */
     zeroIsSingular: '',
-    // ---------- General ----------
     decimalSeparator: '.',
     quote: '"{0}"',
     yes: 'Yes',
@@ -20,7 +18,6 @@ define([], function () {
     toolNames: { select: 'Select', rect: 'Rectangle', circle: 'Circle', ellipse: 'Ellipse' },
     toolKeys: { select: 'V', rect: 'R', circle: 'C', ellipse: 'E' },
     imageLoadFailed: 'The image could not be loaded.',
-    // ---------- Property pane ----------
     folderNotFound: 'This folder does not exist or you do not have access to it.',
     propertyPaneDescription: 'Image with linked areas. Areas, links and alt text are edited directly in the web part.',
     groupImage: 'Image',
@@ -45,7 +42,6 @@ define([], function () {
     logLevels: { verbose: 'Verbose', info: 'Information', warning: 'Warnings and errors', error: 'Errors only', off: 'Off' },
     uploadFolderLabel: 'Library folder',
     uploadFolderDescription: 'Relative to the current site, e.g. "SiteAssets" or "SiteAssets/Images". The folder must exist.',
-    // ---------- Editor ----------
     rectPosition: '{0}% from the left, {1}% from the top',
     rectSize: '{0} by {1}%',
     circleDiameter: 'diameter {0}% of the image width',
@@ -84,7 +80,7 @@ define([], function () {
     canvasLabel: 'Canvas, {0} tool, {1} {1#area|areas}',
     areaAriaLabel: 'Area {0}, {1}: {2}. {3}.',
     problemCount: '{0#One problem|{0} problems}',
-    listHeading: 'Areas in reading order ({0})',
+    listHeading: 'Areas in reading order ({0} of {1})',
     noAreas: 'No areas defined yet.',
     noLinkLower: 'no link',
     newTabShort: ' (new tab)',
@@ -104,7 +100,6 @@ define([], function () {
     previewClick: 'Clicking "{0}" would open {1} ({2?new tab|same window}).',
     fullscreenNote: 'The image areas are being edited in full screen.',
     fullscreenTitle: 'Edit image areas – full screen',
-    // ---------- Area properties ----------
     shapeOptions: { rect: 'Rectangle', circle: 'Circle (always stays round)', ellipse: 'Ellipse' },
     borderStyles: { solid: 'Solid', dashed: 'Dashed', dotted: 'Dotted', double: 'Double' },
     linkKinds: {
@@ -180,7 +175,6 @@ define([], function () {
     editAreaTitle: 'Edit area {0}',
     closeProperties: 'Close properties',
     propertiesOf: 'Properties of area {0}',
-    // ---------- Toolbar ----------
     selectTitle: 'Select ({0})',
     drawTitle: 'Draw {0:lower} ({1}). Keyboard: Enter on the canvas inserts it.',
     image: 'Image',
@@ -203,18 +197,15 @@ define([], function () {
     exitFullscreenTooltip: 'Exit full screen (Esc)',
     toolbarAria: 'Image area tools. Arrow keys switch between items.',
     moreCommands: 'More commands',
-    // ---------- Issues ----------
     issuesLabel: '{0?{0} {0#issue|issues}|No issues}',
     openList: ', open list',
     issuesFooter: 'Areas with errors are not rendered as links in display mode.',
-    // ---------- Page search ----------
     searching: 'Searching …',
     noPagesFound: 'No pages found.',
     pagesFound: '{0} {0#page|pages} found. Press down arrow to go to the results.',
     searchPlaceholder: 'Enter page title',
     searchAria: 'Search site pages',
     foundPages: 'Pages found',
-    // ---------- Quick actions ----------
     actionsFor: 'Actions for area {0}',
     noLink: 'No link',
     targetAria: 'Target: {0}',
@@ -224,20 +215,16 @@ define([], function () {
     duplicateShortcut: 'Duplicate (Ctrl+D)',
     duplicateAria: 'Duplicate area {0}',
     deleteShortcut: 'Delete (Del)',
-    // ---------- Alt text dialog ----------
     altDialogTitle: 'Alt text of the image',
     altDialogSubText: 'Describes the image content for screen readers, e.g. "Floor plan of the ground floor". The links are announced by their title.',
     altLabel: 'Alt text',
-    // ---------- Color field ----------
     openColorPicker: '{0}: {1}. Open color picker',
-    // ---------- Viewer ----------
     newTabSuffix: ' (opens in new tab)',
     imageBlocked: 'The image was not loaded for security reasons.',
     interactiveGraphic: 'Interactive graphic with {0} {0#link|links}',
     linkFallback: 'Link {0}',
     linksAsList: 'Links of the graphic as a list',
     graphicLinks: 'Links of the graphic',
-    // ---------- Image picker ----------
     imagesFound: '{0} {0#image|images} found.',
     imagesLoadFailed: 'Images could not be loaded. {0}',
     checkingAndUploading: 'Checking and uploading image.',
@@ -271,12 +258,10 @@ define([], function () {
     imageUrlField: 'Image URL',
     imageUrlPlaceholder: '/sites/intranet/SiteAssets/image.png',
     sameHostOnly: 'Only images from this SharePoint are allowed.',
-    // ---------- History ----------
     nothingToUndo: 'Nothing to undo.',
     undone: 'Undone: {0}.',
     nothingToRedo: 'Nothing to redo.',
     redone: 'Redone: {0}.',
-    // ---------- Services ----------
     httpBadRequest: 'The request was invalid.',
     httpForbidden: 'You do not have permission for this folder.',
     httpNotFound: 'The folder was not found. Please check the "Library folder" setting.',
@@ -287,15 +272,12 @@ define([], function () {
     httpError: 'Server error (status {0}). Please try again later.',
     fileReadFailed: 'The file could not be read.',
     pageSearchFailed: 'The pages could not be searched.',
-    // ---------- File validation ----------
     noFileSelected: 'No file selected.',
     fileEmpty: 'The file is empty.',
     fileTooLarge: 'The file is too large ({0} MB). The maximum is {1} MB.',
     invalidImageContent: 'The file content is not an allowed image format. Allowed: {0}. SVG files are not allowed for security reasons.',
     defaultFileName: 'image',
-    // ---------- Hover styles ----------
     visibilityWarning: 'The area is barely visible on hover. Recommended: border of at least 2 px with an opaque color (WCAG 1.4.11).',
-    // ---------- Validation ----------
     linkTooLong: 'The link is too long: {0} characters, the maximum is {1}.',
     linkControlChars: 'The link contains control characters (e.g. tab or line break).',
     linkInvisibleChars: 'The link contains invisible characters (e.g. text direction overrides). Please type it again instead of copying.',

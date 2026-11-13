@@ -1,8 +1,6 @@
 define([], function () {
   return {
-    /** '1' = 0 and 1 are singular (French), '' = only 1 is singular */
     zeroIsSingular: '',
-    // ---------- General ----------
     decimalSeparator: ',',
     quote: '\u201E{0}\u201C',
     yes: 'Ja',
@@ -20,7 +18,6 @@ define([], function () {
     toolNames: { select: 'Auswählen', rect: 'Rechteck', circle: 'Kreis', ellipse: 'Ellipse' },
     toolKeys: { select: 'V', rect: 'R', circle: 'K', ellipse: 'E' },
     imageLoadFailed: 'Das Bild konnte nicht geladen werden.',
-    // ---------- Property pane ----------
     folderNotFound: 'Dieser Ordner existiert nicht oder Sie haben keinen Zugriff.',
     propertyPaneDescription: 'Bild mit verlinkten Bereichen. Bereiche, Links und Alternativtext werden direkt im Webpart bearbeitet.',
     groupImage: 'Bild',
@@ -45,7 +42,6 @@ define([], function () {
     logLevels: { verbose: 'Ausführlich', info: 'Informationen', warning: 'Warnungen und Fehler', error: 'Nur Fehler', off: 'Aus' },
     uploadFolderLabel: 'Bibliotheksordner',
     uploadFolderDescription: 'Relativ zur aktuellen Website, z. B. „SiteAssets“ oder „SiteAssets/Bilder“. Der Ordner muss existieren.',
-    // ---------- Editor ----------
     rectPosition: '{0} % von links, {1} % von oben',
     rectSize: '{0} mal {1} %',
     circleDiameter: 'Durchmesser {0} % der Bildbreite',
@@ -84,7 +80,7 @@ define([], function () {
     canvasLabel: 'Zeichenfl\u00E4che, Werkzeug {0}, {1} {1#Bereich|Bereiche}',
     areaAriaLabel: 'Bereich {0}, {1}: {2}. {3}.',
     problemCount: '{0#Ein Problem|{0} Probleme}',
-    listHeading: 'Bereiche in Lesereihenfolge ({0})',
+    listHeading: 'Bereiche in Lesereihenfolge ({0} von {1})',
     noAreas: 'Noch keine Bereiche festgelegt.',
     noLinkLower: 'kein Link',
     newTabShort: ' (neuer Tab)',
@@ -104,7 +100,6 @@ define([], function () {
     previewClick: 'Klick auf \u201E{0}\u201C w\u00FCrde {1} \u00F6ffnen ({2?neuer Tab|gleiches Fenster}).',
     fullscreenNote: 'Die Bildbereiche werden im Vollbild bearbeitet.',
     fullscreenTitle: 'Bildbereiche bearbeiten – Vollbild',
-    // ---------- Area properties ----------
     shapeOptions: { rect: 'Rechteck', circle: 'Kreis (bleibt immer rund)', ellipse: 'Ellipse' },
     borderStyles: { solid: 'Durchgezogen', dashed: 'Gestrichelt', dotted: 'Gepunktet', double: 'Doppelt' },
     linkKinds: {
@@ -180,7 +175,6 @@ define([], function () {
     editAreaTitle: 'Bereich {0} bearbeiten',
     closeProperties: 'Eigenschaften schließen',
     propertiesOf: 'Eigenschaften von Bereich {0}',
-    // ---------- Toolbar ----------
     selectTitle: 'Ausw\u00E4hlen ({0})',
     drawTitle: '{0} zeichnen ({1}). Per Tastatur: Enter auf der Zeichenfl\u00E4che f\u00FCgt ein.',
     image: 'Bild',
@@ -203,18 +197,15 @@ define([], function () {
     exitFullscreenTooltip: 'Vollbild beenden (Esc)',
     toolbarAria: 'Werkzeuge für Bildbereiche. Pfeiltasten wechseln zwischen den Einträgen.',
     moreCommands: 'Weitere Befehle',
-    // ---------- Issues ----------
     issuesLabel: '{0?{0} {0#Hinweis|Hinweise}|Keine Hinweise}',
     openList: ', Liste öffnen',
     issuesFooter: 'Fehlerhafte Bereiche werden im Anzeigemodus nicht als Link ausgegeben.',
-    // ---------- Page search ----------
     searching: 'Suche läuft …',
     noPagesFound: 'Keine Seiten gefunden.',
     pagesFound: '{0} {0#Seite|Seiten} gefunden. Mit Pfeil runter zu den Ergebnissen.',
     searchPlaceholder: 'Seitentitel eingeben',
     searchAria: 'Websiteseiten durchsuchen',
     foundPages: 'Gefundene Seiten',
-    // ---------- Quick actions ----------
     actionsFor: 'Aktionen f\u00FCr Bereich {0}',
     noLink: 'Kein Link',
     targetAria: 'Ziel: {0}',
@@ -224,20 +215,16 @@ define([], function () {
     duplicateShortcut: 'Duplizieren (Strg+D)',
     duplicateAria: 'Bereich {0} duplizieren',
     deleteShortcut: 'Löschen (Entf)',
-    // ---------- Alt text dialog ----------
     altDialogTitle: 'Alternativtext des Bildes',
     altDialogSubText: 'Beschreibt den Bildinhalt für Screenreader, z. B. „Lageplan des Erdgeschosses“. Die Links werden über ihren Titel angesagt.',
     altLabel: 'Alternativtext',
-    // ---------- Color field ----------
     openColorPicker: '{0}: {1}. Farbauswahl \u00F6ffnen',
-    // ---------- Viewer ----------
     newTabSuffix: ' (öffnet in neuem Tab)',
     imageBlocked: 'Das Bild wurde aus Sicherheitsgründen nicht geladen.',
     interactiveGraphic: 'Interaktive Grafik mit {0} {0#Link|Links}',
     linkFallback: 'Link {0}',
     linksAsList: 'Links der Grafik als Liste',
     graphicLinks: 'Links der Grafik',
-    // ---------- Image picker ----------
     imagesFound: '{0} {0#Bild|Bilder} gefunden.',
     imagesLoadFailed: 'Bilder konnten nicht geladen werden. {0}',
     checkingAndUploading: 'Bild wird geprüft und hochgeladen.',
@@ -271,12 +258,10 @@ define([], function () {
     imageUrlField: 'Bild-URL',
     imageUrlPlaceholder: '/sites/intranet/SiteAssets/bild.png',
     sameHostOnly: 'Nur Bilder aus diesem SharePoint sind erlaubt.',
-    // ---------- History ----------
     nothingToUndo: 'Nichts rückgängig zu machen.',
     undone: 'R\u00FCckg\u00E4ngig: {0}.',
     nothingToRedo: 'Nichts zu wiederholen.',
     redone: 'Wiederholt: {0}.',
-    // ---------- Services ----------
     httpBadRequest: 'Die Anfrage war ungültig.',
     httpForbidden: 'Sie haben keine Berechtigung für diesen Ordner.',
     httpNotFound: 'Der Ordner wurde nicht gefunden. Bitte die Einstellung „Bibliotheksordner“ prüfen.',
@@ -287,15 +272,12 @@ define([], function () {
     httpError: 'Serverfehler (Status {0}). Bitte sp\u00E4ter erneut versuchen.',
     fileReadFailed: 'Die Datei konnte nicht gelesen werden.',
     pageSearchFailed: 'Die Seiten konnten nicht gesucht werden.',
-    // ---------- File validation ----------
     noFileSelected: 'Keine Datei ausgewählt.',
     fileEmpty: 'Die Datei ist leer.',
     fileTooLarge: 'Die Datei ist zu gro\u00DF ({0} MB). Erlaubt sind maximal {1} MB.',
     invalidImageContent: 'Der Dateiinhalt ist kein erlaubtes Bildformat. Erlaubt: {0}. SVG-Dateien sind aus Sicherheitsgr\u00FCnden nicht erlaubt.',
     defaultFileName: 'bild',
-    // ---------- Hover styles ----------
     visibilityWarning: 'Der Bereich ist beim Überfahren kaum erkennbar. Empfohlen: Rahmen ab 2 px mit deckender Farbe (WCAG 1.4.11).',
-    // ---------- Validation ----------
     linkTooLong: 'Der Link ist zu lang: {0} Zeichen, erlaubt sind maximal {1}.',
     linkControlChars: 'Der Link enthält Steuerzeichen (z. B. Tabulator oder Zeilenumbruch).',
     linkInvisibleChars: 'Der Link enthält unsichtbare Zeichen (z. B. Textrichtungs-Umschaltung). Bitte neu eintippen statt kopieren.',

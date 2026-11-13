@@ -1,8 +1,6 @@
 define([], function () {
   return {
-    /** '1' = 0 and 1 are singular (French), '' = only 1 is singular */
     zeroIsSingular: '1',
-    // ---------- General ----------
     decimalSeparator: ',',
     quote: '\u00AB {0} \u00BB',
     yes: 'Oui',
@@ -20,7 +18,6 @@ define([], function () {
     toolNames: { select: 'Sélectionner', rect: 'Rectangle', circle: 'Cercle', ellipse: 'Ellipse' },
     toolKeys: { select: 'V', rect: 'R', circle: 'C', ellipse: 'E' },
     imageLoadFailed: 'L\'image n\'a pas pu être chargée.',
-    // ---------- Property pane ----------
     folderNotFound: 'Ce dossier n\'existe pas ou vous n\'y avez pas accès.',
     propertyPaneDescription: 'Image avec zones liées. Les zones, les liens et le texte alternatif se modifient directement dans le composant.',
     groupImage: 'Image',
@@ -45,7 +42,6 @@ define([], function () {
     logLevels: { verbose: 'Détaillé', info: 'Informations', warning: 'Avertissements et erreurs', error: 'Erreurs uniquement', off: 'Désactivé' },
     uploadFolderLabel: 'Dossier de bibliothèque',
     uploadFolderDescription: 'Relatif au site actuel, p. ex. « SiteAssets » ou « SiteAssets/Images ». Le dossier doit exister.',
-    // ---------- Editor ----------
     rectPosition: '{0} % depuis la gauche, {1} % depuis le haut',
     rectSize: '{0} sur {1} %',
     circleDiameter: 'diam\u00E8tre {0} % de la largeur de l\'image',
@@ -84,7 +80,7 @@ define([], function () {
     canvasLabel: 'Canevas, outil {0}, {1} {1#zone|zones}',
     areaAriaLabel: 'Zone {0}, {1} : {2}. {3}.',
     problemCount: '{0?{0#Un probl\u00E8me|{0} probl\u00E8mes}|0 probl\u00E8mes}',
-    listHeading: 'Zones dans l\'ordre de lecture ({0})',
+    listHeading: 'Zones dans l\'ordre de lecture ({0} sur {1})',
     noAreas: 'Aucune zone définie pour le moment.',
     noLinkLower: 'aucun lien',
     newTabShort: ' (nouvel onglet)',
@@ -104,7 +100,6 @@ define([], function () {
     previewClick: 'Un clic sur \u00AB {0} \u00BB ouvrirait {1} ({2?nouvel onglet|m\u00EAme fen\u00EAtre}).',
     fullscreenNote: 'Les zones de l\'image sont en cours de modification en plein écran.',
     fullscreenTitle: 'Modifier les zones de l\'image – plein écran',
-    // ---------- Area properties ----------
     shapeOptions: { rect: 'Rectangle', circle: 'Cercle (reste toujours rond)', ellipse: 'Ellipse' },
     borderStyles: { solid: 'Continu', dashed: 'Tirets', dotted: 'Pointillés', double: 'Double' },
     linkKinds: {
@@ -180,7 +175,6 @@ define([], function () {
     editAreaTitle: 'Modifier la zone {0}',
     closeProperties: 'Fermer les propriétés',
     propertiesOf: 'Propri\u00E9t\u00E9s de la zone {0}',
-    // ---------- Toolbar ----------
     selectTitle: 'S\u00E9lectionner ({0})',
     drawTitle: 'Dessiner : {0:lower} ({1}). Au clavier : Entr\u00E9e sur le canevas ins\u00E8re la forme.',
     image: 'Image',
@@ -203,18 +197,15 @@ define([], function () {
     exitFullscreenTooltip: 'Quitter le plein écran (Échap)',
     toolbarAria: 'Outils pour les zones de l\'image. Les flèches permettent de passer d\'un élément à l\'autre.',
     moreCommands: 'Autres commandes',
-    // ---------- Issues ----------
     issuesLabel: '{0?{0} {0#probl\u00E8me|probl\u00E8mes}|Aucun probl\u00E8me}',
     openList: ', ouvrir la liste',
     issuesFooter: 'Les zones comportant des erreurs ne sont pas affichées comme liens en mode lecture.',
-    // ---------- Page search ----------
     searching: 'Recherche en cours …',
     noPagesFound: 'Aucune page trouvée.',
     pagesFound: '{0} {0#page trouv\u00E9e|pages trouv\u00E9es}. Fl\u00E8che vers le bas pour acc\u00E9der aux r\u00E9sultats.',
     searchPlaceholder: 'Saisir le titre de la page',
     searchAria: 'Rechercher dans les pages du site',
     foundPages: 'Pages trouvées',
-    // ---------- Quick actions ----------
     actionsFor: 'Actions pour la zone {0}',
     noLink: 'Aucun lien',
     targetAria: 'Cible : {0}',
@@ -224,20 +215,16 @@ define([], function () {
     duplicateShortcut: 'Dupliquer (Ctrl+D)',
     duplicateAria: 'Dupliquer la zone {0}',
     deleteShortcut: 'Supprimer (Suppr)',
-    // ---------- Alt text dialog ----------
     altDialogTitle: 'Texte alternatif de l\'image',
     altDialogSubText: 'Décrit le contenu de l\'image pour les lecteurs d\'écran, p. ex. « Plan du rez-de-chaussée ». Les liens sont annoncés par leur titre.',
     altLabel: 'Texte alternatif',
-    // ---------- Color field ----------
     openColorPicker: '{0} : {1}. Ouvrir le s\u00E9lecteur de couleur',
-    // ---------- Viewer ----------
     newTabSuffix: ' (s\'ouvre dans un nouvel onglet)',
     imageBlocked: 'L\'image n\'a pas été chargée pour des raisons de sécurité.',
     interactiveGraphic: 'Graphique interactif avec {0} {0#lien|liens}',
     linkFallback: 'Lien {0}',
     linksAsList: 'Liens du graphique sous forme de liste',
     graphicLinks: 'Liens du graphique',
-    // ---------- Image picker ----------
     imagesFound: '{0} {0#image trouv\u00E9e|images trouv\u00E9es}.',
     imagesLoadFailed: 'Les images n\'ont pas pu \u00EAtre charg\u00E9es. {0}',
     checkingAndUploading: 'Vérification et chargement de l\'image.',
@@ -271,12 +258,10 @@ define([], function () {
     imageUrlField: 'URL de l\'image',
     imageUrlPlaceholder: '/sites/intranet/SiteAssets/image.png',
     sameHostOnly: 'Seules les images de ce SharePoint sont autorisées.',
-    // ---------- History ----------
     nothingToUndo: 'Rien à annuler.',
     undone: 'Annul\u00E9 : {0}.',
     nothingToRedo: 'Rien à rétablir.',
     redone: 'R\u00E9tabli : {0}.',
-    // ---------- Services ----------
     httpBadRequest: 'La requête n\'était pas valide.',
     httpForbidden: 'Vous n\'avez pas l\'autorisation pour ce dossier.',
     httpNotFound: 'Le dossier est introuvable. Veuillez vérifier le paramètre « Dossier de bibliothèque ».',
@@ -287,15 +272,12 @@ define([], function () {
     httpError: 'Erreur serveur (statut {0}). Veuillez r\u00E9essayer plus tard.',
     fileReadFailed: 'Le fichier n\'a pas pu être lu.',
     pageSearchFailed: 'La recherche de pages a échoué.',
-    // ---------- File validation ----------
     noFileSelected: 'Aucun fichier sélectionné.',
     fileEmpty: 'Le fichier est vide.',
     fileTooLarge: 'Le fichier est trop volumineux ({0} Mo). {1} Mo maximum.',
     invalidImageContent: 'Le contenu du fichier n\'est pas un format d\'image autoris\u00E9. Autoris\u00E9s : {0}. Les fichiers SVG ne sont pas autoris\u00E9s pour des raisons de s\u00E9curit\u00E9.',
     defaultFileName: 'image',
-    // ---------- Hover styles ----------
     visibilityWarning: 'La zone est à peine visible au survol. Recommandé : bordure d\'au moins 2 px de couleur opaque (WCAG 1.4.11).',
-    // ---------- Validation ----------
     linkTooLong: 'Le lien est trop long : {0} caract\u00E8res, {1} maximum.',
     linkControlChars: 'Le lien contient des caractères de contrôle (p. ex. tabulation ou saut de ligne).',
     linkInvisibleChars: 'Le lien contient des caractères invisibles (p. ex. changement de sens du texte). Veuillez le ressaisir au lieu de le copier.',

@@ -618,7 +618,7 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
         </div>
       </div>
 
-      <h3 className={classNames.listHeading} id={ids.current.list}>{formatText(strings.listHeading, areas.length)}</h3>
+      <h3 className={classNames.listHeading} id={ids.current.list}>{formatText(strings.listHeading, areas.length, policy.maxAreas)}</h3>
       {areas.length === 0 ? (
         <Text variant="small">{strings.noAreas}</Text>
       ) : (
