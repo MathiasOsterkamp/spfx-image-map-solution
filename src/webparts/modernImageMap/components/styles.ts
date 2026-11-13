@@ -29,7 +29,19 @@ const getClassNames = memoizeFunction((theme: ITheme) => mergeStyleSets({
     minHeight: 24,
     pointerEvents: 'auto'
   },
-  textLinks: { margin: '12px 0 0', paddingLeft: 20, lineHeight: 1.6, fontSize: 14 },
+  // The list sits inside containers that center text and set line-height 0 for the image,
+  // so alignment and line height are set explicitly, also on the items.
+  textLinks: {
+    margin: '12px 0 0',
+    padding: '0 0 0 20px',
+    listStyle: 'disc outside',
+    textAlign: 'left',
+    fontSize: 14,
+    lineHeight: '22px',
+    selectors: {
+      li: { display: 'list-item', margin: 0, padding: 0, lineHeight: '22px', textAlign: 'left' }
+    }
+  },
   textLink: {
     color: theme.semanticColors.bodyText,
     textDecoration: 'none',
@@ -42,7 +54,8 @@ const getClassNames = memoizeFunction((theme: ITheme) => mergeStyleSets({
       ':focus': { outline: `2px solid ${theme.palette.neutralPrimary}`, outlineOffset: 2 }
     }
   },
-  newTabIcon: { fontSize: 12, marginLeft: 4, verticalAlign: 'middle' },
+  // Fixed box and line-height 1: the icon must not make its row taller than the others.
+  newTabIcon: { fontSize: 12, width: 12, height: 12, lineHeight: 1, marginLeft: 4, verticalAlign: 'baseline' },
   // shared image surface (display + editor)
   outer: { width: '100%', textAlign: 'center' },
   outerStretch: { textAlign: 'left' },
