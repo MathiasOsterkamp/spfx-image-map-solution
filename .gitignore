@@ -22,3 +22,7 @@ coverage
 
 # Lokale Beispielbilder zum Testen
 beispielbilder/
+
+# Lokale Arbeitsdokumente
+USER-STORIES.md
+TESTFAELLE.md

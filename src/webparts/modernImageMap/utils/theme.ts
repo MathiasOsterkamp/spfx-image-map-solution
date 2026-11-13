@@ -1,5 +1,5 @@
 import { getColorFromString } from '@fluentui/react/lib/Color';
-import { createTheme, IPalette, ISemanticColors, ITheme } from '@fluentui/react/lib/Theme';
+import { ComponentsStyles, createTheme, IPalette, ISemanticColors, ITheme } from '@fluentui/react/lib/Theme';
 import { safeColor } from './sanitize';
 import { asRecord, IUntyped } from './untyped';
 
@@ -12,8 +12,29 @@ import { asRecord, IUntyped } from './untyped';
  * Fluent UI are taken from there, everything else is derived by createTheme from the palette.
  * Without a SharePoint theme (e.g. local workbench) the Fluent UI default theme is returned.
  */
+/**
+ * Component overrides that apply in every theme.
+ *
+ * CommandBarButton: Fluent UI paints disabled buttons with the "white" palette slot, and the
+ * page styles of SharePoint 2019 (Fabric 5) also style ".is-disabled". On a toolbar that is not
+ * pure white, disabled buttons then show up as white boxes. Transparent lets the toolbar
+ * background through; the doubled class raises the specificity above the page styles.
+ */
+const COMPONENT_OVERRIDES: ComponentsStyles = {
+  CommandBarButton: {
+    styles: {
+      rootDisabled: {
+        backgroundColor: 'transparent',
+        selectors: {
+          '&&.is-disabled, &&.is-disabled:hover, &&.is-disabled:focus': { backgroundColor: 'transparent' }
+        }
+      }
+    }
+  }
+};
+
 export function createSharePointTheme(): ITheme {
-  const defaults = createTheme({});
+  const defaults = createTheme({ components: COMPONENT_OVERRIDES });
   const slots = asRecord(asRecord(asRecord(window).__themeState__).theme);
 
   const palette = pickColors(slots, Object.keys(defaults.palette));
@@ -25,6 +46,7 @@ export function createSharePointTheme(): ITheme {
   return createTheme({
     palette: palette as Partial<IPalette>,
     semanticColors: semanticColors as Partial<ISemanticColors>,
+    components: COMPONENT_OVERRIDES,
     isInverted: isDark(palette.white)
   });
 }
