@@ -235,6 +235,8 @@ define([], function () {
     closeMessage: 'Close message',
     imageSource: 'Image source',
     tabLibrary: 'Library',
+    libraryLabel: 'Library',
+    libraryDefault: '{0} (default)',
     folderInfo: 'Folder: {0}',
     refreshList: 'Refresh list',
     loadingImages: 'Loading images…',

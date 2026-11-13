@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Breadcrumb, IBreadcrumbItem } from '@fluentui/react/lib/Breadcrumb';
 import { PrimaryButton, DefaultButton, ActionButton, IconButton } from '@fluentui/react/lib/Button';
+import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
 import { Icon } from '@fluentui/react/lib/Icon';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { Panel, PanelType } from '@fluentui/react/lib/Panel';
@@ -13,8 +14,9 @@ import { css } from '@fluentui/react/lib/Utilities';
 import { useClassNames } from './styles';
 import { ISecurityPolicy } from '../config/securityConfig';
 import { formatText } from '../loc/template';
-import { IImageFile, IImageFolder, IImagePage, ImageService, isSameImageUrl } from '../services/ImageService';
+import { IImageFile, IImageFolder, IImageLibrary, IImagePage, ImageService, isSameImageUrl } from '../services/ImageService';
 import { acceptAttribute, describeAllowedTypes, IValidatedImage, validateImageFile } from '../utils/fileValidation';
+import { logWarning } from '../utils/logging';
 import { checkImageUrl } from '../utils/validation';
 import * as strings from 'ModernImageMapWebPartStrings';
 
@@ -35,6 +37,12 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
   const [tab, setTab] = React.useState<string>('library');
   const [images, setImages] = React.useState<IImageFile[]>([]);
   const [folders, setFolders] = React.useState<IImageFolder[]>([]);
+  /** Configured folder (web part property): preselected and target of uploads */
+  const defaultRoot = (folder || '').replace(/^\/+|\/+$/g, '') || 'SiteAssets';
+  const [libraries, setLibraries] = React.useState<IImageLibrary[]>([]);
+  /** Library (or configured folder) whose content is shown. The ref is what the loaders read. */
+  const [root, setRoot] = React.useState<string>(defaultRoot);
+  const rootRef = React.useRef<string>(defaultRoot);
   /** Subfolders below the configured folder the user navigated into */
   const [subFolders, setSubFolders] = React.useState<string[]>([]);
   /** Paging token for the next page (undefined = everything loaded) */
@@ -72,8 +80,8 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
     setImages([]);
     setNext(undefined);
     Promise.all([
-      service.getFolders(folder, path),
-      service.getImagePage(folder, path, search)
+      service.getFolders(rootRef.current, path),
+      service.getImagePage(rootRef.current, path, search)
     ])
       .then((result: [IImageFolder[], IImagePage]) => {
         if (!isCurrent()) { return; }
@@ -92,7 +100,7 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
     const isCurrent = () => alive.current && id === requestId.current;
     setLoadingMore(true);
     setError(undefined);
-    service.getImagePage(folder, subFolders, query, next)
+    service.getImagePage(rootRef.current, subFolders, query, next)
       .then((page: IImagePage) => {
         if (!isCurrent()) { return; }
         const all = images.concat(page.images);
@@ -130,15 +138,34 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
 
   React.useEffect(() => clearSearchTimer, []);
 
+  const selectRoot = (value: string) => {
+    rootRef.current = value;
+    setRoot(value);
+    openFolder([]);
+  };
+
   React.useEffect(() => {
     if (isOpen) {
       setUrlInput(currentUrl || '');
-      openFolder([]);
+      selectRoot(defaultRoot);
+      service.getLibraries()
+        .then((list: IImageLibrary[]) => { if (alive.current) { setLibraries(list); } })
+        // Without the list the picker still works with the configured folder.
+        .catch((e: Error) => logWarning('Libraries could not be loaded', { error: e.message }));
     }
   }, [isOpen, folder]);
 
-  const rootName = (folder || '').replace(/^\/+|\/+$/g, '') || 'SiteAssets';
-  const breadcrumb: IBreadcrumbItem[] = [rootName].concat(subFolders).map((name: string, index: number) => ({
+  const sameFolder = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
+  const defaultLibrary = libraries.filter((l: IImageLibrary) => sameFolder(l.folder, defaultRoot))[0];
+  const libraryOptions: IDropdownOption[] = [{
+    key: defaultRoot,
+    text: formatText(strings.libraryDefault, defaultLibrary ? defaultLibrary.title : defaultRoot)
+  }].concat(libraries
+    .filter((l: IImageLibrary) => !sameFolder(l.folder, defaultRoot))
+    .map((l: IImageLibrary) => ({ key: l.folder, text: l.title })));
+  const rootOption = libraryOptions.filter((o: IDropdownOption) => o.key === root)[0];
+
+  const breadcrumb: IBreadcrumbItem[] = [rootOption ? rootOption.text : root].concat(subFolders).map((name: string, index: number) => ({
     key: String(index),
     text: name,
     isCurrentItem: index === subFolders.length,
@@ -203,6 +230,16 @@ export const ImagePickerPanel: React.FunctionComponent<IImagePickerPanelProps> =
         aria-label={strings.imageSource}
       >
         <PivotItem headerText={strings.tabLibrary} itemKey="library" itemIcon="Library">
+          <Dropdown
+            label={strings.libraryLabel}
+            options={libraryOptions}
+            selectedKey={root}
+            disabled={libraryOptions.length < 2}
+            onChange={(e: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
+              if (option && option.key !== root) { selectRoot(String(option.key)); }
+            }}
+            styles={{ root: { marginTop: 8 } }}
+          />
           <Breadcrumb
             items={breadcrumb}
             ariaLabel={strings.folderPath}

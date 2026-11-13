@@ -236,6 +236,8 @@ declare interface IModernImageMapWebPartStrings {
   closeMessage: string;
   imageSource: string;
   tabLibrary: string;
+  libraryLabel: string;
+  libraryDefault: string;
   folderInfo: string;
   refreshList: string;
   loadingImages: string;

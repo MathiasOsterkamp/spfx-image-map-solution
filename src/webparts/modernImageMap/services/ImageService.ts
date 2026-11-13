@@ -14,6 +14,12 @@ export interface IImageFolder {
   name: string;
 }
 
+export interface IImageLibrary {
+  title: string;
+  /** Root folder relative to the site, e.g. "SiteAssets" or "Shared Documents" */
+  folder: string;
+}
+
 /** One page of images. "next" is the paging token for the following page (undefined = end reached). */
 export interface IImagePage {
   images: IImageFile[];
@@ -66,6 +72,30 @@ export class ImageService {
         return response.json().then((json: unknown) => odataEntity(json).Exists !== false);
       })
       .catch(() => false);
+  }
+
+  /**
+   * Document and picture libraries of the current site that are shown in the site contents, sorted by title.
+   * SharePoint only returns the libraries the user is allowed to see.
+   */
+  public getLibraries(): Promise<IImageLibrary[]> {
+    const url = `${this.api()}/web/lists?$select=Title,IsCatalog,RootFolder/ServerRelativeUrl&$expand=RootFolder` +
+      '&$filter=' + encodeURIComponent('(BaseTemplate eq 101 or BaseTemplate eq 109) and Hidden eq false') +
+      '&$orderby=Title';
+    const prefix = this.resolveFolder('x').replace(/x$/, '').toLowerCase();
+
+    return this.httpClient.get(url, SPHttpClient.configurations.v1)
+      .then(readJson)
+      .then((json: unknown) => {
+        const libraries: IImageLibrary[] = [];
+        odataItems(json).forEach((i: IUntyped) => {
+          const root = String(asRecord(i.RootFolder).ServerRelativeUrl || '');
+          if (typeof i.Title === 'string' && i.IsCatalog !== true && root.toLowerCase().indexOf(prefix) === 0 && root.length > prefix.length) {
+            libraries.push({ title: i.Title, folder: root.substr(prefix.length) });
+          }
+        });
+        return libraries;
+      });
   }
 
   /** Subfolders of a folder, sorted by name. */
