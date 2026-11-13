@@ -1,7 +1,7 @@
-import * as strings from 'ModernImageMapWebPartStrings';
 import { formatNumber } from './format';
 import { ImageType, ISecurityPolicy } from '../config/securityConfig';
 import { formatText } from '../loc/template';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 const TYPE_LABEL: { [key: string]: string } = { png: 'PNG', jpeg: 'JPEG', gif: 'GIF', webp: 'WebP' };
 const TYPE_EXTENSION: { [key: string]: string } = { png: 'png', jpeg: 'jpg', gif: 'gif', webp: 'webp' };
@@ -38,6 +38,7 @@ export function sanitizeFileName(name: string, extension: string): string {
   const dot = (name || '').lastIndexOf('.');
   let base = dot > 0 ? name.substr(0, dot) : (name || '');
   base = base
+    // eslint-disable-next-line no-control-regex -- control characters are removed on purpose
     .replace(/[\u0000-\u001f~"#%&*:<>?/\\{|}]/g, '_')
     .replace(/\s+/g, ' ')
     .replace(/^[.\s_]+|[.\s]+$/g, '')

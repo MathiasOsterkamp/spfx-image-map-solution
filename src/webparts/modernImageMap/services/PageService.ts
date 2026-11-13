@@ -1,7 +1,7 @@
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
-import * as strings from 'ModernImageMapWebPartStrings';
 import { logWarning } from '../utils/logging';
 import { IUntyped, odataItems } from '../utils/untyped';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 export interface IPageResult {
   title: string;

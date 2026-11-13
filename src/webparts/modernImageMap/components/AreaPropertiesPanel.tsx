@@ -5,8 +5,7 @@ import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
 import { Label } from '@fluentui/react/lib/Label';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { Panel, PanelType } from '@fluentui/react/lib/Panel';
-import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
-import { IPivotItemProps } from '@fluentui/react/lib/Pivot';
+import { Pivot, PivotItem, IPivotItemProps } from '@fluentui/react/lib/Pivot';
 import { Separator } from '@fluentui/react/lib/Separator';
 import { SpinButton } from '@fluentui/react/lib/SpinButton';
 import { Stack } from '@fluentui/react/lib/Stack';
@@ -14,7 +13,6 @@ import { Text } from '@fluentui/react/lib/Text';
 import { TextField } from '@fluentui/react/lib/TextField';
 import { Toggle } from '@fluentui/react/lib/Toggle';
 import { getId, IRenderFunction } from '@fluentui/react/lib/Utilities';
-import * as strings from 'ModernImageMapWebPartStrings';
 import { ColorField } from './ColorField';
 import { PageSearch } from './PageSearch';
 import { useClassNames } from './styles';
@@ -27,6 +25,7 @@ import { IPageResult, PageService } from '../services/PageService';
 import { circleFromWidth, normalizeRect, IRect } from '../utils/geometry';
 import { getEditAreaClass, getHoverRawStyle, getVisibilityWarning } from '../utils/hoverStyles';
 import { checkLinkUrl, checkTitle, checkTooltip } from '../utils/validation';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 /** CSS class on the link input so the panel focuses it when opened. */
 export const FIRST_FIELD_CLASS = 'imagemap-first-field';
@@ -35,7 +34,6 @@ export type PropertiesTab = 'link' | 'style' | 'position';
 
 export interface IAreaPropertiesFormProps {
   area: IImageArea;
-  index: number;
   policy: ISecurityPolicy;
   pageService: PageService;
   /** Image width / image height, so circles stay round */
@@ -362,6 +360,8 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
 };
 
 export interface IAreaPropertiesPanelProps extends IAreaPropertiesFormProps {
+  /** Position of the area (0-based), used in the heading */
+  index: number;
   isOpen: boolean;
   onDelete: () => void;
   onDismiss: () => void;
@@ -397,8 +397,8 @@ export const AreaPropertiesPanel: React.FunctionComponent<IAreaPropertiesPanelPr
 };
 
 /** Full-screen variant: as a column next to the canvas. */
-export const AreaPropertiesInline: React.FunctionComponent<IAreaPropertiesFormProps & { onDelete: () => void; onClose: () => void }> =
-  (props: IAreaPropertiesFormProps & { onDelete: () => void; onClose: () => void }) => {
+export const AreaPropertiesInline: React.FunctionComponent<IAreaPropertiesFormProps & { index: number; onDelete: () => void; onClose: () => void }> =
+  (props: IAreaPropertiesFormProps & { index: number; onDelete: () => void; onClose: () => void }) => {
     const { index, onDelete, onClose } = props;
     return (
       <section aria-label={formatText(strings.propertiesOf, index + 1)} style={{ padding: '8px 16px' }}>

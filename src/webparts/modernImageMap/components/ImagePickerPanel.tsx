@@ -10,13 +10,13 @@ import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
 import { Text } from '@fluentui/react/lib/Text';
 import { TextField } from '@fluentui/react/lib/TextField';
 import { css } from '@fluentui/react/lib/Utilities';
-import * as strings from 'ModernImageMapWebPartStrings';
 import { useClassNames } from './styles';
 import { ISecurityPolicy } from '../config/securityConfig';
 import { formatText } from '../loc/template';
 import { IImageFile, IImageFolder, IImagePage, ImageService, isSameImageUrl } from '../services/ImageService';
 import { acceptAttribute, describeAllowedTypes, IValidatedImage, validateImageFile } from '../utils/fileValidation';
 import { checkImageUrl } from '../utils/validation';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 export interface IImagePickerPanelProps {
   isOpen: boolean;

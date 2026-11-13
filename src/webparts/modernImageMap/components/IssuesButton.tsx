@@ -4,10 +4,10 @@ import { Callout, DirectionalHint } from '@fluentui/react/lib/Callout';
 import { Link } from '@fluentui/react/lib/Link';
 import { Text } from '@fluentui/react/lib/Text';
 import { getId } from '@fluentui/react/lib/Utilities';
-import * as strings from 'ModernImageMapWebPartStrings';
 import { formatText } from '../loc/template';
 import { handleRovingKeyDown } from '../utils/rovingFocus';
 import { IValidationIssue } from '../utils/validation';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 export interface IIssuesButtonProps {
   issues: IValidationIssue[];
@@ -56,8 +56,8 @@ export const IssuesButton: React.FunctionComponent<IIssuesButtonProps> = (props:
           {/* role="presentation": only catches the arrow keys bubbling up from the links. */}
           <div role="presentation" onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => handleRovingKeyDown(e, 'vertical')}>
             <ul style={{ margin: 0, paddingLeft: 18 }}>
-              {issues.map((issue: IValidationIssue, i: number) => (
-                <li key={i} style={{ marginBottom: 6 }}>
+              {issues.map((issue: IValidationIssue) => (
+                <li key={`${issue.areaId || 'image'}|${issue.field}|${issue.message}`}style={{ marginBottom: 6 }}>
                   <Link onClick={() => { setOpen(false); onSelect(issue); }}>{issue.message}</Link>
                 </li>
               ))}

@@ -2,13 +2,13 @@ import * as React from 'react';
 import { Icon } from '@fluentui/react/lib/Icon';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { css } from '@fluentui/react/lib/Utilities';
-import * as strings from 'ModernImageMapWebPartStrings';
 import { useClassNames } from './styles';
 import { ISecurityPolicy } from '../config/securityConfig';
 import { formatText } from '../loc/template';
 import { IImageArea } from '../models/IImageMap';
 import { getViewAreaClass } from '../utils/hoverStyles';
 import { checkImageUrl, checkLinkUrl, cleanText, IUrlCheck } from '../utils/validation';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 export interface IImageMapViewerProps {
   imageUrl: string;

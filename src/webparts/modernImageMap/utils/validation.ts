@@ -1,7 +1,7 @@
-import * as strings from 'ModernImageMapWebPartStrings';
 import { ISecurityPolicy } from '../config/securityConfig';
 import { formatText } from '../loc/template';
 import { IImageArea } from '../models/IImageMap';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 export type LinkKind = 'internal' | 'external' | 'mailto' | 'tel' | 'anchor';
 
@@ -25,7 +25,8 @@ const INVISIBLE_CHARS = /[\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u
 const URL_FORBIDDEN = /[<>"`{}|^[\]]/g;
 /** Characters not allowed in title, tooltip and alt text. */
 const TEXT_FORBIDDEN = /[<>{}[\]\\`|^~]/g;
-const CONTROL_CHARS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/;
+// eslint-disable-next-line no-control-regex -- control characters are rejected on purpose
+const CONTROL_CHARS =/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/;
 const MAX_HOST_LENGTH = 253;
 const GENERIC_LINK_TEXTS = [
   'hier', 'hier klicken', 'klicken', 'klick', 'mehr', 'weiter', 'link', 'details',
@@ -236,6 +237,7 @@ export function validateFolderPath(value: string | undefined): string {
   if (!f) { return strings.folderRequired; }
   if (f.charAt(0) === '/') { return strings.folderRelative; }
   if (f.length > 200) { return strings.folderTooLong; }
+  // eslint-disable-next-line no-control-regex -- control characters are rejected on purpose
   if (/\.\.|\/\/|[\\:*?"<>|#%~&{}\u0000-\u001f]/.test(f)) {
     return strings.folderInvalid;
   }

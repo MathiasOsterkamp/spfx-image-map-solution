@@ -5,7 +5,6 @@ import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { Modal } from '@fluentui/react/lib/Modal';
 import { Text } from '@fluentui/react/lib/Text';
 import { css, getId } from '@fluentui/react/lib/Utilities';
-import * as strings from 'ModernImageMapWebPartStrings';
 import { AltTextDialog } from './AltTextDialog';
 import { AreaPropertiesInline, AreaPropertiesPanel, FIRST_FIELD_CLASS, PropertiesTab } from './AreaPropertiesPanel';
 import { EditorTool, EditorToolbar } from './EditorToolbar';
@@ -26,6 +25,7 @@ import {
 } from '../utils/geometry';
 import { getEditAreaClass } from '../utils/hoverStyles';
 import { checkImageUrl, collectIssues, IValidationIssue } from '../utils/validation';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 export interface IImageMapEditorProps {
   imageUrl: string;

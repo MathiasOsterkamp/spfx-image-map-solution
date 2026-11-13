@@ -11,6 +11,8 @@
     "clean": "gulp clean",
     "serve": "gulp serve",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "ship": "gulp clean && gulp bundle --ship && gulp package-solution --ship"
   },
   "dependencies": {
@@ -24,13 +26,20 @@
     "react-dom": "16.14.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@microsoft/sp-build-web": "~1.4.1",
     "@microsoft/sp-module-interfaces": "~1.4.1",
     "@microsoft/sp-webpart-workbench": "~1.4.1",
     "@types/react": "16.14.62",
     "@types/react-dom": "16.9.24",
     "@types/webpack-env": "1.13.1",
+    "eslint": "^9.39.5",
+    "eslint-import-resolver-typescript": "3.6.3",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
     "gulp": "~3.9.1",
-    "typescript": "4.7.4"
+    "typescript": "4.7.4",
+    "typescript-eslint": "^8.72.2"
   }
 }

@@ -5,9 +5,9 @@ import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
 import { mergeStyleSets } from '@fluentui/react/lib/Styling';
 import { ITheme, useTheme } from '@fluentui/react/lib/Theme';
 import { getId, memoizeFunction } from '@fluentui/react/lib/Utilities';
-import * as strings from 'ModernImageMapWebPartStrings';
 import { formatText } from '../loc/template';
 import { IPageResult, PageService } from '../services/PageService';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 const getCss = memoizeFunction((theme: ITheme) => mergeStyleSets({
   list: { listStyle: 'none', margin: '4px 0 0', padding: 0, border: `1px solid ${theme.palette.neutralLight}`, borderRadius: 2, maxHeight: 220, overflowY: 'auto' },

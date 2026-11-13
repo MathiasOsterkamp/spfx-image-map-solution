@@ -1,7 +1,4 @@
 import * as React from 'react';
-import { initializeIcons } from '@fluentui/react/lib/Icons';
-import { setIconOptions } from '@fluentui/react/lib/Styling';
-import { ITheme } from '@fluentui/react/lib/Theme';
 import { DisplayMode } from '@microsoft/sp-core-library';
 import {
   BaseClientSideWebPart,
@@ -12,7 +9,9 @@ import {
   PropertyPaneTextField,
   PropertyPaneToggle
 } from '@microsoft/sp-webpart-base';
-import * as strings from 'ModernImageMapWebPartStrings';
+import { initializeIcons } from '@fluentui/react/lib/Icons';
+import { setIconOptions } from '@fluentui/react/lib/Styling';
+import { ITheme } from '@fluentui/react/lib/Theme';
 import * as ReactDom from 'react-dom';
 import { ImageMap, IImageMapProps } from './components/ImageMap';
 import { createSecurityPolicy, ISecurityPolicy } from './config/securityConfig';
@@ -25,6 +24,7 @@ import { sanitizeAreas, sanitizeHover } from './utils/sanitize';
 import { createSharePointTheme } from './utils/theme';
 import { asRecord } from './utils/untyped';
 import { checkAlt, checkImageUrl, validateFolderPath } from './utils/validation';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 export interface IModernImageMapWebPartProps {
   imageUrl: string;
@@ -40,6 +40,7 @@ export interface IModernImageMapWebPartProps {
 }
 
 /** Name and version of the solution package, shown on the developer page of the property pane. */
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- an import would pull config/ into the compiler's rootDir and shift the output in lib/
 const SOLUTION = asRecord(asRecord(require('../../../config/package-solution.json')).solution);
 const SOLUTION_NAME = String(SOLUTION.name || '');
 const SOLUTION_VERSION = String(SOLUTION.version || '');

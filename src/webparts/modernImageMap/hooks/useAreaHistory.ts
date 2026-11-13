@@ -1,7 +1,7 @@
 import * as React from 'react';
-import * as strings from 'ModernImageMapWebPartStrings';
 import { formatText } from '../loc/template';
 import { IImageArea } from '../models/IImageMap';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 interface IHistoryEntry {
   areas: IImageArea[];
