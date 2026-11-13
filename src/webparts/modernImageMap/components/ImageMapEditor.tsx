@@ -674,10 +674,8 @@ export const ImageMapEditor: React.FunctionComponent<IImageMapEditorProps> = (pr
         undoLabel={history.undoLabel}
         redoLabel={history.redoLabel}
         canSort={areas.length > 1}
-        limitReached={limitReached}
         issues={issues}
         onToolChange={(t: EditorTool) => { setTool(t); setFocusTarget('#surface'); }}
-        onInsert={insertCentered}
         onChooseImage={() => setPickerOpen(true)}
         onEditAlt={() => setAltOpen(true)}
         onUndo={() => history.undo()}

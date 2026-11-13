@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // Started automatically before debugging (preLaunchTask in launch.json) and
+      // keeps running afterwards. Stop it with "Tasks: Terminate Task".
+      "label": "gulp serve",
+      "type": "shell",
+      "command": "npx gulp serve --nobrowser",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated"
+      },
+      "problemMatcher": {
+        "owner": "gulp-serve",
+        "fileLocation": "absolute",
+        "pattern": {
+          "regexp": "Error - \\[(?:typescript|tsc)\\] (.+)\\((\\d+),(\\d+)\\): (.+)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "message": 4
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting (gulp|subtask 'typescript')",
+          "endsPattern": "Finished subtask 'reload'"
+        }
+      }
+    }
+  ]
+}

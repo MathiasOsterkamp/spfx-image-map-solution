@@ -16,3 +16,6 @@ npm-debug.log*
 Thumbs.db
 coverage
 .vscode/*.log
+
+# Persönliche VS-Code-Einstellungen (enthält die eigene SharePoint-URL)
+.vscode/settings.json

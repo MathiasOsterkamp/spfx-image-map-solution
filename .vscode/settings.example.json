@@ -1,0 +1,8 @@
+{
+  // Copy to settings.json (not checked in) and enter your own site, without a trailing slash.
+  "spfx.siteUrl": "https://<tenant>.sharepoint.com/sites/<site>",
+  // Use the project's TypeScript (4.9) in the editor instead of the one bundled with VS Code.
+  // Confirm once with "TypeScript: Select TypeScript Version" → "Use Workspace Version".
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

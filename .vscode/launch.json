@@ -1,0 +1,46 @@
+{
+  // Debugging on a real SharePoint site. "gulp serve" is started automatically (tasks.json).
+  // The site URL is read from the setting "spfx.siteUrl" in .vscode/settings.json,
+  // which is not checked in (see .vscode/settings.example.json).
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "SharePoint page",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "gulp serve",
+      "url": "${config:spfx.siteUrl}/SitePages/${input:pageName}?debug=true&noredir=true&debugManifestsFile=https://localhost:4321/temp/manifests.js",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///.././src/*": "${webRoot}/src/*",
+        "webpack:///../../../src/*": "${webRoot}/src/*",
+        "webpack:///../../../../src/*": "${webRoot}/src/*",
+        "webpack:///../../../../../src/*": "${webRoot}/src/*"
+      }
+    },
+    {
+      "name": "Hosted workbench",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "gulp serve",
+      "url": "${config:spfx.siteUrl}/_layouts/15/workbench.aspx",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///.././src/*": "${webRoot}/src/*",
+        "webpack:///../../../src/*": "${webRoot}/src/*",
+        "webpack:///../../../../src/*": "${webRoot}/src/*",
+        "webpack:///../../../../../src/*": "${webRoot}/src/*"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "pageName",
+      "type": "promptString",
+      "description": "Page in the library \"Site Pages\"",
+      "default": "Home.aspx"
+    }
+  ]
+}

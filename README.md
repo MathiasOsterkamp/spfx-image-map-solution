@@ -123,7 +123,7 @@ Gespeicherte Webpart-Daten bleiben kompatibel, denn neue Felder (z. B. `tooltip`
 | Bild | Untermenü: Bild auswählen/ändern, Alternativtext bearbeiten |
 | Werkzeuge | Auswählen · Rechteck · Kreis · Ellipse (Optionsgruppe, `menuitemradio` + `aria-checked`) |
 | Verlauf | Rückgängig · Wiederholen (Name nennt den Schritt, z. B. „Rückgängig: Bereich verschoben“) |
-| „…“ | Bereich einfügen (Rechteck/Kreis/Ellipse in der Bildmitte) · Lesereihenfolge sortieren |
+| „…“ | Lesereihenfolge sortieren |
 | rechts | Hinweis-Zähler (öffnet Liste mit Sprunglinks) · Vorschau · Vollbild |
 
 Bei wenig Platz verschwinden zuerst die Beschriftungen (nur Icons, der Name bleibt als `aria-label`/Tooltip erhalten),
@@ -217,7 +217,7 @@ Die Felder begrenzen die Eingabe auf die Maximallänge und zeigen einen Zeichenz
 
 ### Maßnahmen
 
-- **Link-Prüfung mit Positivliste** (`utils/validation.ts`): erlaubt sind nur `https:`, `mailto:`, `tel:`, serverrelative Pfade (`/…`) und Sprungmarken (`#…`).
+- **Link-Prüfung mit Positivliste** (`utils/validation.ts`): erlaubt sind nur `https:`, `mailto:`, `tel:`, serverrelative Pfade (`/…`), seitenrelative Links (`Seite.aspx`, `../Docs/x.pdf`, `?id=1`) und Sprungmarken (`#…`).
   Abgelehnt werden unter anderem `javascript:` (auch mit Groß-/Kleinschreibung, Leerzeichen oder Tabs), `data:`, `vbscript:`, `file:`,
   protokoll-relative `//host`, Backslash-Tricks, Steuerzeichen, Zugangsdaten in der URL (`https://intranet@evil.com`)
   und ungültige Hostnamen. Für Eingaben wie „www.firma.de“ gibt es einen Korrekturvorschlag.
@@ -260,7 +260,7 @@ Die Felder begrenzen die Eingabe auf die Maximallänge und zeigen einen Zeichenz
 ### Bearbeitungsmodus
 
 - **Vollständig per Tastatur bedienbar (2.1.1):** siehe Tabelle „Tastatur“. Neue Bereiche entstehen auch ohne Ziehen
-  (Enter auf der Zeichenfläche oder „…“ → „Bereich einfügen“), damit ist WCAG 2.5.7 erfüllt.
+  (Enter auf der Zeichenfläche), damit ist WCAG 2.5.7 erfüllt.
 - **Ansagen per Live-Region (4.1.3):** Position, Größe, Anlegen, Löschen, Reihenfolge und Upload-Status.
 - **Fokusmanagement:** Nach dem Löschen geht der Fokus zum nächsten Bereich, nach dem Schließen des Panels zurück zum Bereich.
   Das Panel fokussiert beim Öffnen das Link-Feld.

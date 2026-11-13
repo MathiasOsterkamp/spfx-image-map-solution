@@ -24,10 +24,8 @@ export interface IEditorToolbarProps {
   undoLabel?: string;
   redoLabel?: string;
   canSort: boolean;
-  limitReached: boolean;
   issues: IValidationIssue[];
   onToolChange: (tool: EditorTool) => void;
-  onInsert: (shape: AreaShape) => void;
   onChooseImage: () => void;
   onEditAlt: () => void;
   onUndo: () => void;
@@ -109,7 +107,7 @@ function onGrowData(data: ICommandBarData): ICommandBarData | undefined {
 export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (props: IEditorToolbarProps) => {
   const {
     tool, canUndo, canRedo, testMode, fullscreen, hasImage, issues, onToolChange, onChooseImage, onEditAlt,
-    undoLabel, onUndo, redoLabel, onRedo, limitReached, onInsert, canSort, onSort, onIssueSelect, onToggleTest,
+    undoLabel, onUndo, redoLabel, onRedo, canSort, onSort, onIssueSelect, onToggleTest,
     onToggleFullscreen
   } = props;
   // The state is included in the keys so the CommandBar does not render stale items from its cache.
@@ -177,19 +175,6 @@ export const EditorToolbar: React.FunctionComponent<IEditorToolbarProps> = (prop
   ];
 
   const overflowItems: ICommandBarItemProps[] = [
-    {
-      key: `insert-${v}`,
-      text: strings.insertArea,
-      iconProps: { iconName: 'Add' },
-      disabled: !editing || limitReached,
-      subMenuProps: {
-        items: (['rect', 'circle', 'ellipse'] as AreaShape[]).map((shape: AreaShape) => ({
-          key: shape,
-          text: formatText(strings.insertCentered, strings.toolNames[shape]),
-          onClick: () => onInsert(shape)
-        }))
-      }
-    },
     {
       key: `sort-${v}`,
       text: strings.sortOrder,

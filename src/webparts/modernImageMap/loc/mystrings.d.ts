@@ -243,9 +243,7 @@ declare interface IModernImageMapWebPartStrings {
   undoTitle: string;
   /** Template: {0} = label */
   redoTitle: string;
-  insertArea: string;
   /** Template: {0} = toolName */
-  insertCentered: string;
   sortOrder: string;
   sortOrderTitle: string;
   previewTitle: string;
@@ -399,7 +397,6 @@ declare interface IModernImageMapWebPartStrings {
   emptyAnchor: string;
   protocolRelativeLink: string;
   linkNeedsHttps: string;
-  relativeLinkSlash: string;
   invalidEmail: string;
   emailTooLong: string;
   invalidEmailDomain: string;

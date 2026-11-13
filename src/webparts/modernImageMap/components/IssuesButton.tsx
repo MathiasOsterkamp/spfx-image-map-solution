@@ -14,7 +14,7 @@ export interface IIssuesButtonProps {
   onSelect: (issue: IValidationIssue) => void;
 }
 
-/** "n issues" counter in the toolbar. Opens a list with jump links to the affected locations. */
+/** Issue counter in the toolbar: icon with a short text ("2 issues" / "No issues"). Opens a list with jump links to the affected locations. */
 export const IssuesButton: React.FunctionComponent<IIssuesButtonProps> = (props: IIssuesButtonProps) => {
   const { issues, onSelect } = props;
   const [open, setOpen] = React.useState<boolean>(false);
@@ -26,10 +26,9 @@ export const IssuesButton: React.FunctionComponent<IIssuesButtonProps> = (props:
   return (
     <div ref={buttonRef} style={{ display: 'flex', height: '100%' }}>
       <CommandBarButton
-        text={String(count)}
+        text={label}
         iconProps={{ iconName: count ? 'Warning' : 'CheckMark' }}
         ariaLabel={`${label}${count ? strings.openList : ''}`}
-        title={label}
         role="menuitem"
         aria-haspopup={count ? 'dialog' : undefined}
         aria-expanded={count ? open : undefined}
@@ -37,7 +36,7 @@ export const IssuesButton: React.FunctionComponent<IIssuesButtonProps> = (props:
         styles={{
           root: { padding: '0 8px', minWidth: 0 },
           icon: { color: count ? '#a4262c' : '#107c10' },
-          label: { fontWeight: count ? 600 : 400, color: count ? '#a4262c' : undefined }
+          label: { fontSize: 12, whiteSpace: 'nowrap', fontWeight: count ? 600 : 400, color: count ? '#a4262c' : undefined }
         }}
       />
       {open && count > 0 && (

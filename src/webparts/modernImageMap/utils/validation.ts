@@ -19,6 +19,8 @@ const SCHEME = /^([a-z][a-z0-9+.-]*):/i;
 const LABEL = '[a-z0-9\\u00c0-\\u024f](?:[a-z0-9\\u00c0-\\u024f\\-]{0,61}[a-z0-9\\u00c0-\\u024f])?';
 const HOSTNAME = new RegExp(`^${LABEL}(?:\\.${LABEL})*$`, 'i');
 const LOOKS_LIKE_DOMAIN = /^(www\.)?[a-z0-9\u00c0-\u024f-]+(\.[a-z0-9\u00c0-\u024f-]+)*\.[a-z]{2,}([/?#:]|$)/i;
+/** A file name with a common extension ("Page.aspx"): a relative link, although it looks like a domain. */
+const RELATIVE_FILE = /^(?!www\.)[^/?#:]+\.(aspx?|html?|pdf|docx?|docm|xlsx?|xlsm|pptx?|ppsx|vsdx?|one|msg|eml|txt|csv|json|xml|zip|png|jpe?g|gif|webp|svg|mp[34])([?#]|$)/i;
 /** Invisible characters and text direction overrides (spoofing, "Trojan Source"). */
 const INVISIBLE_CHARS = /[\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]/;
 /** Characters not allowed in links (must be percent-encoded). */
@@ -125,7 +127,7 @@ function parseHttp(url: string): IParsedHttp | undefined {
 
 /**
  * Validates an area link. Only the following are allowed:
- *  - server-relative links (/sites/…), anchors (#…)
+ *  - server-relative links (/sites/…), links relative to the page (Page.aspx, ../Docs/x.pdf, ?id=1), anchors (#…)
  *  - https:// (http:// only on the own host or if httpsOnly = false)
  *  - mailto: and tel:
  * Everything else (javascript:, data:, file:, //host, user:password@ …) is rejected.
@@ -149,10 +151,12 @@ export function checkLinkUrl(raw: string | undefined, policy: ISecurityPolicy): 
 
   const scheme = SCHEME.exec(url);
   if (!scheme || scheme[1].indexOf('.') >= 0) {
-    if (LOOKS_LIKE_DOMAIN.test(url)) {
+    // "www.firma.de" is almost certainly meant as a website, "Page.aspx" as a file next to the page.
+    if (LOOKS_LIKE_DOMAIN.test(url) && !RELATIVE_FILE.test(url)) {
       return fail(url, strings.linkNeedsHttps, 'https://' + url);
     }
-    return fail(url, strings.relativeLinkSlash);
+    const tooLong = pathError(url, policy);
+    return tooLong ? fail(url, tooLong) : { valid: true, url, kind: 'internal' };
   }
 
   const protocol = scheme[1].toLowerCase();
