@@ -5,7 +5,7 @@ import { IColor } from '@fluentui/react/lib/Color';
 import { ColorPicker } from '@fluentui/react/lib/ColorPicker';
 import { Label } from '@fluentui/react/lib/Label';
 import { getId } from '@fluentui/react/lib/Utilities';
-import * as strings from 'ImageMapWebPartStrings';
+import * as strings from 'ModernImageMapWebPartStrings';
 import { useClassNames } from './styles';
 import { formatText } from '../loc/template';
 import { safeColor } from '../utils/sanitize';

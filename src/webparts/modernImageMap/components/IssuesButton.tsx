@@ -4,7 +4,7 @@ import { Callout, DirectionalHint } from '@fluentui/react/lib/Callout';
 import { Link } from '@fluentui/react/lib/Link';
 import { Text } from '@fluentui/react/lib/Text';
 import { getId } from '@fluentui/react/lib/Utilities';
-import * as strings from 'ImageMapWebPartStrings';
+import * as strings from 'ModernImageMapWebPartStrings';
 import { formatText } from '../loc/template';
 import { handleRovingKeyDown } from '../utils/rovingFocus';
 import { IValidationIssue } from '../utils/validation';

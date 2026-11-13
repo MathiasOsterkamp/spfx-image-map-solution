@@ -2,7 +2,7 @@ import * as React from 'react';
 import { CommandBar, ICommandBarData, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
 import { ContextualMenuItemType } from '@fluentui/react/lib/ContextualMenu';
 import { VerticalDivider } from '@fluentui/react/lib/Divider';
-import * as strings from 'ImageMapWebPartStrings';
+import * as strings from 'ModernImageMapWebPartStrings';
 import { IssuesButton } from './IssuesButton';
 import { formatText } from '../loc/template';
 import { AreaShape } from '../models/IImageMap';

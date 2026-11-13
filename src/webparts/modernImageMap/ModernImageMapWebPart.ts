@@ -12,7 +12,7 @@ import {
   PropertyPaneTextField,
   PropertyPaneToggle
 } from '@microsoft/sp-webpart-base';
-import * as strings from 'ImageMapWebPartStrings';
+import * as strings from 'ModernImageMapWebPartStrings';
 import * as ReactDom from 'react-dom';
 import { ImageMap, IImageMapProps } from './components/ImageMap';
 import { createSecurityPolicy, ISecurityPolicy } from './config/securityConfig';
@@ -26,7 +26,7 @@ import { createSharePointTheme } from './utils/theme';
 import { asRecord } from './utils/untyped';
 import { checkAlt, checkImageUrl, validateFolderPath } from './utils/validation';
 
-export interface IImageMapWebPartProps {
+export interface IModernImageMapWebPartProps {
   imageUrl: string;
   imageAlt: string;
   areas: IImageArea[];
@@ -46,7 +46,7 @@ const SOLUTION_VERSION = String(SOLUTION.version || '');
 
 let iconsInitialized = false;
 
-export default class ImageMapWebPart extends BaseClientSideWebPart<IImageMapWebPartProps> {
+export default class ModernImageMapWebPart extends BaseClientSideWebPart<IModernImageMapWebPartProps> {
   private service!: ImageService;
   private pageService!: PageService;
   private policy!: ISecurityPolicy;

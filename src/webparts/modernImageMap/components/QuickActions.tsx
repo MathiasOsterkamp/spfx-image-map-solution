@@ -4,7 +4,7 @@ import { Icon } from '@fluentui/react/lib/Icon';
 import { mergeStyleSets } from '@fluentui/react/lib/Styling';
 import { ITheme, useTheme } from '@fluentui/react/lib/Theme';
 import { memoizeFunction } from '@fluentui/react/lib/Utilities';
-import * as strings from 'ImageMapWebPartStrings';
+import * as strings from 'ModernImageMapWebPartStrings';
 import { formatText } from '../loc/template';
 import { IImageArea } from '../models/IImageMap';
 import { handleRovingKeyDown, initRovingTabIndex } from '../utils/rovingFocus';

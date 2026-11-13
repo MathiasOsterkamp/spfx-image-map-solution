@@ -14,7 +14,7 @@ import { Text } from '@fluentui/react/lib/Text';
 import { TextField } from '@fluentui/react/lib/TextField';
 import { Toggle } from '@fluentui/react/lib/Toggle';
 import { getId, IRenderFunction } from '@fluentui/react/lib/Utilities';
-import * as strings from 'ImageMapWebPartStrings';
+import * as strings from 'ModernImageMapWebPartStrings';
 import { ColorField } from './ColorField';
 import { PageSearch } from './PageSearch';
 import { useClassNames } from './styles';

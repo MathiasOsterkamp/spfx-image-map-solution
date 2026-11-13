@@ -1,4 +1,4 @@
-import * as strings from 'ImageMapWebPartStrings';
+import * as strings from 'ModernImageMapWebPartStrings';
 
 /**
  * Fills a text template of the language files with values, using the plural rule of the

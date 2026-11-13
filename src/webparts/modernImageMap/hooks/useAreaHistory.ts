@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as strings from 'ImageMapWebPartStrings';
+import * as strings from 'ModernImageMapWebPartStrings';
 import { formatText } from '../loc/template';
 import { IImageArea } from '../models/IImageMap';
 

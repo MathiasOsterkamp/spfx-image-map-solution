@@ -1,4 +1,4 @@
-import * as strings from 'ImageMapWebPartStrings';
+import * as strings from 'ModernImageMapWebPartStrings';
 import { formatNumber } from './format';
 import { ImageType, ISecurityPolicy } from '../config/securityConfig';
 import { formatText } from '../loc/template';

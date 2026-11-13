@@ -45,7 +45,7 @@ Die Skripte sind (`includeClientSideAssets: true`) im Paket enthalten. Ein CDN i
 
 > **SharePoint 2019 / On-Premises:** In `.yo-rc.json` steht `"environment": "spo"`. Das betrifft nur den Generator, nicht das Paket.
 > SPFx 1.4.1 ist die passende Version für SharePoint 2019. Die Icon-Schrift lädt standardmäßig vom Microsoft-CDN. Ohne Internetzugang
-> die Schriftdateien selbst hosten und in `ImageMapWebPart.ts` `initializeIcons('https://…/fonts/')` angeben.
+> die Schriftdateien selbst hosten und in `ModernImageMapWebPart.ts` `initializeIcons('https://…/fonts/')` angeben.
 
 ## Build-Anpassungen in `gulpfile.js`
 
@@ -64,9 +64,9 @@ Zusätzlich: `npm run typecheck` führt nur die Typprüfung aus.
 │   ├── config.json                 Bundle-Definition
 │   ├── package-solution.json       Lösungs-ID, Version, Paketpfad
 │   ├── serve.json / write-manifests.json / copy-assets.json / deploy-azure-storage.json
-├── src/webparts/imageMap/
-│   ├── ImageMapWebPart.ts          Webpart, Eigenschaftenbereich, Daten-Bereinigung
-│   ├── ImageMapWebPart.manifest.json
+├── src/webparts/modernImageMap/
+│   ├── ModernImageMapWebPart.ts          Webpart, Eigenschaftenbereich, Daten-Bereinigung
+│   ├── ModernImageMapWebPart.manifest.json
 │   ├── config/securityConfig.ts    Zentrale Sicherheitsregeln
 │   ├── components/                 Viewer, Editor, Panels, Farbwahl, Styles
 │   ├── services/ImageService.ts    SharePoint-REST (SPHttpClient)
@@ -101,11 +101,11 @@ eingebunden. Webpack 3 aus SPFx 1.4.1 kennt kein Tree-Shaking über Paketgrenzen
 Unterstützt werden **Deutsch (Standard)**, **Englisch** und **Französisch**. Die Sprache richtet sich nach der Oberflächensprache der Website
 (`pageContext.cultureInfo.currentUICultureName`): `en-*` → Englisch, `fr-*` → Französisch, alle anderen → Deutsch.
 
-- Alle Texte liegen in `src/webparts/imageMap/loc/` (`de.ts`, `en.ts`, `fr.ts`). Die Schnittstelle `IStrings.ts` sorgt dafür, dass jede Sprache
+- Alle Texte liegen in `src/webparts/modernImageMap/loc/` (`de.ts`, `en.ts`, `fr.ts`). Die Schnittstelle `IStrings.ts` sorgt dafür, dass jede Sprache
   vollständig ist: Fehlt ein Text, bricht der Build ab.
 - Bewusst nicht über die SPFx-Ressourcen (`loc/*.js` + `localizedResources`): Diese fallen immer auf `en-us` zurück, Deutsch soll aber Standard sein.
 - Die Werkzeug-Kurztasten folgen der Sprache: Kreis ist im Deutschen **K**, im Englischen und Französischen **C**.
-- Titel und Beschreibung in der Webpart-Toolbox stehen im Manifest (`ImageMapWebPart.manifest.json`).
+- Titel und Beschreibung in der Webpart-Toolbox stehen im Manifest (`ModernImageMapWebPart.manifest.json`).
 
 ## Versionierung
 

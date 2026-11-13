@@ -2,12 +2,12 @@ declare type ImageMapStringsShapeMap = { [K in import('../models/IImageMap').Are
 declare type ImageMapStringsToolMap = { [K in import('../models/IImageMap').AreaShape | 'select']: string };
 
 /**
- * All user-facing texts of the web part (module "ImageMapWebPartStrings").
+ * All user-facing texts of the web part (module "ModernImageMapWebPartStrings").
  * The SPFx build writes the language files as plain data, so they cannot contain functions.
  * Texts with parameters are templates and are filled in with formatText from loc/template:
  * every language can handle word order and plural forms itself.
  */
-declare interface IImageMapWebPartStrings {
+declare interface IModernImageMapWebPartStrings {
   /** Plural rule: '1' = 0 and 1 are singular (French), '' = only 1 is singular */
   zeroIsSingular: string;
 
@@ -442,7 +442,7 @@ declare interface IImageMapWebPartStrings {
   issueTooltip: string;
 }
 
-declare module 'ImageMapWebPartStrings' {
-  const strings: IImageMapWebPartStrings;
+declare module 'ModernImageMapWebPartStrings' {
+  const strings: IModernImageMapWebPartStrings;
   export = strings;
 }

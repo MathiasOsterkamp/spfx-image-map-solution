@@ -2,17 +2,17 @@
   "$schema": "https://dev.office.com/json-schemas/spfx-build/config.2.0.schema.json",
   "version": "2.0",
   "bundles": {
-    "image-map-web-part": {
+    "modern-image-map-web-part": {
       "components": [
         {
-          "entrypoint": "./lib/webparts/imageMap/ImageMapWebPart.js",
-          "manifest": "./src/webparts/imageMap/ImageMapWebPart.manifest.json"
+          "entrypoint": "./lib/webparts/modernImageMap/ModernImageMapWebPart.js",
+          "manifest": "./src/webparts/modernImageMap/ModernImageMapWebPart.manifest.json"
         }
       ]
     }
   },
   "externals": {},
   "localizedResources": {
-    "ImageMapWebPartStrings": "lib/webparts/imageMap/loc/{locale}.js"
+    "ModernImageMapWebPartStrings": "lib/webparts/modernImageMap/loc/{locale}.js"
   }
 }

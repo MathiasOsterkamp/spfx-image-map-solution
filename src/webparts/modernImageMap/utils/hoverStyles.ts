@@ -1,5 +1,5 @@
 import { HighContrastSelector, IRawStyle, mergeStyles } from '@fluentui/react/lib/Styling';
-import * as strings from 'ImageMapWebPartStrings';
+import * as strings from 'ModernImageMapWebPartStrings';
 import { colorAlpha, safeBorderStyle, safeColor, safeNumber } from './sanitize';
 import { AreaShape, DEFAULT_HOVER, IHoverStyle, IImageArea } from '../models/IImageMap';
 
