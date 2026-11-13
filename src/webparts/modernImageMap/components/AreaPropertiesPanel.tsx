@@ -191,34 +191,35 @@ export const AreaPropertiesForm: React.FunctionComponent<IAreaPropertiesFormProp
       >
         <Stack tokens={{ childrenGap: 12 }} styles={{ root: { paddingTop: 12 } }}>
           <div>
-            <Stack horizontal verticalAlign="end" tokens={{ childrenGap: 4 }}>
-              <Stack.Item grow={1}>
-                <TextField
-                  label={strings.targetUrlLabel}
-                  required={true}
-                  inputClassName={FIRST_FIELD_CLASS}
-                  placeholder={strings.linkPlaceholder}
-                  value={area.url}
-                  maxLength={policy.maxUrlLength}
-                  autoComplete="off"
-                  spellCheck={false}
-                  onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) =>
-                    onChange({ url: v || '' }, strings.labelTargetChanged, `url-${area.id}`)}
-                  errorMessage={link.error}
-                  description={link.valid && link.kind ? strings.linkKinds[link.kind] : undefined}
+            {/* The search button sits inside the field (suffix), so it stays aligned with the input
+                whether or not a description or an error is shown below. */}
+            <TextField
+              label={strings.targetUrlLabel}
+              required={true}
+              inputClassName={FIRST_FIELD_CLASS}
+              placeholder={strings.linkPlaceholder}
+              value={area.url}
+              maxLength={policy.maxUrlLength}
+              autoComplete="off"
+              spellCheck={false}
+              onChange={(e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, v?: string) =>
+                onChange({ url: v || '' }, strings.labelTargetChanged, `url-${area.id}`)}
+              errorMessage={link.error}
+              description={link.valid && link.kind ? strings.linkKinds[link.kind] : undefined}
+              styles={{ suffix: { padding: 0, background: 'transparent' } }}
+              onRenderSuffix={() => (
+                <IconButton
+                  elementRef={searchButtonRef}
+                  iconProps={{ iconName: 'Search' }}
+                  title={strings.searchPageTitle}
+                  ariaLabel={strings.searchPageAria}
+                  aria-expanded={searchOpen}
+                  checked={searchOpen}
+                  onClick={() => setSearchOpen(!searchOpen)}
+                  styles={{ root: { height: 30 } }}
                 />
-              </Stack.Item>
-              <IconButton
-                elementRef={searchButtonRef}
-                iconProps={{ iconName: 'Search' }}
-                title={strings.searchPageTitle}
-                ariaLabel={strings.searchPageAria}
-                aria-expanded={searchOpen}
-                checked={searchOpen}
-                onClick={() => setSearchOpen(!searchOpen)}
-                styles={{ root: { marginBottom: link.error || (link.valid && link.kind) ? 22 : 0 } }}
-              />
-            </Stack>
+              )}
+            />
             {searchOpen && (
               <div style={{ marginTop: 8 }}>
                 <PageSearch
